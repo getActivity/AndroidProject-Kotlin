@@ -18,15 +18,17 @@ import android.view.View
 import android.widget.TextView
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
+import androidx.lifecycle.lifecycleScope
 import com.gyf.immersionbar.ImmersionBar
 import com.hjq.demo.R
 import com.hjq.demo.aop.SingleClick
 import com.hjq.demo.app.AppActivity
-import com.hjq.demo.manager.ThreadPoolManager
 import com.hjq.demo.other.AppConfig
 import com.hjq.permissions.Permission
 import com.hjq.permissions.XXPermissions
 import com.tencent.bugly.crashreport.CrashReport
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.io.PrintWriter
 import java.io.StringWriter
 import java.net.InetAddress
@@ -227,14 +229,17 @@ class CrashActivity : AppActivity() {
             }
             if (permissions.contains(Manifest.permission.INTERNET)) {
                 builder.append("\n当前网络访问：\t")
-                ThreadPoolManager.getInstance().execute {
+
+                lifecycleScope.launch(Dispatchers.IO) {
                     try {
                         InetAddress.getByName("www.baidu.com")
                         builder.append("正常")
                     } catch (ignored: UnknownHostException) {
                         builder.append("异常")
                     }
-                    post { infoView?.text = builder }
+                    lifecycleScope.launch(Dispatchers.Main) {
+                        infoView?.text = builder
+                    }
                 }
             } else {
                 infoView?.text = builder

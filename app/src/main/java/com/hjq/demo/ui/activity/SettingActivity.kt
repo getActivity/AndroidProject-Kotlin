@@ -2,6 +2,7 @@ package com.hjq.demo.ui.activity
 
 import android.view.Gravity
 import android.view.View
+import androidx.lifecycle.lifecycleScope
 import com.hjq.base.BaseDialog
 import com.hjq.base.action.AnimAction
 import com.hjq.demo.R
@@ -12,7 +13,6 @@ import com.hjq.demo.http.glide.GlideApp
 import com.hjq.demo.http.model.HttpData
 import com.hjq.demo.manager.ActivityManager
 import com.hjq.demo.manager.CacheDataManager
-import com.hjq.demo.manager.ThreadPoolManager
 import com.hjq.demo.other.AppConfig
 import com.hjq.demo.ui.dialog.MenuDialog
 import com.hjq.demo.ui.dialog.SafeDialog
@@ -21,6 +21,9 @@ import com.hjq.http.EasyHttp
 import com.hjq.http.listener.HttpCallback
 import com.hjq.widget.layout.SettingBar
 import com.hjq.widget.view.SwitchButton
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 /**
  *    author : Android 轮子哥
@@ -132,11 +135,11 @@ class SettingActivity : AppActivity(), SwitchButton.OnCheckedChangeListener {
 
                 // 清除内存缓存（必须在主线程）
                 GlideApp.get(this@SettingActivity).clearMemory()
-                ThreadPoolManager.getInstance().execute {
-                    CacheDataManager.clearAllCache(this)
+                lifecycleScope.launch(Dispatchers.IO) {
+                    CacheDataManager.clearAllCache(this@SettingActivity)
                     // 清除本地缓存（必须在子线程）
                     GlideApp.get(this@SettingActivity).clearDiskCache()
-                    post {
+                    withContext(Dispatchers.Main) {
                         // 重新获取应用缓存大小
                         cleanCacheView?.setRightText(CacheDataManager.getTotalCacheSize(this@SettingActivity))
                     }

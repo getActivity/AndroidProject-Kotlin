@@ -8,6 +8,7 @@ import android.provider.MediaStore
 import android.text.TextUtils
 import android.view.*
 import android.view.animation.*
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import com.hjq.base.BaseActivity
 import com.hjq.base.BaseAdapter
@@ -18,7 +19,6 @@ import com.hjq.demo.aop.Log
 import com.hjq.demo.aop.Permissions
 import com.hjq.demo.aop.SingleClick
 import com.hjq.demo.app.AppActivity
-import com.hjq.demo.manager.ThreadPoolManager
 import com.hjq.demo.other.GridSpaceDecoration
 import com.hjq.demo.ui.activity.CameraActivity.OnCameraListener
 import com.hjq.demo.ui.adapter.ImageSelectAdapter
@@ -28,6 +28,8 @@ import com.hjq.demo.widget.StatusLayout
 import com.hjq.permissions.Permission
 import com.hjq.permissions.XXPermissions
 import com.hjq.widget.view.FloatActionButton
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.io.File
 import java.util.*
 
@@ -150,7 +152,7 @@ class ImageSelectActivity : AppActivity(), StatusAction, Runnable,
         // 显示加载进度条
         showLoading()
         // 加载图片列表
-        ThreadPoolManager.getInstance().execute(this)
+        lifecycleScope.launch(Dispatchers.IO) { run() }
     }
 
     override fun getStatusLayout(): StatusLayout? {
@@ -238,7 +240,7 @@ class ImageSelectActivity : AppActivity(), StatusAction, Runnable,
                             // 这里需要延迟刷新，否则可能会找不到拍照的图片
                             postDelayed({
                                 // 重新加载图片列表
-                                ThreadPoolManager.getInstance().execute(this@ImageSelectActivity)
+                                lifecycleScope.launch { run() }
                             }, 1000)
                         }
 

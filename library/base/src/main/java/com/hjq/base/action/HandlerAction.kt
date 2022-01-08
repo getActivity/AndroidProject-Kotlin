@@ -34,11 +34,7 @@ interface HandlerAction {
      * 延迟一段时间执行
      */
     fun postDelayed(runnable: Runnable, delayMillis: Long): Boolean {
-        var delayMillis: Long = delayMillis
-        if (delayMillis < 0) {
-            delayMillis = 0
-        }
-        return postAtTime(runnable, SystemClock.uptimeMillis() + delayMillis)
+        return postAtTime(runnable, SystemClock.uptimeMillis() + if (delayMillis < 0) 0 else delayMillis)
     }
 
     /**

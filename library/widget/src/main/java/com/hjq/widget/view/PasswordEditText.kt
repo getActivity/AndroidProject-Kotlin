@@ -1,12 +1,16 @@
 package com.hjq.widget.view
 
-import android.content.*
+import android.content.Context
 import android.graphics.drawable.Drawable
-import android.text.*
+import android.text.Editable
+import android.text.InputType
+import android.text.TextUtils
+import android.text.TextWatcher
 import android.text.method.HideReturnsTransformationMethod
 import android.text.method.PasswordTransformationMethod
 import android.util.AttributeSet
-import android.view.*
+import android.view.MotionEvent
+import android.view.View
 import android.view.View.OnFocusChangeListener
 import android.view.View.OnTouchListener
 import androidx.core.content.ContextCompat
@@ -76,11 +80,7 @@ class PasswordEditText @JvmOverloads constructor(
      * [OnFocusChangeListener]
      */
     override fun onFocusChange(view: View?, hasFocus: Boolean) {
-        if (hasFocus && text != null) {
-            setDrawableVisible(text!!.isNotEmpty())
-        } else {
-            setDrawableVisible(false)
-        }
+        setDrawableVisible(hasFocus && !TextUtils.isEmpty(text))
         focusChangeListener?.onFocusChange(view, hasFocus)
     }
 

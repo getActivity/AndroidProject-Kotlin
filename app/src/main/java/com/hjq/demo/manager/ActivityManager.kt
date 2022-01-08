@@ -19,18 +19,10 @@ class ActivityManager private constructor() : ActivityLifecycleCallbacks {
     companion object {
 
         @Suppress("StaticFieldLeak")
-        @Volatile
-        private var sInstance: ActivityManager? = null
+        private val activityManager: ActivityManager by lazy { ActivityManager() }
 
         fun getInstance(): ActivityManager {
-            if (sInstance == null) {
-                synchronized(ActivityManager::class.java) {
-                    if (sInstance == null) {
-                        sInstance = ActivityManager()
-                    }
-                }
-            }
-            return sInstance!!
+            return activityManager
         }
 
         /**

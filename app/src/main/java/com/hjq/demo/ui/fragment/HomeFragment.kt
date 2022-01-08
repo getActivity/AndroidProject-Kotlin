@@ -2,7 +2,8 @@ package com.hjq.demo.ui.fragment
 
 import android.content.res.ColorStateList
 import android.widget.TextView
-import androidx.appcompat.widget.*
+import androidx.appcompat.widget.AppCompatImageView
+import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager.widget.ViewPager
@@ -13,7 +14,7 @@ import com.hjq.demo.R
 import com.hjq.demo.app.AppFragment
 import com.hjq.demo.app.TitleBarFragment
 import com.hjq.demo.ui.activity.HomeActivity
-import com.hjq.demo.ui.adapter.*
+import com.hjq.demo.ui.adapter.TabAdapter
 import com.hjq.demo.ui.adapter.TabAdapter.OnTabListener
 import com.hjq.demo.widget.XCollapsingToolbarLayout
 import com.hjq.demo.widget.XCollapsingToolbarLayout.OnScrimsListener

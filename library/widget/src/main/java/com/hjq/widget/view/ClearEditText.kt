@@ -3,6 +3,7 @@ package com.hjq.widget.view
 import android.content.Context
 import android.graphics.drawable.Drawable
 import android.text.Editable
+import android.text.TextUtils
 import android.text.TextWatcher
 import android.util.AttributeSet
 import android.view.MotionEvent
@@ -60,11 +61,7 @@ class ClearEditText @JvmOverloads constructor(
      * [OnFocusChangeListener]
      */
     override fun onFocusChange(view: View, hasFocus: Boolean) {
-        if (hasFocus && text != null) {
-            setDrawableVisible(text!!.isNotEmpty())
-        } else {
-            setDrawableVisible(false)
-        }
+        setDrawableVisible(hasFocus && !TextUtils.isEmpty(text))
         focusChangeListener?.onFocusChange(view, hasFocus)
     }
 
@@ -91,7 +88,7 @@ class ClearEditText @JvmOverloads constructor(
             }
             return true
         }
-        return touchListener != null && touchListener!!.onTouch(view, event)
+        return touchListener?.onTouch(view, event) ?: false
     }
 
     /**
