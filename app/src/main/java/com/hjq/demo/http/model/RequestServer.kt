@@ -16,11 +16,7 @@ class RequestServer : IRequestServer {
         return AppConfig.getHostUrl()
     }
 
-    override fun getPath(): String {
-        return "api/"
-    }
-
-    override fun getType(): BodyType {
+    override fun getBodyType(): BodyType {
         // 以表单的形式提交参数
         return BodyType.FORM
     }
