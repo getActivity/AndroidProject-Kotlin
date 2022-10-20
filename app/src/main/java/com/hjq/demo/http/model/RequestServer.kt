@@ -12,6 +12,7 @@ import com.hjq.http.model.BodyType
  */
 class RequestServer : IRequestServer {
 
+
     override fun getHost(): String {
         return AppConfig.getHostUrl()
     }
