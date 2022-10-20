@@ -11,8 +11,7 @@ import com.hjq.http.model.BodyType
  *    desc   : 服务器配置
  */
 class RequestServer : IRequestServer {
-
-
+    
     override fun getHost(): String {
         return AppConfig.getHostUrl()
     }
