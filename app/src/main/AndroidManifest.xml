@@ -236,6 +236,8 @@
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:exported="true"
             android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+        <activity android:name=".ui.activity.LoginActivity2" />
+        <activity android:name=".ui.activity.LoginActivity3" />
 
     </application>
 
