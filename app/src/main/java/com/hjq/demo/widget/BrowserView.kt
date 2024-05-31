@@ -42,11 +42,13 @@ import java.util.*
  *    desc   : 基于原生 WebView 封装
  */
 @Suppress("SetJavaScriptEnabled")
-class BrowserView  @JvmOverloads constructor(
-    context: Context, attrs: AttributeSet? = null,
-    defStyleAttr: Int = android.R.attr.webViewStyle, defStyleRes: Int = 0) :
-    NestedScrollWebView(context, attrs, defStyleAttr, defStyleRes),
-    LifecycleEventObserver, ActivityAction {
+class BrowserView @JvmOverloads constructor(
+    context: Context,
+    attrs: AttributeSet? = null,
+    defStyleAttr: Int = android.R.attr.webViewStyle,
+    defStyleRes: Int = 0
+) : NestedScrollWebView(context, attrs, defStyleAttr, defStyleRes), LifecycleEventObserver,
+    ActivityAction {
 
     companion object {
 
@@ -130,9 +132,11 @@ class BrowserView  @JvmOverloads constructor(
     /**
      * 已过时
      */
-    @Deprecated("请使用 {@link BrowserViewClient}", ReplaceWith(
-        "super.setWebViewClient(client)",
-        "com.hjq.widget.layout.NestedScrollWebView"))
+    @Deprecated(
+        "请使用 {@link BrowserViewClient}", ReplaceWith(
+            "super.setWebViewClient(client)", "com.hjq.widget.layout.NestedScrollWebView"
+        )
+    )
     override fun setWebViewClient(client: WebViewClient) {
         super.setWebViewClient(client)
     }
@@ -148,9 +152,11 @@ class BrowserView  @JvmOverloads constructor(
     /**
      * 已过时
      */
-    @Deprecated("请使用 {@link BrowserChromeClient}", ReplaceWith(
-        "super.setWebChromeClient(client)",
-        "com.hjq.widget.layout.NestedScrollWebView"))
+    @Deprecated(
+        "请使用 {@link BrowserChromeClient}", ReplaceWith(
+            "super.setWebChromeClient(client)", "com.hjq.widget.layout.NestedScrollWebView"
+        )
+    )
     override fun setWebChromeClient(client: WebChromeClient?) {
         super.setWebChromeClient(client)
     }
@@ -166,11 +172,9 @@ class BrowserView  @JvmOverloads constructor(
          */
         override fun onReceivedSslError(view: WebView, handler: SslErrorHandler, error: SslError) {
             // 如何处理应用中的 WebView SSL 错误处理程序提醒：https://support.google.com/faqs/answer/7071387?hl=zh-Hans
-            MessageDialog.Builder(view.context)
-                .setMessage(R.string.common_web_ssl_error_title)
+            MessageDialog.Builder(view.context).setMessage(R.string.common_web_ssl_error_title)
                 .setConfirm(R.string.common_web_ssl_error_allow)
-                .setCancel(R.string.common_web_ssl_error_reject)
-                .setCancelable(false)
+                .setCancel(R.string.common_web_ssl_error_reject).setCancelable(false)
                 .setListener(object : MessageDialog.OnListener {
 
                     override fun onConfirm(dialog: BaseDialog?) {
@@ -180,24 +184,29 @@ class BrowserView  @JvmOverloads constructor(
                     override fun onCancel(dialog: BaseDialog?) {
                         handler.cancel()
                     }
-                })
-                .show()
+                }).show()
         }
 
         /**
          * 同名 API 兼容
          */
         @TargetApi(Build.VERSION_CODES.M)
-        override fun onReceivedError(view: WebView, request: WebResourceRequest, error: WebResourceError) {
+        override fun onReceivedError(
+            view: WebView, request: WebResourceRequest, error: WebResourceError
+        ) {
             if (request.isForMainFrame) {
-                onReceivedError(view, error.errorCode, error.description.toString(), request.url.toString())
+                onReceivedError(
+                    view, error.errorCode, error.description.toString(), request.url.toString()
+                )
             }
         }
 
         /**
          * 加载错误
          */
-        override fun onReceivedError(view: WebView, errorCode: Int, description: String, failingUrl: String) {
+        override fun onReceivedError(
+            view: WebView, errorCode: Int, description: String, failingUrl: String
+        ) {
             super.onReceivedError(view, errorCode, description, failingUrl)
         }
 
@@ -227,13 +236,13 @@ class BrowserView  @JvmOverloads constructor(
          */
         protected fun dialing(view: WebView, url: String) {
             val context: Context = view.context
-            MessageDialog.Builder(context)
-                .setMessage(String.format(
+            MessageDialog.Builder(context).setMessage(
+                String.format(
                     view.resources.getString(R.string.common_web_call_phone_title),
-                    url.replace("tel:", "")))
-                .setConfirm(R.string.common_web_call_phone_allow)
-                .setCancel(R.string.common_web_call_phone_reject)
-                .setCancelable(false)
+                    url.replace("tel:", "")
+                )
+            ).setConfirm(R.string.common_web_call_phone_allow)
+                .setCancel(R.string.common_web_call_phone_reject).setCancelable(false)
                 .setListener(object : MessageDialog.OnListener {
 
                     override fun onConfirm(dialog: BaseDialog?) {
@@ -242,40 +251,38 @@ class BrowserView  @JvmOverloads constructor(
                         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                         context.startActivity(intent)
                     }
-                })
-                .show()
+                }).show()
         }
     }
 
-    open class BrowserChromeClient constructor(private val webView: BrowserView) : WebChromeClient() {
+    open class BrowserChromeClient constructor(private val webView: BrowserView) :
+        WebChromeClient() {
 
         /**
          * 网页弹出警告框
          */
-        override fun onJsAlert(view: WebView, url: String, message: String, result: JsResult): Boolean {
+        override fun onJsAlert(
+            view: WebView, url: String, message: String, result: JsResult
+        ): Boolean {
             val activity: Activity = webView.getActivity() ?: return false
-            TipsDialog.Builder(activity)
-                .setIcon(TipsDialog.ICON_WARNING)
-                .setMessage(message)
-                .setCancelable(false)
-                .addOnDismissListener(object : BaseDialog.OnDismissListener {
+            TipsDialog.Builder(activity).setIcon(TipsDialog.ICON_WARNING).setMessage(message)
+                .setCancelable(false).addOnDismissListener(object : BaseDialog.OnDismissListener {
 
                     override fun onDismiss(dialog: BaseDialog?) {
                         result.confirm()
                     }
-                })
-                .show()
+                }).show()
             return true
         }
 
         /**
          * 网页弹出确定取消框
          */
-        override fun onJsConfirm(view: WebView, url: String, message: String, result: JsResult): Boolean {
+        override fun onJsConfirm(
+            view: WebView, url: String, message: String, result: JsResult
+        ): Boolean {
             val activity: Activity = webView.getActivity() ?: return false
-            MessageDialog.Builder(activity)
-                .setMessage(message)
-                .setCancelable(false)
+            MessageDialog.Builder(activity).setMessage(message).setCancelable(false)
                 .setListener(object : MessageDialog.OnListener {
 
                     override fun onConfirm(dialog: BaseDialog?) {
@@ -285,21 +292,23 @@ class BrowserView  @JvmOverloads constructor(
                     override fun onCancel(dialog: BaseDialog?) {
                         result.cancel()
                     }
-                })
-                .show()
+                }).show()
             return true
         }
 
         /**
          * 网页弹出输入框
          */
-        override fun onJsPrompt(view: WebView, url: String, message: String, defaultValue: String, result: JsPromptResult): Boolean {
+        override fun onJsPrompt(
+            view: WebView,
+            url: String,
+            message: String,
+            defaultValue: String,
+            result: JsPromptResult
+        ): Boolean {
             val activity: Activity = webView.getActivity() ?: return false
-            InputDialog.Builder(activity)
-                .setContent(defaultValue)
-                .setHint(message)
-                .setCancelable(false)
-                .setListener(object : InputDialog.OnListener {
+            InputDialog.Builder(activity).setContent(defaultValue).setHint(message)
+                .setCancelable(false).setListener(object : InputDialog.OnListener {
 
                     override fun onConfirm(dialog: BaseDialog?, content: String) {
                         result.confirm(content)
@@ -308,8 +317,7 @@ class BrowserView  @JvmOverloads constructor(
                     override fun onCancel(dialog: BaseDialog?) {
                         result.cancel()
                     }
-                })
-                .show()
+                }).show()
             return true
         }
 
@@ -317,25 +325,24 @@ class BrowserView  @JvmOverloads constructor(
          * 网页请求定位功能
          * 测试地址：https://map.baidu.com/
          */
-        override fun onGeolocationPermissionsShowPrompt(origin: String, callback: GeolocationPermissions.Callback) {
+        override fun onGeolocationPermissionsShowPrompt(
+            origin: String, callback: GeolocationPermissions.Callback
+        ) {
             val activity: Activity = webView.getActivity() ?: return
             MessageDialog.Builder(activity)
                 .setMessage(R.string.common_web_location_permission_title)
                 .setConfirm(R.string.common_web_location_permission_allow)
-                .setCancel(R.string.common_web_location_permission_reject)
-                .setCancelable(false)
+                .setCancel(R.string.common_web_location_permission_reject).setCancelable(false)
                 .setListener(object : MessageDialog.OnListener {
 
                     override fun onConfirm(dialog: BaseDialog?) {
-                        XXPermissions.with(activity)
-                            .permission(Permission.ACCESS_FINE_LOCATION)
+                        XXPermissions.with(activity).permission(Permission.ACCESS_FINE_LOCATION)
                             .permission(Permission.ACCESS_COARSE_LOCATION)
                             .request(object : PermissionCallback() {
                                 override fun onGranted(
-                                    permissions: MutableList<String?>?,
-                                    all: Boolean
+                                    permissions: MutableList<String>, allGranted: Boolean
                                 ) {
-                                    if (all) {
+                                    if (allGranted) {
                                         callback.invoke(origin, true, true)
                                     }
                                 }
@@ -345,8 +352,7 @@ class BrowserView  @JvmOverloads constructor(
                     override fun onCancel(dialog: BaseDialog?) {
                         callback.invoke(origin, false, true)
                     }
-                })
-                .show()
+                }).show()
         }
 
         /**
@@ -356,13 +362,14 @@ class BrowserView  @JvmOverloads constructor(
          * @param callback              文件选择回调
          * @param params                文件选择参数
          */
-        override fun onShowFileChooser(webView: WebView, callback: ValueCallback<Array<Uri>>, params: FileChooserParams): Boolean {
+        override fun onShowFileChooser(
+            webView: WebView, callback: ValueCallback<Array<Uri>>, params: FileChooserParams
+        ): Boolean {
             val activity: Activity? = this.webView.getActivity()
             if (activity !is BaseActivity) {
                 return false
             }
-            XXPermissions.with(activity)
-                .permission(*Permission.Group.STORAGE)
+            XXPermissions.with(activity).permission(*Permission.Group.STORAGE)
                 .request(object : PermissionCallback() {
                     override fun onGranted(permissions: MutableList<String>, all: Boolean) {
                         if (all) {
@@ -381,7 +388,9 @@ class BrowserView  @JvmOverloads constructor(
         /**
          * 打开系统文件选择器
          */
-        private fun openSystemFileChooser(activity: BaseActivity, params: FileChooserParams, callback: ValueCallback<Array<Uri>>) {
+        private fun openSystemFileChooser(
+            activity: BaseActivity, params: FileChooserParams, callback: ValueCallback<Array<Uri>>
+        ) {
             val intent: Intent = params.createIntent()
             val mimeTypes: Array<String>? = params.acceptTypes
             val multipleSelect: Boolean = params.mode == FileChooserParams.MODE_OPEN_MULTIPLE
@@ -391,36 +400,41 @@ class BrowserView  @JvmOverloads constructor(
                 if (mimeTypes.size == 1) {
                     when (mimeTypes[0]) {
                         "image/*" -> {
-                            ImageSelectActivity.start(activity, if (multipleSelect) Int.MAX_VALUE else 1, object : OnPhotoSelectListener {
-                                override fun onSelected(data: MutableList<String>) {
-                                    val uris: MutableList<Uri> = ArrayList(data.size)
-                                    for (filePath in data) {
-                                        uris.add(Uri.fromFile(File(filePath)))
+                            ImageSelectActivity.start(activity,
+                                if (multipleSelect) Int.MAX_VALUE else 1,
+                                object : OnPhotoSelectListener {
+                                    override fun onSelected(data: MutableList<String>) {
+                                        val uris: MutableList<Uri> = ArrayList(data.size)
+                                        for (filePath in data) {
+                                            uris.add(Uri.fromFile(File(filePath)))
+                                        }
+                                        callback.onReceiveValue(uris.toTypedArray())
                                     }
-                                    callback.onReceiveValue(uris.toTypedArray())
-                                }
 
-                                override fun onCancel() {
-                                    callback.onReceiveValue(null)
-                                }
-                            })
+                                    override fun onCancel() {
+                                        callback.onReceiveValue(null)
+                                    }
+                                })
                             return
                         }
+
                         "video/*" -> {
-                            VideoSelectActivity.start(activity, if (multipleSelect) Int.MAX_VALUE else 1, object : OnVideoSelectListener {
+                            VideoSelectActivity.start(activity,
+                                if (multipleSelect) Int.MAX_VALUE else 1,
+                                object : OnVideoSelectListener {
 
-                                override fun onSelected(data: MutableList<VideoBean>) {
-                                    val uris: MutableList<Uri> = ArrayList(data.size)
-                                    for (bean in data) {
-                                        uris.add(Uri.fromFile(File(bean.getVideoPath())))
+                                    override fun onSelected(data: MutableList<VideoBean>) {
+                                        val uris: MutableList<Uri> = ArrayList(data.size)
+                                        for (bean in data) {
+                                            uris.add(Uri.fromFile(File(bean.getVideoPath())))
+                                        }
+                                        callback.onReceiveValue(uris.toTypedArray())
                                     }
-                                    callback.onReceiveValue(uris.toTypedArray())
-                                }
 
-                                override fun onCancel() {
-                                    callback.onReceiveValue(null)
-                                }
-                            })
+                                    override fun onCancel() {
+                                        callback.onReceiveValue(null)
+                                    }
+                                })
                             return
                         }
                     }
@@ -429,29 +443,30 @@ class BrowserView  @JvmOverloads constructor(
 
             // 是否是多选模式
             intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, multipleSelect)
-            activity.startActivityForResult(Intent.createChooser(intent, params.title), object : OnActivityCallback {
+            activity.startActivityForResult(Intent.createChooser(intent, params.title),
+                object : OnActivityCallback {
 
-                override fun onActivityResult(resultCode: Int, data: Intent?) {
-                    val uris: MutableList<Uri> = ArrayList()
-                    if (resultCode == Activity.RESULT_OK && data != null) {
-                        val uri = data.data
-                        if (uri != null) {
-                            // 如果用户只选择了一个文件
-                            uris.add(uri)
-                        } else {
-                            // 如果用户选择了多个文件
-                            val clipData = data.clipData
-                            if (clipData != null) {
-                                for (i in 0 until clipData.itemCount) {
-                                    uris.add(clipData.getItemAt(i).uri)
+                    override fun onActivityResult(resultCode: Int, data: Intent?) {
+                        val uris: MutableList<Uri> = ArrayList()
+                        if (resultCode == Activity.RESULT_OK && data != null) {
+                            val uri = data.data
+                            if (uri != null) {
+                                // 如果用户只选择了一个文件
+                                uris.add(uri)
+                            } else {
+                                // 如果用户选择了多个文件
+                                val clipData = data.clipData
+                                if (clipData != null) {
+                                    for (i in 0 until clipData.itemCount) {
+                                        uris.add(clipData.getItemAt(i).uri)
+                                    }
                                 }
                             }
                         }
+                        // 不管用户最后有没有选择文件，最后必须要调用 onReceiveValue，如果没有调用就会导致网页再次点击上传无响应
+                        callback.onReceiveValue(uris.toTypedArray())
                     }
-                    // 不管用户最后有没有选择文件，最后必须要调用 onReceiveValue，如果没有调用就会导致网页再次点击上传无响应
-                    callback.onReceiveValue(uris.toTypedArray())
-                }
-            })
+                })
         }
     }
 }

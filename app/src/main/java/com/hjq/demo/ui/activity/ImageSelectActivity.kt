@@ -51,7 +51,11 @@ class ImageSelectActivity : AppActivity(), StatusAction, Runnable,
         }
 
         @Log
-        @Permissions(Permission.READ_EXTERNAL_STORAGE, Permission.WRITE_EXTERNAL_STORAGE)
+        @Permissions(
+            Permission.READ_EXTERNAL_STORAGE,
+            Permission.WRITE_EXTERNAL_STORAGE,
+            Permission.CAMERA
+        )
         fun start(activity: BaseActivity, maxSelect: Int, listener: OnPhotoSelectListener?) {
             if (maxSelect < 1) {
                 // 最少要选择一个图片
@@ -171,10 +175,23 @@ class ImageSelectActivity : AppActivity(), StatusAction, Runnable,
                 continue
             }
             count += list.size
-            data.add(AlbumInfo(list[0], key, String.format(getString(R.string.image_select_total), list.size), adapter.getData() === list))
+            data.add(
+                AlbumInfo(
+                    list[0],
+                    key,
+                    String.format(getString(R.string.image_select_total), list.size),
+                    adapter.getData() === list
+                )
+            )
         }
-        data.add(0, AlbumInfo(allImage[0], getString(R.string.image_select_all),
-            String.format(getString(R.string.image_select_total), count), adapter.getData() === allImage))
+        data.add(
+            0, AlbumInfo(
+                allImage[0],
+                getString(R.string.image_select_all),
+                String.format(getString(R.string.image_select_total), count),
+                adapter.getData() === allImage
+            )
+        )
         if (albumDialog == null) {
             albumDialog = AlbumDialog.Builder(this)
                 .setListener(object : AlbumDialog.OnListener {
@@ -189,7 +206,8 @@ class ImageSelectActivity : AppActivity(), StatusAction, Runnable,
                         }
                         // 执行列表动画
                         recyclerView?.layoutAnimation = AnimationUtils.loadLayoutAnimation(
-                            getActivity(), R.anim.layout_from_right)
+                            getActivity(), R.anim.layout_from_right
+                        )
                         recyclerView?.scheduleLayoutAnimation()
                     }
                 })
@@ -266,7 +284,11 @@ class ImageSelectActivity : AppActivity(), StatusAction, Runnable,
      * @param position          被点击的条目位置
      */
     override fun onItemClick(recyclerView: RecyclerView?, itemView: View?, position: Int) {
-        ImagePreviewActivity.start(this@ImageSelectActivity, adapter.getData().toMutableList(), position)
+        ImagePreviewActivity.start(
+            this@ImageSelectActivity,
+            adapter.getData().toMutableList(),
+            position
+        )
     }
 
     /**
@@ -275,7 +297,11 @@ class ImageSelectActivity : AppActivity(), StatusAction, Runnable,
      * @param itemView          被点击的条目对象
      * @param position          被点击的条目位置
      */
-    override fun onItemLongClick(recyclerView: RecyclerView?, itemView: View?, position: Int): Boolean {
+    override fun onItemLongClick(
+        recyclerView: RecyclerView?,
+        itemView: View?,
+        position: Int
+    ): Boolean {
         if (selectImage.size < maxSelect) {
             // 长按的时候模拟选中
             itemView?.findViewById<View?>(R.id.fl_image_select_check)?.let {
@@ -332,15 +358,33 @@ class ImageSelectActivity : AppActivity(), StatusAction, Runnable,
         allImage.clear()
         val contentUri: Uri = MediaStore.Files.getContentUri("external")
         val sortOrder: String = MediaStore.Files.FileColumns.DATE_MODIFIED + " DESC"
-        val selection: String = "(" + MediaStore.Files.FileColumns.MEDIA_TYPE + "=?)" + " AND " + MediaStore.MediaColumns.SIZE + ">0"
+        val selection: String =
+            "(" + MediaStore.Files.FileColumns.MEDIA_TYPE + "=?)" + " AND " + MediaStore.MediaColumns.SIZE + ">0"
         val contentResolver: ContentResolver = contentResolver
-        val projections: Array<String?> = arrayOf(MediaStore.Files.FileColumns._ID, MediaStore.MediaColumns.DATA,
-            MediaStore.MediaColumns.DISPLAY_NAME, MediaStore.MediaColumns.DATE_MODIFIED, MediaStore.MediaColumns.MIME_TYPE,
-            MediaStore.MediaColumns.WIDTH, MediaStore.MediaColumns.HEIGHT, MediaStore.MediaColumns.SIZE)
+        val projections: Array<String?> = arrayOf(
+            MediaStore.Files.FileColumns._ID,
+            MediaStore.MediaColumns.DATA,
+            MediaStore.MediaColumns.DISPLAY_NAME,
+            MediaStore.MediaColumns.DATE_MODIFIED,
+            MediaStore.MediaColumns.MIME_TYPE,
+            MediaStore.MediaColumns.WIDTH,
+            MediaStore.MediaColumns.HEIGHT,
+            MediaStore.MediaColumns.SIZE
+        )
         var cursor: Cursor? = null
-        if (XXPermissions.isGranted(this, Permission.READ_EXTERNAL_STORAGE, Permission.WRITE_EXTERNAL_STORAGE)) {
-            cursor = contentResolver.query(contentUri, projections, selection,
-                arrayOf<String?>(MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE.toString()), sortOrder)
+        if (XXPermissions.isGranted(
+                this,
+                Permission.READ_EXTERNAL_STORAGE,
+                Permission.WRITE_EXTERNAL_STORAGE
+            )
+        ) {
+            cursor = contentResolver.query(
+                contentUri,
+                projections,
+                selection,
+                arrayOf<String?>(MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE.toString()),
+                sortOrder
+            )
         }
         if (cursor != null && cursor.moveToFirst()) {
             val pathIndex: Int = cursor.getColumnIndex(MediaStore.MediaColumns.DATA)
@@ -387,7 +431,8 @@ class ImageSelectActivity : AppActivity(), StatusAction, Runnable,
             }
 
             // 执行列表动画
-            recyclerView?.layoutAnimation = AnimationUtils.loadLayoutAnimation(getActivity(), R.anim.layout_fall_down)
+            recyclerView?.layoutAnimation =
+                AnimationUtils.loadLayoutAnimation(getActivity(), R.anim.layout_fall_down)
             recyclerView?.scheduleLayoutAnimation()
             if (allImage.isEmpty()) {
                 // 显示空布局
