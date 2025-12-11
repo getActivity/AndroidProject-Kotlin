@@ -32,7 +32,7 @@ class UmengShare {
          * @param platform      平台名称
          */
         override fun onStart(platform: SHARE_MEDIA) {
-            listener?.onStart(this.platform)
+            listener?.onShareStart(this.platform)
         }
 
         /**
@@ -41,7 +41,7 @@ class UmengShare {
          * @param platform      平台名称
          */
         override fun onResult(platform: SHARE_MEDIA) {
-            listener?.onSucceed(this.platform)
+            listener?.onShareSuccess(this.platform)
             listener = null
         }
 
@@ -53,7 +53,7 @@ class UmengShare {
          */
         override fun onError(platform: SHARE_MEDIA, t: Throwable) {
             t.printStackTrace()
-            listener?.onError(this.platform, t)
+            listener?.onShareFail(this.platform, t)
             listener = null
         }
 
@@ -63,7 +63,7 @@ class UmengShare {
          * @param platform      平台名称
          */
         override fun onCancel(platform: SHARE_MEDIA) {
-            listener?.onCancel(this.platform)
+            listener?.onShareCancel(this.platform)
             listener = null
         }
     }
@@ -75,14 +75,14 @@ class UmengShare {
          *
          * @param platform      平台对象
          */
-        fun onStart(platform: Platform?) {}
+        fun onShareStart(platform: Platform?) {}
 
         /**
          * 分享成功的回调
          *
          * @param platform      平台对象
          */
-        fun onSucceed(platform: Platform?)
+        fun onShareSuccess(platform: Platform?)
 
         /**
          * 分享失败的回调
@@ -90,13 +90,13 @@ class UmengShare {
          * @param platform      平台对象
          * @param t             错误原因
          */
-        fun onError(platform: Platform?, t: Throwable) {}
+        fun onShareFail(platform: Platform?, t: Throwable) {}
 
         /**
          * 分享取消的回调
          *
          * @param platform      平台对象
          */
-        fun onCancel(platform: Platform?) {}
+        fun onShareCancel(platform: Platform?) {}
     }
 }

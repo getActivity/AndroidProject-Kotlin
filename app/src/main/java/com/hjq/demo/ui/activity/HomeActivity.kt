@@ -1,23 +1,26 @@
 package com.hjq.demo.ui.activity
 
-import android.app.Activity
-import android.content.*
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager.widget.ViewPager
 import com.gyf.immersionbar.ImmersionBar
-import com.hjq.base.FragmentPagerAdapter
+import com.hjq.base.BasePagerAdapter
+import com.hjq.base.ktx.createIntent
+import com.hjq.base.ktx.lazyFindViewById
 import com.hjq.demo.R
 import com.hjq.demo.app.AppActivity
 import com.hjq.demo.app.AppFragment
-import com.hjq.demo.manager.*
+import com.hjq.demo.ktx.toast
+import com.hjq.demo.manager.ActivityManager
 import com.hjq.demo.other.DoubleClickHelper
-import com.hjq.demo.ui.adapter.NavigationAdapter
-import com.hjq.demo.ui.fragment.FindFragment
-import com.hjq.demo.ui.fragment.HomeFragment
-import com.hjq.demo.ui.fragment.MessageFragment
-import com.hjq.demo.ui.fragment.MineFragment
+import com.hjq.demo.ui.adapter.common.NavigationAdapter
+import com.hjq.demo.ui.fragment.home.HomeFindFragment
+import com.hjq.demo.ui.fragment.home.HomeMainFragment
+import com.hjq.demo.ui.fragment.home.HomeMessageFragment
+import com.hjq.demo.ui.fragment.home.HomeMineFragment
 
 /**
  *    author : Android 轮子哥
@@ -33,20 +36,17 @@ class HomeActivity : AppActivity(), NavigationAdapter.OnNavigationListener {
         private const val INTENT_KEY_IN_FRAGMENT_CLASS: String = "fragmentClass"
 
         @JvmOverloads
-        fun start(context: Context, fragmentClass: Class<out AppFragment<*>?>? = HomeFragment::class.java) {
-            val intent = Intent(context, HomeActivity::class.java)
+        fun start(context: Context, fragmentClass: Class<out AppFragment<*>?>? = HomeMainFragment::class.java) {
+            val intent = context.createIntent(HomeActivity::class.java)
             intent.putExtra(INTENT_KEY_IN_FRAGMENT_CLASS, fragmentClass)
-            if (context !is Activity) {
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            }
             context.startActivity(intent)
         }
     }
 
-    private val viewPager: ViewPager? by lazy { findViewById(R.id.vp_home_pager) }
-    private val navigationView: RecyclerView? by lazy { findViewById(R.id.rv_home_navigation) }
+    private val viewPager: ViewPager? by lazyFindViewById(R.id.vp_home_pager)
+    private val navigationView: RecyclerView? by lazyFindViewById(R.id.rv_home_navigation)
     private var navigationAdapter: NavigationAdapter? = null
-    private var pagerAdapter: FragmentPagerAdapter<AppFragment<*>>? = null
+    private var pagerAdapter: BasePagerAdapter<AppFragment<*>>? = null
 
     override fun getLayoutId(): Int {
         return R.layout.home_activity
@@ -54,25 +54,25 @@ class HomeActivity : AppActivity(), NavigationAdapter.OnNavigationListener {
 
     override fun initView() {
         navigationAdapter = NavigationAdapter(this).apply {
-            addItem(NavigationAdapter.MenuItem(getString(R.string.home_nav_index),
-                ContextCompat.getDrawable(this@HomeActivity, R.drawable.home_home_selector)))
-            addItem(NavigationAdapter.MenuItem(getString(R.string.home_nav_found),
+            addItem(NavigationAdapter.NavigationItem(getString(R.string.home_nav_main),
+                ContextCompat.getDrawable(this@HomeActivity, R.drawable.home_main_selector)))
+            addItem(NavigationAdapter.NavigationItem(getString(R.string.home_nav_found),
                 ContextCompat.getDrawable(this@HomeActivity, R.drawable.home_found_selector)))
-            addItem(NavigationAdapter.MenuItem(getString(R.string.home_nav_message),
+            addItem(NavigationAdapter.NavigationItem(getString(R.string.home_nav_message),
                 ContextCompat.getDrawable(this@HomeActivity, R.drawable.home_message_selector)))
-            addItem(NavigationAdapter.MenuItem(getString(R.string.home_nav_me),
-                ContextCompat.getDrawable(this@HomeActivity, R.drawable.home_me_selector)))
+            addItem(NavigationAdapter.NavigationItem(getString(R.string.home_nav_mime),
+                ContextCompat.getDrawable(this@HomeActivity, R.drawable.home_mime_selector)))
             setOnNavigationListener(this@HomeActivity)
             navigationView?.adapter = this
         }
     }
 
     override fun initData() {
-        pagerAdapter = FragmentPagerAdapter<AppFragment<*>>(this).apply {
-            addFragment(HomeFragment.newInstance())
-            addFragment(FindFragment.newInstance())
-            addFragment(MessageFragment.newInstance())
-            addFragment(MineFragment.newInstance())
+        pagerAdapter = BasePagerAdapter<AppFragment<*>>(this).apply {
+            addFragment(HomeMainFragment.newInstance())
+            addFragment(HomeFindFragment.newInstance())
+            addFragment(HomeMessageFragment.newInstance())
+            addFragment(HomeMineFragment.newInstance())
             viewPager?.adapter = this
         }
         onNewIntent(intent)
@@ -135,12 +135,12 @@ class HomeActivity : AppActivity(), NavigationAdapter.OnNavigationListener {
             return
         }
 
-        // 移动到上一个任务栈，避免侧滑引起的不良反应
+        // 移动到上一个任务栈
         moveTaskToBack(false)
         postDelayed({
             // 进行内存优化，销毁掉所有的界面
-            ActivityManager.getInstance().finishAllActivities()
-        }, 300)
+            ActivityManager.finishAllActivities()
+        }, 200)
     }
 
     override fun onDestroy() {

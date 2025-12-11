@@ -8,6 +8,9 @@ package com.hjq.demo.http.model
  */
 open class HttpData<T> {
 
+    /** 响应头 */
+    private var responseHeaders: Map<String, String>? = null
+
     /** 返回码 */
     private val code: Int = 0
 
@@ -16,6 +19,14 @@ open class HttpData<T> {
 
     /** 数据 */
     private val data: T? = null
+
+    fun setResponseHeaders(headers: Map<String, String>?) {
+        this.responseHeaders = headers
+    }
+
+    fun getResponseHeaders(): Map<String, String>? {
+        return responseHeaders
+    }
 
     fun getCode(): Int {
         return code
@@ -32,14 +43,14 @@ open class HttpData<T> {
     /**
      * 是否请求成功
      */
-    fun isRequestSucceed(): Boolean {
+    fun isRequestSuccess(): Boolean {
         return code == 200
     }
 
     /**
      * 是否 Token 失效
      */
-    fun isTokenFailure(): Boolean {
+    fun isTokenInvalidation(): Boolean {
         return code == 1001
     }
 }

@@ -2,10 +2,14 @@ package com.hjq.demo.other
 
 import android.app.Activity
 import android.app.Application.ActivityLifecycleCallbacks
-import android.graphics.*
-import android.os.*
-import android.view.*
+import android.graphics.Rect
+import android.os.Build
+import android.os.Bundle
+import android.view.View
+import android.view.ViewTreeObserver
 import android.view.ViewTreeObserver.OnGlobalLayoutListener
+import android.view.Window
+import android.view.WindowManager
 
 /**
  *    author : Android 轮子哥

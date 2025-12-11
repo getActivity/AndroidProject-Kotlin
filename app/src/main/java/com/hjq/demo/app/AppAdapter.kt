@@ -5,7 +5,7 @@ import android.view.View
 import androidx.annotation.IntRange
 import androidx.annotation.LayoutRes
 import com.hjq.base.BaseAdapter
-import java.util.*
+import com.hjq.widget.layout.WrapRecyclerView
 
 /**
  *    author : Android 轮子哥
@@ -165,8 +165,8 @@ abstract class AppAdapter<T> constructor(context: Context) :
     /**
      * 设置是否为最后一页
      */
-    open fun setLastPage(last: Boolean) {
-        lastPage = last
+    open fun setLastPage(lastPage: Boolean) {
+        this.lastPage = lastPage
     }
 
     /**
@@ -188,6 +188,16 @@ abstract class AppAdapter<T> constructor(context: Context) :
         constructor(@LayoutRes id: Int) : super(id)
 
         constructor(itemView: View) : super(itemView)
+
+        override fun getViewHolderPosition(): Int {
+            var position = super.getViewHolderPosition()
+            val recyclerView = getRecyclerView()
+            if (recyclerView is WrapRecyclerView) {
+                // 这里要减去头部的数量
+                position -= recyclerView.getHeaderViewsCount()
+            }
+            return position
+        }
     }
 
     inner class SimpleViewHolder : AppViewHolder {

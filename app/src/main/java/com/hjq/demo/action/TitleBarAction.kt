@@ -1,7 +1,6 @@
 package com.hjq.demo.action
 
 import android.graphics.drawable.Drawable
-import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.StringRes
 import com.hjq.bar.OnTitleBarListener
@@ -21,98 +20,91 @@ interface TitleBarAction : OnTitleBarListener {
     fun getTitleBar(): TitleBar?
 
     /**
-     * 左项被点击
-     *
-     * @param view     被点击的左项View
-     */
-    override fun onLeftClick(view: View) {}
-
-    /**
-     * 标题被点击
-     *
-     * @param view     被点击的标题View
-     */
-    override fun onTitleClick(view: View) {}
-
-    /**
-     * 右项被点击
-     *
-     * @param view     被点击的右项View
-     */
-    override fun onRightClick(view: View) {}
-
-    /**
      * 设置标题栏的标题
      */
     fun setTitle(@StringRes id: Int) {
-        getTitleBar()?.setTitle(id)
+        val titleBar = getTitleBar() ?: return
+        titleBar.setTitle(id)
     }
 
     /**
      * 设置标题栏的标题
      */
     fun setTitle(title: CharSequence?) {
-        getTitleBar()?.title = title
+        val titleBar = getTitleBar() ?: return
+        titleBar.title = title
     }
 
     /**
      * 设置标题栏的左标题
      */
     fun setLeftTitle(id: Int) {
-        getTitleBar()?.setLeftTitle(id)
+        val titleBar = getTitleBar() ?: return
+        titleBar.setLeftTitle(id)
     }
 
     fun setLeftTitle(text: CharSequence?) {
-        getTitleBar()?.leftTitle = text
+        val titleBar = getTitleBar() ?: return
+        titleBar.leftTitle = text
     }
 
     fun getLeftTitle(): CharSequence? {
-        return getTitleBar()?.leftTitle
+        val titleBar = getTitleBar() ?: return ""
+        return titleBar.leftTitle
     }
 
     /**
      * 设置标题栏的右标题
      */
     fun setRightTitle(id: Int) {
-        getTitleBar()?.setRightTitle(id)
+        val titleBar = getTitleBar() ?: return
+        titleBar.setRightTitle(id)
     }
 
     fun setRightTitle(text: CharSequence?) {
-        getTitleBar()?.rightTitle = text
+        val titleBar = getTitleBar() ?: return
+        titleBar.rightTitle = text
     }
 
     fun getRightTitle(): CharSequence? {
-        return getTitleBar()?.rightTitle
+        val titleBar = getTitleBar() ?: return ""
+        return titleBar.rightTitle
     }
 
     /**
      * 设置标题栏的左图标
      */
     fun setLeftIcon(id: Int) {
-        getTitleBar()?.setLeftIcon(id)
+        val titleBar = getTitleBar() ?: return
+        titleBar.setLeftIcon(id)
     }
 
     fun setLeftIcon(drawable: Drawable?) {
-        getTitleBar()?.leftIcon = drawable
+        val titleBar = getTitleBar() ?: return
+        titleBar.leftIcon = drawable
     }
 
     fun getLeftIcon(): Drawable? {
-        return getTitleBar()?.leftIcon
+        val titleBar = getTitleBar() ?: return null
+        return titleBar.leftIcon
     }
 
     /**
      * 设置标题栏的右图标
      */
     fun setRightIcon(id: Int) {
-        getTitleBar()?.setRightIcon(id)
+        val titleBar = getTitleBar() ?: return
+        titleBar.setRightIcon(id)
     }
 
     fun setRightIcon(drawable: Drawable?) {
-        getTitleBar()?.rightIcon = drawable
+        val titleBar = getTitleBar() ?: return
+        titleBar.rightIcon = drawable
     }
 
     fun getRightIcon(): Drawable? {
-        return getTitleBar()?.rightIcon
+        val titleBar = getTitleBar() ?: return null
+        return titleBar.rightIcon
     }
 
     /**

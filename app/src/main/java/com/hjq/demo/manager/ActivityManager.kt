@@ -1,12 +1,18 @@
 package com.hjq.demo.manager
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.Application
 import android.app.Application.ActivityLifecycleCallbacks
+import android.content.Context
+import android.os.Build
 import android.os.Bundle
-import androidx.collection.ArrayMap
+import android.text.TextUtils
 import timber.log.Timber
-import java.util.*
+import java.io.FileInputStream
+import java.io.IOException
+import java.lang.reflect.InvocationTargetException
+import java.nio.charset.StandardCharsets
 
 /**
  *    author : Android 轮子哥
@@ -14,28 +20,11 @@ import java.util.*
  *    time   : 2018/11/18
  *    desc   : Activity 管理类
  */
-class ActivityManager private constructor() : ActivityLifecycleCallbacks {
-
-    companion object {
-
-        @Suppress("StaticFieldLeak")
-        private val activityManager: ActivityManager by lazy { ActivityManager() }
-
-        fun getInstance(): ActivityManager {
-            return activityManager
-        }
-
-        /**
-         * 获取一个对象的独立无二的标记
-         */
-        private fun getObjectTag(`object`: Any): String {
-            // 对象所在的包名 + 对象的内存地址
-            return `object`.javaClass.name + Integer.toHexString(`object`.hashCode())
-        }
-    }
+@Suppress("StaticFieldLeak")
+object ActivityManager : ActivityLifecycleCallbacks {
 
     /** Activity 存放集合 */
-    private val activitySet: ArrayMap<String?, Activity?> = ArrayMap()
+    private val activityList: MutableList<Activity> = mutableListOf()
 
     /** 应用生命周期回调 */
     private val lifecycleCallbacks: ArrayList<ApplicationLifecycleCallback> = ArrayList()
@@ -76,6 +65,13 @@ class ActivityManager private constructor() : ActivityLifecycleCallbacks {
     }
 
     /**
+     * 获取 Activity 集合
+     */
+    fun getActivityList(): List<Activity> {
+        return activityList
+    }
+
+    /**
      * 判断当前应用是否处于前台状态
      */
     fun isForeground(): Boolean {
@@ -103,17 +99,17 @@ class ActivityManager private constructor() : ActivityLifecycleCallbacks {
         if (clazz == null) {
             return
         }
-        val keys: Array<String?> = activitySet.keys.toTypedArray()
-        for (key: String? in keys) {
-            val activity: Activity? = activitySet[key]
-            if (activity == null || activity.isFinishing) {
+
+        val iterator: MutableIterator<Activity> = activityList.iterator()
+        while (iterator.hasNext()) {
+            val activity = iterator.next()
+            if (activity.javaClass != clazz) {
                 continue
             }
-            if ((activity.javaClass == clazz)) {
+            if (!activity.isFinishing) {
                 activity.finish()
-                activitySet.remove(key)
-                break
             }
+            iterator.remove()
         }
     }
 
@@ -131,37 +127,35 @@ class ActivityManager private constructor() : ActivityLifecycleCallbacks {
      */
     @SafeVarargs
     fun finishAllActivities(vararg classArray: Class<out Activity>?) {
-        val keys: Array<String?> = activitySet.keys.toTypedArray()
-        for (key: String? in keys) {
-            val activity: Activity? = activitySet[key]
-            if (activity == null || activity.isFinishing) {
-                continue
-            }
+        val iterator: MutableIterator<Activity> = activityList.iterator()
+        while (iterator.hasNext()) {
+            val activity = iterator.next()
             var whiteClazz = false
-            for (clazz: Class<out Activity?>? in classArray) {
-                if ((activity.javaClass == clazz)) {
+            for (clazz in classArray) {
+                if (activity.javaClass == clazz) {
                     whiteClazz = true
                 }
             }
             if (whiteClazz) {
                 continue
             }
-
             // 如果不是白名单上面的 Activity 就销毁掉
-            activity.finish()
-            activitySet.remove(key)
+            if (!activity.isFinishing) {
+                activity.finish()
+            }
+            iterator.remove()
         }
     }
 
     override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
         Timber.i("%s - onCreate", activity.javaClass.simpleName)
-        if (activitySet.size == 0) {
+        if (activityList.isEmpty()) {
             for (callback: ApplicationLifecycleCallback? in lifecycleCallbacks) {
                 callback?.onApplicationCreate(activity)
             }
             Timber.i("%s - onApplicationCreate", activity.javaClass.simpleName)
         }
-        activitySet[getObjectTag(activity)] = activity
+        activityList.add(activity)
         topActivity = activity
     }
 
@@ -204,16 +198,92 @@ class ActivityManager private constructor() : ActivityLifecycleCallbacks {
 
     override fun onActivityDestroyed(activity: Activity) {
         Timber.i("%s - onDestroy", activity.javaClass.simpleName)
-        activitySet.remove(getObjectTag(activity))
+        activityList.remove(activity)
         if (topActivity === activity) {
             topActivity = null
         }
-        if (activitySet.size == 0) {
+        if (activityList.isEmpty()) {
             for (callback: ApplicationLifecycleCallback in lifecycleCallbacks) {
                 callback.onApplicationDestroy(activity)
             }
             Timber.i("%s - onApplicationDestroy", activity.javaClass.simpleName)
         }
+    }
+
+    /**
+     * 判断是否在主进程中
+     */
+    fun isMainProcess(context: Context): Boolean {
+        val processName = getProcessName()
+        return if (TextUtils.isEmpty(processName)) {
+            // 如果获取不到进程名称，那么则将它当做主进程
+            true
+        } else TextUtils.equals(processName, context.packageName)
+    }
+
+    /**
+     * 获取当前进程名称
+     */
+    @SuppressLint("PrivateApi, DiscouragedPrivateApi")
+    fun getProcessName(): String? {
+        var processName: String? = null
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            processName = Application.getProcessName()
+        } else {
+            try {
+                val activityThread = Class.forName("android.app.ActivityThread")
+                val currentProcessNameMethod =
+                    activityThread.getDeclaredMethod("currentProcessName")
+                processName = currentProcessNameMethod.invoke(null) as String
+            } catch (e: ClassNotFoundException) {
+                e.printStackTrace()
+            } catch (e: ClassCastException) {
+                e.printStackTrace()
+            } catch (e: NoSuchMethodException) {
+                e.printStackTrace()
+            } catch (e: IllegalAccessException) {
+                e.printStackTrace()
+            } catch (e: InvocationTargetException) {
+                e.printStackTrace()
+            }
+        }
+        if (!TextUtils.isEmpty(processName)) {
+            return processName
+        }
+
+        // 利用 Linux 系统获取进程名
+        var inputStream: FileInputStream? = null
+        try {
+            inputStream = FileInputStream("/proc/self/cmdline")
+            val buffer = ByteArray(256)
+            var len = 0
+            var b: Int
+            while (inputStream.read().also { b = it } > 0 && len < buffer.size) {
+                buffer[len++] = b.toByte()
+            }
+            if (len > 0) {
+                return String(buffer, 0, len, StandardCharsets.UTF_8)
+            }
+        } catch (e: IOException) {
+            e.printStackTrace()
+        } finally {
+            if (inputStream != null) {
+                try {
+                    inputStream.close()
+                } catch (e: IOException) {
+                    e.printStackTrace()
+                }
+            }
+        }
+        return null
+    }
+
+    /**
+     * 获取某个对象的唯一标记
+     */
+    private fun getObjectTag(`object`: Any): String {
+        // 对象所在的包名 + 对象的内存地址
+        return `object`.javaClass.name + Integer.toHexString(`object`.hashCode())
     }
 
     /**

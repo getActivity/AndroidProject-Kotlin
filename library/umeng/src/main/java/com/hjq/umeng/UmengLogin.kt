@@ -76,7 +76,7 @@ class UmengLogin {
          * @param platform      平台名称
          */
         override fun onStart(platform: SHARE_MEDIA) {
-            listener?.onStart(this.platform)
+            listener?.onLoginStart(this.platform)
         }
 
         /**
@@ -87,7 +87,7 @@ class UmengLogin {
          * @param data          用户资料返回
          */
         override fun onComplete(platform: SHARE_MEDIA, action: Int, data: MutableMap<String?, String?>?) {
-            listener?.onSucceed(this.platform, LoginData(data))
+            listener?.onLoginSuccess(this.platform, LoginData(data))
             listener = null
         }
 
@@ -100,7 +100,7 @@ class UmengLogin {
          */
         override fun onError(platform: SHARE_MEDIA?, action: Int, t: Throwable) {
             t.printStackTrace()
-            listener?.onError(this.platform, t)
+            listener?.onLoginFail(this.platform, t)
             listener = null
         }
 
@@ -111,7 +111,7 @@ class UmengLogin {
          * @param action        行为序号，开发者用不上
          */
         override fun onCancel(platform: SHARE_MEDIA?, action: Int) {
-            listener?.onCancel(this.platform)
+            listener?.onLoginCancel(this.platform)
             listener = null
         }
     }
@@ -123,7 +123,7 @@ class UmengLogin {
          *
          * @param platform      平台对象
          */
-        fun onStart(platform: Platform?) {}
+        fun onLoginStart(platform: Platform?) {}
 
         /**
          * 授权成功的回调
@@ -131,7 +131,7 @@ class UmengLogin {
          * @param platform      平台对象
          * @param data          用户资料返回
          */
-        fun onSucceed(platform: Platform?, data: LoginData?)
+        fun onLoginSuccess(platform: Platform?, data: LoginData?)
 
         /**
          * 授权失败的回调
@@ -139,13 +139,13 @@ class UmengLogin {
          * @param platform      平台对象
          * @param t             错误原因
          */
-        fun onError(platform: Platform?, t: Throwable) {}
+        fun onLoginFail(platform: Platform?, t: Throwable) {}
 
         /**
          * 授权取消的回调
          *
          * @param platform      平台对象
          */
-        fun onCancel(platform: Platform?) {}
+        fun onLoginCancel(platform: Platform?) {}
     }
 }

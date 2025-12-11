@@ -3,17 +3,19 @@ package com.hjq.demo.ui.dialog
 import android.content.Context
 import android.view.View
 import android.view.ViewGroup
-import android.widget.*
+import android.widget.ImageView
+import android.widget.TextView
 import androidx.annotation.StringRes
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.hjq.base.BaseAdapter
 import com.hjq.base.BaseDialog
+import com.hjq.base.ktx.lazyFindViewById
 import com.hjq.demo.R
 import com.hjq.demo.aop.SingleClick
 import com.hjq.demo.app.AppAdapter
 import com.hjq.demo.widget.PasswordView
-import java.util.*
+import java.util.LinkedList
 
 /**
  *    author : Android 轮子哥
@@ -37,12 +39,12 @@ class PayPasswordDialog {
         private var autoDismiss: Boolean = true
         private val recordList: LinkedList<String?> = LinkedList()
 
-        private val titleView: TextView? by lazy { findViewById(R.id.tv_pay_title) }
-        private val closeView: ImageView? by lazy { findViewById(R.id.iv_pay_close) }
-        private val subTitleView: TextView? by lazy { findViewById(R.id.tv_pay_sub_title) }
-        private val moneyView: TextView? by lazy { findViewById(R.id.tv_pay_money) }
-        private val passwordView: PasswordView? by lazy { findViewById(R.id.pw_pay_view) }
-        private val recyclerView: RecyclerView? by lazy { findViewById(R.id.rv_pay_list) }
+        private val titleView: TextView? by lazyFindViewById(R.id.tv_pay_title)
+        private val closeView: ImageView? by lazyFindViewById(R.id.iv_pay_close)
+        private val subTitleView: TextView? by lazyFindViewById(R.id.tv_pay_sub_title)
+        private val moneyView: TextView? by lazyFindViewById(R.id.tv_pay_money)
+        private val passwordView: PasswordView? by lazyFindViewById(R.id.pw_pay_view)
+        private val recyclerView: RecyclerView? by lazyFindViewById(R.id.rv_pay_list)
         private val adapter: KeyboardAdapter
 
         init {

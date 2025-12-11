@@ -1,8 +1,9 @@
 package com.hjq.demo.ui.adapter
 
-import android.content.*
+import android.content.Context
 import android.view.ViewGroup
 import android.widget.TextView
+import com.hjq.base.ktx.lazyFindViewById
 import com.hjq.demo.R
 import com.hjq.demo.app.AppAdapter
 
@@ -14,13 +15,13 @@ import com.hjq.demo.app.AppAdapter
  */
 class StatusAdapter constructor(context: Context) : AppAdapter<String?>(context) {
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AppViewHolder {
         return ViewHolder()
     }
 
     inner class ViewHolder : AppViewHolder(R.layout.status_item) {
 
-        private val textView: TextView? by lazy { findViewById(R.id.tv_status_text) }
+        private val textView: TextView? by lazyFindViewById(R.id.tv_status_text)
 
         override fun onBindView(position: Int) {
             textView?.text = getItem(position)

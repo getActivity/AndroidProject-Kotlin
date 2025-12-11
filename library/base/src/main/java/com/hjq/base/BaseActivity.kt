@@ -1,6 +1,5 @@
 package com.hjq.base
 
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -11,9 +10,12 @@ import android.view.Window
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
-import com.hjq.base.action.*
-import java.util.*
-import kotlin.math.pow
+import com.hjq.base.action.BundleAction
+import com.hjq.base.action.ClickAction
+import com.hjq.base.action.ContextAction
+import com.hjq.base.action.FixOrientationAction
+import com.hjq.base.action.HandlerAction
+import com.hjq.base.ktx.hideKeyboard
 
 /**
  *    author : Android 轮子哥
@@ -21,8 +23,8 @@ import kotlin.math.pow
  *    time   : 2018/10/18
  *    desc   : Activity 技术基类
  */
-abstract class BaseActivity : AppCompatActivity(), ActivityAction,
-    ClickAction, HandlerAction, BundleAction, KeyboardAction {
+abstract class BaseActivity : AppCompatActivity(), ContextAction,
+    ClickAction, HandlerAction, BundleAction, FixOrientationAction {
 
     companion object {
 
@@ -34,6 +36,9 @@ abstract class BaseActivity : AppCompatActivity(), ActivityAction,
     private val activityCallbacks: SparseArray<OnActivityCallback?> by lazy { SparseArray(1) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        if (!isAllowOrientation(this)) {
+            fixScreenOrientation(this);
+        }
         super.onCreate(savedInstanceState)
         initActivity()
     }
@@ -81,8 +86,8 @@ abstract class BaseActivity : AppCompatActivity(), ActivityAction,
     }
 
     override fun onDestroy() {
-        super.onDestroy()
         removeCallbacks()
+        super.onDestroy()
     }
 
     override fun finish() {
@@ -115,8 +120,11 @@ abstract class BaseActivity : AppCompatActivity(), ActivityAction,
         return this
     }
 
-    override fun startActivity(intent: Intent) {
-        return super<AppCompatActivity>.startActivity(intent)
+    override fun setRequestedOrientation(requestedOrientation: Int) {
+        if (!isAllowOrientation(this)) {
+            return
+        }
+        super.setRequestedOrientation(requestedOrientation)
     }
 
     override fun dispatchKeyEvent(event: KeyEvent?): Boolean {
@@ -143,21 +151,8 @@ abstract class BaseActivity : AppCompatActivity(), ActivityAction,
         super.startActivityForResult(intent, requestCode, options)
     }
 
-    /**
-     * startActivityForResult 方法优化
-     */
-    open fun startActivityForResult(clazz: Class<out Activity>, callback: OnActivityCallback?) {
-        startActivityForResult(Intent(this, clazz), null, callback)
-    }
-
-    open fun startActivityForResult(intent: Intent, callback: OnActivityCallback?) {
-        startActivityForResult(intent, null, callback)
-    }
-
     @Suppress("deprecation")
-    open fun startActivityForResult(intent: Intent, options: Bundle?, callback: OnActivityCallback?) {
-        // 请求码必须在 2 的 16 次方以内
-        val requestCode: Int = Random().nextInt(2.0.pow(16.0).toInt())
+    open fun startActivityForResult(intent: Intent, requestCode: Int, callback: OnActivityCallback?, options: Bundle?) {
         activityCallbacks.put(requestCode, callback)
         startActivityForResult(intent, requestCode, options)
     }
@@ -173,7 +168,7 @@ abstract class BaseActivity : AppCompatActivity(), ActivityAction,
         super.onActivityResult(requestCode, resultCode, data)
     }
 
-    interface OnActivityCallback {
+    fun interface OnActivityCallback {
 
         /**
          * 结果回调

@@ -5,7 +5,7 @@ import kotlin.math.ceil
 
 /**
  *    author : Android 轮子哥
- *    github : https://github.com/getActivity/EasyHttp
+ *    github : https://github.com/getActivity/AndroidProject
  *    time   : 2020/10/07
  *    desc   : 统一接口列表数据结构
  */
@@ -28,7 +28,11 @@ class HttpListData<T> : HttpData<ListBean<T?>?>() {
         /**
          * 判断是否是最后一页
          */
+        @Suppress("DIVISION_BY_ZERO")
         fun isLastPage(): Boolean {
+            if (pageSize == 0) {
+                return true
+            }
             return ceil((totalNumber.toFloat() / pageSize.toFloat())) <= pageIndex
         }
 

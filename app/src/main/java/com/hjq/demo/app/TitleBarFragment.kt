@@ -1,7 +1,8 @@
 package com.hjq.demo.app
 
 import android.os.Bundle
-import android.view.*
+import android.view.View
+import android.view.ViewGroup
 import com.gyf.immersionbar.ImmersionBar
 import com.hjq.bar.TitleBar
 import com.hjq.demo.R
@@ -31,10 +32,11 @@ abstract class TitleBarFragment<A : AppActivity> : AppFragment<A>(), TitleBarAct
         if (isStatusBarEnabled()) {
             // 初始化沉浸式状态栏
             getStatusBarConfig().init()
-            if (titleBar != null) {
-                // 设置标题栏沉浸
-                ImmersionBar.setTitleBar(this, titleBar)
-            }
+        }
+
+        val immersionView = getImmersionView()
+        if (immersionView != null) {
+            ImmersionBar.setTitleBar(this, immersionView)
         }
     }
 
@@ -89,5 +91,9 @@ abstract class TitleBarFragment<A : AppActivity> : AppFragment<A>(), TitleBarAct
             titleBar = obtainTitleBar(view as ViewGroup)
         }
         return titleBar
+    }
+
+    open fun getImmersionView(): View? {
+        return getTitleBar()
     }
 }

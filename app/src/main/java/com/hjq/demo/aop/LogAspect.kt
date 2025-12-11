@@ -16,7 +16,7 @@ import java.util.concurrent.TimeUnit
  *    author : Android 轮子哥
  *    github : https://github.com/getActivity/AndroidProject-Kotlin
  *    time   : 2019/12/06
- *    desc   : Debug 日志切面
+ *    desc   : 日志切面
  */
 @Suppress("unused")
 @Aspect
@@ -90,7 +90,7 @@ class LogAspect {
                 builder.append(", ")
             }
             builder.append(parameterNames[i]).append('=')
-            builder.append(parameterValues[i].toString())
+            builder.append(parameterValues[i])
         }
         builder.append(')')
         if (Looper.myLooper() != Looper.getMainLooper()) {

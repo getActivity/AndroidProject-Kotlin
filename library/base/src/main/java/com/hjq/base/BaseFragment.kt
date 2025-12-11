@@ -3,7 +3,8 @@ package com.hjq.base
 import android.app.Activity
 import android.app.Application
 import android.content.Context
-import android.content.Intent
+import android.os.Build.VERSION
+import android.os.Build.VERSION_CODES
 import android.os.Bundle
 import android.view.KeyEvent
 import android.view.LayoutInflater
@@ -12,11 +13,9 @@ import android.view.ViewGroup
 import androidx.annotation.IdRes
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
-import com.hjq.base.BaseActivity.OnActivityCallback
 import com.hjq.base.action.BundleAction
 import com.hjq.base.action.ClickAction
 import com.hjq.base.action.HandlerAction
-import com.hjq.base.action.KeyboardAction
 
 /**
  *    author : Android 轮子哥
@@ -25,7 +24,8 @@ import com.hjq.base.action.KeyboardAction
  *    desc   : Fragment 技术基类
  */
 abstract class BaseFragment<A : BaseActivity> : Fragment(),
-    HandlerAction, ClickAction, BundleAction, KeyboardAction {
+    Application.ActivityLifecycleCallbacks,
+    HandlerAction, ClickAction, BundleAction {
 
     /** Activity 对象 */
     private var activity: A? = null
@@ -41,6 +41,7 @@ abstract class BaseFragment<A : BaseActivity> : Fragment(),
         super.onAttach(context)
         // 获得全局的 Activity
         activity = requireActivity() as A
+        registerAttachActivityLifecycle()
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -55,31 +56,38 @@ abstract class BaseFragment<A : BaseActivity> : Fragment(),
 
     override fun onResume() {
         super.onResume()
-        if (!loading) {
-            loading = true
-            initData()
-            onFragmentResume(true)
+        if (loading) {
             return
         }
 
-        if (this.activity?.lifecycle?.currentState == Lifecycle.State.STARTED) {
-            onActivityResume()
-        } else {
-            onFragmentResume(false)
-        }
+        loading = true
+        initData()
     }
 
     /**
-     * Fragment 可见回调
-     *
-     * @param first                 是否首次调用
+     * Activity 获取焦点回调
      */
-    protected open fun onFragmentResume(first: Boolean) {}
+    protected open fun onActivityStart(attachActivity: A) {}
 
     /**
      * Activity 可见回调
      */
-    protected open fun onActivityResume() {}
+    protected open fun onActivityResume(attachActivity: A) {}
+
+    /**
+     * Activity 不可见回调
+     */
+    protected open fun onActivityPause(attachActivity: A) {}
+
+    /**
+     * Activity 失去焦点回调
+     */
+    protected open fun onActivityStop(attachActivity: A) {}
+
+    /**
+     * Activity 销毁时回调
+     */
+    protected open fun onActivityDestroy(attachActivity: A) {}
 
     override fun onDestroyView() {
         super.onDestroyView()
@@ -87,13 +95,14 @@ abstract class BaseFragment<A : BaseActivity> : Fragment(),
     }
 
     override fun onDestroy() {
+        removeCallbacks()
         super.onDestroy()
         loading = false
-        removeCallbacks()
     }
 
     override fun onDetach() {
         super.onDetach()
+        unregisterAttachActivityLifecycle()
         activity = null
     }
 
@@ -150,28 +159,6 @@ abstract class BaseFragment<A : BaseActivity> : Fragment(),
     }
 
     /**
-     * 跳转 Activity 简化版
-     */
-    open fun startActivity(clazz: Class<out Activity>) {
-        startActivity(Intent(context, clazz))
-    }
-
-    /**
-     * startActivityForResult 方法优化
-     */
-    open fun startActivityForResult(clazz: Class<out Activity>, callback: OnActivityCallback?) {
-        activity?.startActivityForResult(clazz, callback)
-    }
-
-    open fun startActivityForResult(intent: Intent, callback: OnActivityCallback?) {
-        activity?.startActivityForResult(intent, null, callback)
-    }
-
-    open fun startActivityForResult(intent: Intent, options: Bundle?, callback: OnActivityCallback?) {
-        activity?.startActivityForResult(intent, options, callback)
-    }
-
-    /**
      * 销毁当前 Fragment 所在的 Activity
      */
     open fun finish() {
@@ -222,7 +209,69 @@ abstract class BaseFragment<A : BaseActivity> : Fragment(),
         return false
     }
 
-    override fun getContext(): Context? {
-        return activity
+    override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {}
+
+    override fun onActivityStarted(activity: Activity) {
+        if (activity !== this.activity) {
+            return
+        }
+        onActivityStart(activity)
+    }
+
+    override fun onActivityResumed(activity: Activity) {
+        if (activity !== this.activity) {
+            return
+        }
+        onActivityResume(activity)
+    }
+
+    override fun onActivityPaused(activity: Activity) {
+        if (activity !== this.activity) {
+            return
+        }
+        onActivityPause(activity)
+    }
+
+    override fun onActivityStopped(activity: Activity) {
+        if (activity !== this.activity) {
+            return
+        }
+        onActivityStop(activity)
+    }
+
+    override fun onActivitySaveInstanceState(activity: Activity, outState: Bundle) {}
+
+    override fun onActivityDestroyed(activity: Activity) {
+        if (activity !== this.activity) {
+            return
+        }
+        onActivityDestroy(activity)
+        unregisterAttachActivityLifecycle()
+    }
+
+    /**
+     * 注册绑定 Activity 生命周期回调
+     */
+    private fun registerAttachActivityLifecycle() {
+        activity?.let {
+            if (VERSION.SDK_INT >= VERSION_CODES.Q) {
+                it.registerActivityLifecycleCallbacks(this)
+            } else {
+                it.application.registerActivityLifecycleCallbacks(this)
+            }
+        }
+    }
+
+    /**
+     * 反注册绑定 Activity 生命周期回调
+     */
+    private fun unregisterAttachActivityLifecycle() {
+        activity?.let {
+            if (VERSION.SDK_INT >= VERSION_CODES.Q) {
+                it.unregisterActivityLifecycleCallbacks(this)
+            } else {
+                it.application.unregisterActivityLifecycleCallbacks(this)
+            }
+        }
     }
 }

@@ -5,14 +5,16 @@ import android.view.View
 import android.widget.EditText
 import android.widget.TextView
 import com.hjq.base.BaseDialog
+import com.hjq.base.ktx.lazyFindViewById
 import com.hjq.demo.R
 import com.hjq.demo.aop.SingleClick
 import com.hjq.demo.http.api.GetCodeApi
 import com.hjq.demo.http.api.VerifyCodeApi
 import com.hjq.demo.http.model.HttpData
+import com.hjq.demo.ktx.toast
+import com.hjq.demo.ui.dialog.common.StyleDialog
 import com.hjq.http.EasyHttp
 import com.hjq.http.listener.OnHttpListener
-import com.hjq.toast.ToastUtils
 import com.hjq.widget.view.CountdownView
 
 /**
@@ -23,11 +25,11 @@ import com.hjq.widget.view.CountdownView
  */
 class SafeDialog {
 
-    class Builder(context: Context) : CommonDialog.Builder<Builder>(context) {
+    class Builder(context: Context) : StyleDialog.Builder<Builder>(context) {
 
-        private val phoneView: TextView? by lazy { findViewById(R.id.tv_safe_phone) }
-        private val codeView: EditText? by lazy { findViewById(R.id.et_safe_code) }
-        private val countdownView: CountdownView? by lazy { findViewById(R.id.cv_safe_countdown) }
+        private val phoneView: TextView? by lazyFindViewById(R.id.tv_safe_phone)
+        private val codeView: EditText? by lazyFindViewById(R.id.et_safe_code)
+        private val countdownView: CountdownView? by lazyFindViewById(R.id.cv_safe_countdown)
 
         private var listener: OnListener? = null
 
@@ -58,7 +60,7 @@ class SafeDialog {
             when (view.id) {
                 R.id.cv_safe_countdown -> {
                     if (true) {
-                        ToastUtils.show(R.string.common_code_send_hint)
+                        toast(R.string.common_code_send_hint)
                         countdownView?.start()
                         setCancelable(false)
                         return
@@ -69,26 +71,26 @@ class SafeDialog {
                         .api(GetCodeApi().apply {
                             setPhone(phoneNumber)
                         })
-                        .request(object : OnHttpListener<HttpData<Void?>?> {
+                        .request(object : OnHttpListener<HttpData<Void?>> {
 
-                            override fun onSucceed(data: HttpData<Void?>?) {
-                                ToastUtils.show(R.string.common_code_send_hint)
+                            override fun onHttpSuccess(data: HttpData<Void?>) {
+                                toast(R.string.common_code_send_hint)
                                 countdownView?.start()
                                 setCancelable(false)
                             }
 
-                            override fun onFail(e: Exception) {
-                                ToastUtils.show(e.message)
+                            override fun onHttpFail(throwable: Throwable) {
+                                toast(throwable.message)
                             }
                         })
                 }
                 R.id.tv_ui_confirm -> {
-                    if (codeView?.text.toString().length != getResources().getInteger(R.integer.sms_code_length)) {
-                        ToastUtils.show(R.string.common_code_error_hint)
+                    if (codeView?.text.toString().length != getResources().getInteger(R.integer.sms_code_max_length)) {
+                        toast(R.string.common_code_error_hint)
                         return
                     }
                     if (true) {
-                        autoDismiss()
+                        performClickDismiss()
                         listener?.onConfirm(getDialog(), phoneNumber, codeView?.text.toString())
                         return
                     }
@@ -99,20 +101,20 @@ class SafeDialog {
                             setPhone(phoneNumber)
                             setCode(codeView?.text.toString())
                         })
-                        .request(object : OnHttpListener<HttpData<Void?>?> {
+                        .request(object : OnHttpListener<HttpData<Void?>> {
 
-                            override fun onSucceed(data: HttpData<Void?>?) {
-                                autoDismiss()
+                            override fun onHttpSuccess(data: HttpData<Void?>) {
+                                performClickDismiss()
                                 listener?.onConfirm(getDialog(), phoneNumber, codeView?.text.toString())
                             }
 
-                            override fun onFail(e: Exception) {
-                                ToastUtils.show(e.message)
+                            override fun onHttpFail(throwable: Throwable) {
+                                toast(throwable.message)
                             }
                         })
                 }
                 R.id.tv_ui_cancel -> {
-                    autoDismiss()
+                    performClickDismiss()
                     listener?.onCancel(getDialog())
                 }
             }

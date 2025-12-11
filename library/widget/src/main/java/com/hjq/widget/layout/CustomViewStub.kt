@@ -1,9 +1,11 @@
 package com.hjq.widget.layout
 
-import android.content.*
+import android.content.Context
 import android.content.res.TypedArray
 import android.util.AttributeSet
-import android.view.*
+import android.view.Gravity
+import android.view.LayoutInflater
+import android.view.View
 import android.widget.FrameLayout
 import com.hjq.widget.R
 

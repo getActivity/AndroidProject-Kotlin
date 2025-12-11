@@ -2,7 +2,15 @@ package com.hjq.widget.view
 
 import android.content.Context
 import android.content.res.TypedArray
-import android.graphics.*
+import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.Paint
+import android.graphics.Path
+import android.graphics.PorterDuff
+import android.graphics.PorterDuffXfermode
+import android.graphics.Rect
+import android.graphics.RectF
+import android.graphics.Typeface
 import android.text.TextPaint
 import android.text.TextUtils
 import android.util.AttributeSet
@@ -10,6 +18,7 @@ import android.util.TypedValue
 import android.view.Gravity
 import android.view.View
 import androidx.annotation.StringRes
+import com.hjq.base.ktx.sp2px
 import com.hjq.widget.R
 import kotlin.math.max
 
@@ -63,7 +72,7 @@ class SlantedTextView @JvmOverloads constructor(
         val array: TypedArray = context.obtainStyledAttributes(attrs, R.styleable.SlantedTextView)
         setText(array.getString(R.styleable.SlantedTextView_android_text))
         setTextSize(TypedValue.COMPLEX_UNIT_PX, array.getDimensionPixelSize(R.styleable.SlantedTextView_android_textSize,
-            resources.getDimension(R.dimen.sp_12).toInt()).toFloat())
+            sp2px(12).toInt()).toFloat())
         setTextColor(array.getColor(R.styleable.SlantedTextView_android_textColor, Color.WHITE))
         setTextStyle(Typeface.defaultFromStyle(array.getInt(R.styleable.SlantedTextView_android_textStyle, Typeface.NORMAL)))
         setGravity(array.getInt(R.styleable.SlantedTextView_android_gravity, Gravity.END))

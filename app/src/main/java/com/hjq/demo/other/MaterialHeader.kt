@@ -11,6 +11,7 @@ import android.widget.ImageView
 import androidx.annotation.ColorInt
 import androidx.annotation.ColorRes
 import androidx.core.content.ContextCompat
+import com.hjq.base.ktx.dp2px
 import com.hjq.demo.R
 import com.scwang.smart.refresh.header.material.CircleImageView
 import com.scwang.smart.refresh.header.material.MaterialProgressDrawable
@@ -60,7 +61,7 @@ class MaterialHeader @JvmOverloads constructor(context: Context, attrs: Attribut
 
     init {
         mSpinnerStyle = SpinnerStyle.MatchLayout
-        minimumHeight = resources.getDimension(R.dimen.dp_100).toInt()
+        minimumHeight = dp2px(100).toInt()
         progressDrawable = MaterialProgressDrawable(this)
         progressDrawable.setColorSchemeColors(
             Color.parseColor("#0099CC"),
@@ -72,7 +73,7 @@ class MaterialHeader @JvmOverloads constructor(context: Context, attrs: Attribut
         circleView.setImageDrawable(progressDrawable)
         circleView.alpha = 0f
         addView(circleView)
-        circleDiameter = resources.getDimension(R.dimen.dp_40).toInt()
+        circleDiameter = dp2px(40).toInt()
         bezierPath = Path()
         bezierPaint = Paint()
         bezierPaint.isAntiAlias = true
@@ -246,7 +247,7 @@ class MaterialHeader @JvmOverloads constructor(context: Context, attrs: Attribut
         if (style != BALL_STYLE_LARGE && style != BALL_STYLE_DEFAULT) {
             return@apply
         }
-        circleDiameter = if (style == BALL_STYLE_LARGE) resources.getDimension(R.dimen.dp_56).toInt() else resources.getDimension(R.dimen.dp_40).toInt()
+        circleDiameter = if (style == BALL_STYLE_LARGE) dp2px(56).toInt() else dp2px(40).toInt()
         // force the bounds of the progress circle inside the circle view to
         // update by setting it to null before updating its size and then
         // re-setting it

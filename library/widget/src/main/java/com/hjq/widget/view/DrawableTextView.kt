@@ -1,6 +1,6 @@
 package com.hjq.widget.view
 
-import android.content.*
+import android.content.Context
 import android.content.res.TypedArray
 import android.graphics.drawable.Drawable
 import android.util.AttributeSet
@@ -16,6 +16,11 @@ import com.hjq.widget.R
 class DrawableTextView @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0) :
     AppCompatTextView(context, attrs, defStyleAttr) {
+
+    private val DRAWABLE_INDEX_LEFT = 0
+    private val DRAWABLE_INDEX_TOP = 1
+    private val DRAWABLE_INDEX_RIGHT = 2
+    private val DRAWABLE_INDEX_BOTTOM = 3
 
     private var drawableWidth: Int
     private var drawableHeight: Int
@@ -34,9 +39,6 @@ class DrawableTextView @JvmOverloads constructor(
     fun setDrawableSize(width: Int, height: Int) {
         drawableWidth = width
         drawableHeight = height
-        if (!isAttachedToWindow) {
-            return
-        }
         refreshDrawablesSize()
     }
 
@@ -45,9 +47,6 @@ class DrawableTextView @JvmOverloads constructor(
      */
     fun setDrawableWidth(width: Int) {
         drawableWidth = width
-        if (!isAttachedToWindow) {
-            return
-        }
         refreshDrawablesSize()
     }
 
@@ -56,25 +55,16 @@ class DrawableTextView @JvmOverloads constructor(
      */
     fun setDrawableHeight(height: Int) {
         drawableHeight = height
-        if (!isAttachedToWindow) {
-            return
-        }
         refreshDrawablesSize()
     }
 
     override fun setCompoundDrawables(left: Drawable?, top: Drawable?, right: Drawable?, bottom: Drawable?) {
         super.setCompoundDrawables(left, top, right, bottom)
-        if (!isAttachedToWindow) {
-            return
-        }
         refreshDrawablesSize()
     }
 
     override fun setCompoundDrawablesRelative(start: Drawable?, top: Drawable?, end: Drawable?, bottom: Drawable?) {
         super.setCompoundDrawablesRelative(start, top, end, bottom)
-        if (!isAttachedToWindow) {
-            return
-        }
         refreshDrawablesSize()
     }
 
@@ -85,19 +75,41 @@ class DrawableTextView @JvmOverloads constructor(
         if (drawableWidth == 0 || drawableHeight == 0) {
             return
         }
-        var compoundDrawables: Array<Drawable?> = compoundDrawables
-        if (compoundDrawables[0] != null || compoundDrawables[1] != null) {
-            super.setCompoundDrawables(
-                limitDrawableSize(compoundDrawables[0]), limitDrawableSize(compoundDrawables[1]),
-                limitDrawableSize(compoundDrawables[2]), limitDrawableSize(compoundDrawables[3])
-            )
-            return
+        val compoundDrawables = compoundDrawables
+        val compoundDrawablesRelative = compoundDrawablesRelative
+
+        // 获取布局方向
+        val layoutDirection = layoutDirection
+
+        var leftDrawable = compoundDrawablesRelative[if (layoutDirection == LAYOUT_DIRECTION_LTR) DRAWABLE_INDEX_LEFT else DRAWABLE_INDEX_RIGHT]
+        if (leftDrawable == null) {
+            leftDrawable = compoundDrawables[DRAWABLE_INDEX_LEFT]
         }
-        compoundDrawables = compoundDrawablesRelative
-        super.setCompoundDrawablesRelative(
-            limitDrawableSize(compoundDrawables[0]), limitDrawableSize(compoundDrawables[1]),
-            limitDrawableSize(compoundDrawables[2]), limitDrawableSize(compoundDrawables[3])
-        )
+
+        var topDrawable = compoundDrawablesRelative[DRAWABLE_INDEX_TOP]
+        if (topDrawable == null) {
+            topDrawable = compoundDrawables[DRAWABLE_INDEX_TOP]
+        }
+
+        var rightDrawable = compoundDrawablesRelative[if (layoutDirection == LAYOUT_DIRECTION_LTR) DRAWABLE_INDEX_RIGHT else DRAWABLE_INDEX_LEFT]
+        if (rightDrawable == null) {
+            rightDrawable = compoundDrawables[DRAWABLE_INDEX_RIGHT]
+        }
+
+        var bottomDrawable = compoundDrawablesRelative[DRAWABLE_INDEX_BOTTOM]
+        if (bottomDrawable == null) {
+            bottomDrawable = compoundDrawables[DRAWABLE_INDEX_BOTTOM]
+        }
+
+        val newDrawable = arrayOfNulls<Drawable>(4)
+        newDrawable[DRAWABLE_INDEX_LEFT] = limitDrawableSize(leftDrawable)
+        newDrawable[DRAWABLE_INDEX_TOP] = limitDrawableSize(topDrawable)
+        newDrawable[DRAWABLE_INDEX_RIGHT] = limitDrawableSize(rightDrawable)
+        newDrawable[DRAWABLE_INDEX_BOTTOM] = limitDrawableSize(bottomDrawable)
+
+        super.setCompoundDrawables(
+            newDrawable[DRAWABLE_INDEX_LEFT], newDrawable[DRAWABLE_INDEX_TOP],
+            newDrawable[DRAWABLE_INDEX_RIGHT], newDrawable[DRAWABLE_INDEX_BOTTOM])
     }
 
     /**

@@ -1,12 +1,19 @@
 package com.hjq.widget.view
 
 import android.animation.ValueAnimator
-import android.content.*
+import android.content.Context
 import android.content.res.TypedArray
-import android.graphics.*
+import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.CornerPathEffect
+import android.graphics.Paint
+import android.graphics.Path
+import android.graphics.PathMeasure
+import android.graphics.RectF
 import android.util.AttributeSet
-import android.view.*
+import android.view.View
 import android.view.animation.AnticipateInterpolator
+import com.hjq.base.ktx.dp2px
 import com.hjq.widget.R
 
 /**
@@ -53,7 +60,7 @@ class PlayButton @JvmOverloads constructor(
         val lineColor: Int = typedArray.getColor(R.styleable.PlayButton_pb_lineColor, Color.WHITE)
         val lineSize: Int = typedArray.getInteger(
             R.styleable.PlayButton_pb_lineSize,
-            resources.getDimension(R.dimen.dp_4).toInt()
+            dp2px(4).toInt()
         )
         animDuration = typedArray.getInteger(R.styleable.PlayButton_pb_animDuration, 200)
         typedArray.recycle()
@@ -75,7 +82,7 @@ class PlayButton @JvmOverloads constructor(
         super.onSizeChanged(width, height, oldWidth, oldHeight)
         viewWidth = width * 9 / 10
         viewHeight = height * 9 / 10
-        circleRadius = width / resources.getDimension(R.dimen.dp_4).toInt()
+        circleRadius = width / dp2px(4).toInt()
         centerX = width / 2
         centerY = height / 2
         rectF = RectF(
@@ -99,12 +106,12 @@ class PlayButton @JvmOverloads constructor(
         var finalHeightMeasureSpec: Int = heightMeasureSpec
         when (MeasureSpec.getMode(finalWidthMeasureSpec)) {
             MeasureSpec.AT_MOST, MeasureSpec.UNSPECIFIED ->
-                finalWidthMeasureSpec = MeasureSpec.makeMeasureSpec(resources.getDimension(R.dimen.dp_60).toInt(), MeasureSpec.EXACTLY)
+                finalWidthMeasureSpec = MeasureSpec.makeMeasureSpec(dp2px(60).toInt(), MeasureSpec.EXACTLY)
             MeasureSpec.EXACTLY -> {}
         }
         when (MeasureSpec.getMode(finalHeightMeasureSpec)) {
             MeasureSpec.AT_MOST, MeasureSpec.UNSPECIFIED ->
-                finalHeightMeasureSpec = MeasureSpec.makeMeasureSpec(resources.getDimension(R.dimen.dp_60).toInt(), MeasureSpec.EXACTLY)
+                finalHeightMeasureSpec = MeasureSpec.makeMeasureSpec(dp2px(60).toInt(), MeasureSpec.EXACTLY)
             MeasureSpec.EXACTLY -> {}
         }
         setMeasuredDimension(finalWidthMeasureSpec, finalHeightMeasureSpec)

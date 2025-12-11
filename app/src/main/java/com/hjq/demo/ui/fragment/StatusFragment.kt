@@ -1,18 +1,19 @@
 package com.hjq.demo.ui.fragment
 
-import android.view.*
+import android.view.View
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.hjq.base.BaseAdapter
+import com.hjq.base.ktx.lazyFindViewById
 import com.hjq.demo.R
 import com.hjq.demo.app.AppActivity
 import com.hjq.demo.app.TitleBarFragment
+import com.hjq.demo.ktx.toast
 import com.hjq.demo.ui.adapter.StatusAdapter
 import com.hjq.widget.layout.WrapRecyclerView
 import com.scwang.smart.refresh.layout.SmartRefreshLayout
 import com.scwang.smart.refresh.layout.api.RefreshLayout
 import com.scwang.smart.refresh.layout.listener.OnRefreshLoadMoreListener
-import java.util.*
 
 /**
  *    author : Android 轮子哥
@@ -29,8 +30,8 @@ class StatusFragment : TitleBarFragment<AppActivity>(), OnRefreshLoadMoreListene
         }
     }
 
-    private val refreshLayout: SmartRefreshLayout? by lazy { findViewById(R.id.rl_status_refresh) }
-    private val recyclerView: WrapRecyclerView? by lazy { findViewById(R.id.rv_status_list) }
+    private val refreshLayout: SmartRefreshLayout? by lazyFindViewById(R.id.rl_status_refresh)
+    private val recyclerView: WrapRecyclerView? by lazyFindViewById(R.id.rv_status_list)
 
     private var adapter: StatusAdapter? = null
 
@@ -65,7 +66,7 @@ class StatusFragment : TitleBarFragment<AppActivity>(), OnRefreshLoadMoreListene
         val data: MutableList<String?> = ArrayList()
         adapter?.let {
             for (i in it.getCount() until it.getCount() + 20) {
-                data.add("我是第" + i + "条目")
+                data.add("我是第 " + i + " 条目")
             }
             return data
         }

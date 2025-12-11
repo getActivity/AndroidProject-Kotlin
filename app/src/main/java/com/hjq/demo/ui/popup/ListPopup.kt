@@ -1,17 +1,20 @@
 package com.hjq.demo.ui.popup
 
-import android.content.*
+import android.content.Context
 import android.util.TypedValue
-import android.view.*
+import android.view.Gravity
+import android.view.View
+import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.hjq.base.BaseAdapter
 import com.hjq.base.BasePopupWindow
 import com.hjq.base.action.AnimAction
+import com.hjq.base.ktx.dp2px
+import com.hjq.base.ktx.sp2px
 import com.hjq.demo.R
 import com.hjq.demo.app.AppAdapter
 import com.hjq.demo.other.ArrowDrawable
-import java.util.*
 
 /**
  *    author : Android 轮子哥
@@ -41,7 +44,7 @@ class ListPopup {
             ArrowDrawable.Builder(context)
                 .setArrowOrientation(Gravity.TOP)
                 .setArrowGravity(Gravity.CENTER)
-                .setShadowSize(context.resources.getDimension(R.dimen.dp_10).toInt())
+                .setShadowSize(context.dp2px(10).toInt())
                 .setBackgroundColor(getColor(R.color.white))
                 .apply(recyclerView)
         }
@@ -95,7 +98,7 @@ class ListPopup {
 
     private class MenuAdapter(context: Context) : AppAdapter<Any>(context) {
 
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AppViewHolder {
             return ViewHolder()
         }
 
@@ -105,16 +108,16 @@ class ListPopup {
 
             init {
                 textView.setTextColor(getColor(R.color.black50))
-                textView.setTextSize(TypedValue.COMPLEX_UNIT_PX, getContext().resources.getDimension(R.dimen.sp_16))
+                textView.setTextSize(TypedValue.COMPLEX_UNIT_PX, getContext().sp2px(16))
             }
 
             override fun onBindView(position: Int) {
                 textView.text = getItem(position).toString()
                 textView.setPaddingRelative(
-                    getContext().resources.getDimension(R.dimen.dp_12).toInt(),
-                    if (position == 0) getContext().resources.getDimension(R.dimen.dp_12).toInt() else 0,
-                    getContext().resources.getDimension(R.dimen.dp_12).toInt(),
-                    getContext().resources.getDimension(R.dimen.dp_10).toInt())
+                    getContext().dp2px(12).toInt(),
+                    if (position == 0) getContext().dp2px(12).toInt() else 0,
+                    getContext().dp2px(12).toInt(),
+                    getContext().dp2px(10).toInt())
             }
         }
     }

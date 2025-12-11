@@ -1,12 +1,14 @@
 package com.hjq.demo.other
 
-import android.content.*
+import android.content.Context
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
 import android.widget.TextView
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.content.ContextCompat
 import com.hjq.bar.style.LightBarStyle
+import com.hjq.base.ktx.dp2px
+import com.hjq.base.ktx.sp2px
 import com.hjq.demo.R
 import com.hjq.widget.view.PressAlphaTextView
 
@@ -46,35 +48,43 @@ class TitleBarStyle : LightBarStyle() {
         return null
     }
 
-    override fun getChildHorizontalPadding(context: Context): Int {
-        return context.resources.getDimension(R.dimen.dp_12).toInt()
+    override fun getTitleHorizontalPadding(context: Context): Int {
+        return 0
+    }
+
+    override fun getLeftHorizontalPadding(context: Context): Int {
+        return context.dp2px(10).toInt()
+    }
+
+    override fun getRightHorizontalPadding(context: Context): Int {
+        return context.dp2px(10).toInt()
     }
 
     override fun getChildVerticalPadding(context: Context): Int {
-        return context.resources.getDimension(R.dimen.dp_14).toInt()
+        return context.dp2px(14).toInt()
     }
 
     override fun getTitleSize(context: Context): Float {
-        return context.resources.getDimension(R.dimen.sp_15)
+        return context.sp2px(15)
     }
 
     override fun getLeftTitleSize(context: Context): Float {
-        return context.resources.getDimension(R.dimen.sp_13)
+        return context.sp2px(13)
     }
 
     override fun getRightTitleSize(context: Context): Float {
-        return context.resources.getDimension(R.dimen.sp_13)
+        return context.sp2px(13)
     }
 
     override fun getTitleIconPadding(context: Context): Int {
-        return context.resources.getDimension(R.dimen.dp_2).toInt()
+        return context.dp2px(2).toInt()
     }
 
     override fun getLeftIconPadding(context: Context): Int {
-        return context.resources.getDimension(R.dimen.dp_2).toInt()
+        return context.dp2px(2).toInt()
     }
 
     override fun getRightIconPadding(context: Context): Int {
-        return context.resources.getDimension(R.dimen.dp_2).toInt()
+        return context.dp2px(2).toInt()
     }
 }

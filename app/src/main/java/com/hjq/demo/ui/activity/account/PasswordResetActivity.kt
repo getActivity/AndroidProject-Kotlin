@@ -1,0 +1,138 @@
+package com.hjq.demo.ui.activity.account
+
+import android.content.Context
+import android.view.KeyEvent
+import android.view.View
+import android.view.animation.AnimationUtils
+import android.view.inputmethod.EditorInfo
+import android.widget.Button
+import android.widget.EditText
+import android.widget.TextView
+import android.widget.TextView.OnEditorActionListener
+import com.hjq.base.ktx.createIntent
+import com.hjq.base.ktx.hideKeyboard
+import com.hjq.base.ktx.lazyFindViewById
+import com.hjq.demo.R
+import com.hjq.demo.aop.Log
+import com.hjq.demo.aop.SingleClick
+import com.hjq.demo.app.AppActivity
+import com.hjq.demo.http.api.PasswordApi
+import com.hjq.demo.http.model.HttpData
+import com.hjq.demo.ktx.toast
+import com.hjq.demo.manager.InputTextManager
+import com.hjq.demo.ui.dialog.common.TipsDialog
+import com.hjq.http.EasyHttp
+import com.hjq.http.listener.HttpCallbackProxy
+
+/**
+ *    author : Android 轮子哥
+ *    github : https://github.com/getActivity/AndroidProject-Kotlin
+ *    time   : 2019/02/27
+ *    desc   : 重置密码
+ */
+class PasswordResetActivity : AppActivity(), OnEditorActionListener {
+
+    companion object {
+
+        private const val INTENT_KEY_IN_PHONE: String = "phone"
+        private const val INTENT_KEY_IN_CODE: String = "code"
+
+        @Log
+        fun start(context: Context, phone: String?, code: String?) {
+            val intent = context.createIntent(PasswordResetActivity::class.java)
+            intent.putExtra(INTENT_KEY_IN_PHONE, phone)
+            intent.putExtra(INTENT_KEY_IN_CODE, code)
+            context.startActivity(intent)
+        }
+    }
+
+    private val firstPassword: EditText? by lazyFindViewById(R.id.et_password_reset_password1)
+    private val secondPassword: EditText? by lazyFindViewById(R.id.et_password_reset_password2)
+    private val commitView: Button? by lazyFindViewById(R.id.btn_password_reset_commit)
+
+    /** 手机号 */
+    private var phoneNumber: String? = null
+
+    /** 验证码 */
+    private var verifyCode: String? = null
+
+    override fun getLayoutId(): Int {
+        return R.layout.password_reset_activity
+    }
+
+    override fun initView() {
+        setOnClickListener(commitView)
+        secondPassword?.setOnEditorActionListener(this)
+        commitView?.let {
+            InputTextManager.with(this)
+                .addView(firstPassword)
+                .addView(secondPassword)
+                .setMain(it)
+                .build()
+        }
+    }
+
+    override fun initData() {
+        phoneNumber = getString(INTENT_KEY_IN_PHONE)
+        verifyCode = getString(INTENT_KEY_IN_CODE)
+    }
+
+    @SingleClick
+    override fun onClick(view: View) {
+        if (view === commitView) {
+            if (firstPassword?.text.toString() != secondPassword?.text.toString()) {
+                firstPassword?.startAnimation(AnimationUtils.loadAnimation(getContext(), R.anim.shake_anim))
+                secondPassword?.startAnimation(AnimationUtils.loadAnimation(getContext(), R.anim.shake_anim))
+                toast(R.string.common_password_input_unlike)
+                return
+            }
+
+            // 隐藏软键盘
+            hideKeyboard(currentFocus)
+            if (true) {
+                TipsDialog.Builder(this)
+                    .setIcon(TipsDialog.ICON_FINISH)
+                    .setMessage(R.string.password_reset_success)
+                    .setDuration(2000)
+                    .addOnDismissListener { finish() }
+                    .show()
+                return
+            }
+
+            // 重置密码
+            EasyHttp.post(this)
+                .api(PasswordApi().apply {
+                    setPhone(phoneNumber)
+                    setCode(verifyCode)
+                    setPassword(firstPassword?.text.toString())
+                })
+                .request(object : HttpCallbackProxy<HttpData<Void?>>(this) {
+
+                    override fun onHttpSuccess(data: HttpData<Void?>) {
+                        TipsDialog.Builder(this@PasswordResetActivity)
+                            .setIcon(TipsDialog.ICON_FINISH)
+                            .setMessage(R.string.password_reset_success)
+                            .setDuration(2000)
+                            .addOnDismissListener { finish() }
+                            .show()
+                    }
+                })
+        }
+    }
+
+    /**
+     * [TextView.OnEditorActionListener]
+     */
+    override fun onEditorAction(v: TextView?, actionId: Int, event: KeyEvent?): Boolean {
+        if (actionId == EditorInfo.IME_ACTION_DONE) {
+            // 模拟点击提交按钮
+            commitView?.let {
+                if (it.isEnabled) {
+                    onClick(it)
+                    return true
+                }
+            }
+        }
+        return false
+    }
+}

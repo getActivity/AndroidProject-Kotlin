@@ -6,6 +6,7 @@ import android.view.animation.ScaleAnimation
 import androidx.viewpager2.widget.ViewPager2
 import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
 import com.gyf.immersionbar.ImmersionBar
+import com.hjq.base.ktx.lazyFindViewById
 import com.hjq.demo.R
 import com.hjq.demo.aop.SingleClick
 import com.hjq.demo.app.AppActivity
@@ -20,50 +21,13 @@ import me.relex.circleindicator.CircleIndicator3
  */
 class GuideActivity : AppActivity() {
 
-    private val viewPager: ViewPager2? by lazy { findViewById(R.id.vp_guide_pager) }
-    private val indicatorView: CircleIndicator3? by lazy { findViewById(R.id.cv_guide_indicator) }
-    private val completeView: View? by lazy { findViewById(R.id.btn_guide_complete) }
+    private val viewPager: ViewPager2? by lazyFindViewById(R.id.vp_guide_pager)
+    private val indicatorView: CircleIndicator3? by lazyFindViewById(R.id.cv_guide_indicator)
+    private val completeView: View? by lazyFindViewById(R.id.btn_guide_complete)
 
     private val adapter: GuideAdapter = GuideAdapter(this)
 
-    override fun getLayoutId(): Int {
-        return R.layout.guide_activity
-    }
-
-    override fun initView() {
-        setOnClickListener(completeView)
-    }
-
-    override fun initData() {
-        adapter.addItem(R.drawable.guide_1_bg)
-        adapter.addItem(R.drawable.guide_2_bg)
-        adapter.addItem(R.drawable.guide_3_bg)
-
-        viewPager?.adapter = adapter
-        viewPager?.registerOnPageChangeCallback(mCallback)
-        indicatorView?.setViewPager(viewPager)
-    }
-
-    @SingleClick
-    override fun onClick(view: View) {
-        if (view === completeView) {
-            HomeActivity.start(getContext())
-            finish()
-        }
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        viewPager?.unregisterOnPageChangeCallback(mCallback)
-    }
-
-    override fun createStatusBarConfig(): ImmersionBar {
-        return super.createStatusBarConfig()
-            // 指定导航栏背景颜色
-            .navigationBarColor(R.color.white)
-    }
-
-    private val mCallback: OnPageChangeCallback = object : OnPageChangeCallback() {
+    private val callback: OnPageChangeCallback by lazy{ object : OnPageChangeCallback() {
 
         override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {
             if (viewPager?.currentItem != adapter.getCount() - 1 || positionOffsetPixels <= 0) {
@@ -92,5 +56,42 @@ class GuideActivity : AppActivity() {
                 completeView?.startAnimation(animation)
             }
         }
+    }}
+
+    override fun getLayoutId(): Int {
+        return R.layout.guide_activity
+    }
+
+    override fun initView() {
+        setOnClickListener(completeView)
+    }
+
+    override fun initData() {
+        adapter.addItem(R.drawable.guide_1_bg)
+        adapter.addItem(R.drawable.guide_2_bg)
+        adapter.addItem(R.drawable.guide_3_bg)
+
+        viewPager?.adapter = adapter
+        viewPager?.registerOnPageChangeCallback(callback)
+        indicatorView?.setViewPager(viewPager)
+    }
+
+    @SingleClick
+    override fun onClick(view: View) {
+        if (view === completeView) {
+            HomeActivity.start(getContext())
+            finish()
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        viewPager?.unregisterOnPageChangeCallback(callback)
+    }
+
+    override fun createStatusBarConfig(): ImmersionBar {
+        return super.createStatusBarConfig()
+            // 指定导航栏背景颜色
+            .navigationBarColor(R.color.white)
     }
 }

@@ -1,8 +1,10 @@
 package com.hjq.widget.view
 
-import android.content.*
+import android.content.Context
 import android.content.res.TypedArray
-import android.text.*
+import android.text.InputFilter
+import android.text.Spanned
+import android.text.TextUtils
 import android.util.AttributeSet
 import androidx.appcompat.widget.AppCompatEditText
 import com.hjq.widget.R
@@ -41,6 +43,9 @@ open class RegexEditText @JvmOverloads constructor(
 
         /** 非空格的字符（不能输入空格）*/
         const val REGEX_NONNULL: String = "\\S+"
+
+        /** 密码（只能输入英文，数字，英文符号） */
+        const val REGEX_PASSWORD: String = "[a-zA-Z|\\d|,|\\.|\\|?|!|:|/|@|\"|;|'|~|\\|\\(|\\)|<|>|\\|\\[|\\]|\\{|\\}|\\*|&|\\\\||`|#|\\$|%|\\^|_|\\|\\+|\\-|=]+"
     }
 
     /** 正则表达式规则 */
@@ -59,6 +64,7 @@ open class RegexEditText @JvmOverloads constructor(
                 0x05 -> setInputRegex(REGEX_COUNT)
                 0x06 -> setInputRegex(REGEX_NAME)
                 0x07 -> setInputRegex(REGEX_NONNULL)
+                0x08 -> setInputRegex(REGEX_PASSWORD)
             }
         }
         array.recycle()

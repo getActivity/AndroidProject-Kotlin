@@ -2,10 +2,11 @@ package com.hjq.demo.ui.activity
 
 import androidx.core.content.ContextCompat
 import com.hjq.base.BaseDialog
+import com.hjq.base.ktx.lazyFindViewById
 import com.hjq.demo.R
 import com.hjq.demo.action.StatusAction
 import com.hjq.demo.app.AppActivity
-import com.hjq.demo.ui.dialog.MenuDialog
+import com.hjq.demo.ui.dialog.common.MenuDialog
 import com.hjq.demo.widget.StatusLayout
 import com.hjq.demo.widget.StatusLayout.OnRetryListener
 
@@ -17,7 +18,7 @@ import com.hjq.demo.widget.StatusLayout.OnRetryListener
  */
 class StatusActivity : AppActivity(), StatusAction {
 
-    private val hintLayout: StatusLayout? by lazy { findViewById(R.id.hl_status_hint) }
+    private val hintLayout: StatusLayout? by lazyFindViewById(R.id.hl_status_hint)
 
     override fun getLayoutId(): Int {
         return R.layout.status_activity

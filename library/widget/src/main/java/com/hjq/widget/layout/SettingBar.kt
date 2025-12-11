@@ -2,11 +2,14 @@ package com.hjq.widget.layout
 
 import android.content.Context
 import android.content.res.TypedArray
+import android.graphics.BlendMode
+import android.graphics.BlendModeColorFilter
 import android.graphics.Color
 import android.graphics.PorterDuff
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
 import android.graphics.drawable.StateListDrawable
+import android.os.Build
 import android.text.TextUtils
 import android.util.AttributeSet
 import android.util.TypedValue
@@ -19,6 +22,8 @@ import androidx.annotation.ColorInt
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.core.content.ContextCompat
+import com.hjq.base.ktx.dp2px
+import com.hjq.base.ktx.sp2px
 import com.hjq.widget.R
 
 /**
@@ -51,7 +56,9 @@ class SettingBar @JvmOverloads constructor(
     private var rightDrawableSize: Int = 0
 
     init {
-        mainLayout.layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT, Gravity.CENTER_VERTICAL)
+        mainLayout.layoutParams = LayoutParams(LayoutParams.MATCH_PARENT,
+            LayoutParams.WRAP_CONTENT, Gravity.CENTER_VERTICAL)
+
         val leftParams = LinearLayout.LayoutParams(0, LayoutParams.WRAP_CONTENT)
         leftParams.gravity = Gravity.CENTER_VERTICAL
         leftParams.weight = 1f
@@ -60,29 +67,26 @@ class SettingBar @JvmOverloads constructor(
         val rightParams = LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT)
         rightParams.gravity = Gravity.CENTER_VERTICAL
         rightView.layoutParams = rightParams
-        rightView.layoutParams = rightParams
 
         lineView.layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, 1, Gravity.BOTTOM)
+
         leftView.gravity = Gravity.START or Gravity.CENTER_VERTICAL
         rightView.gravity = Gravity.END or Gravity.CENTER_VERTICAL
+
         leftView.isSingleLine = true
         rightView.isSingleLine = true
+
         leftView.ellipsize = TextUtils.TruncateAt.END
         rightView.ellipsize = TextUtils.TruncateAt.END
-        leftView.setLineSpacing(resources.getDimension(R.dimen.dp_5), leftView.lineSpacingMultiplier)
-        rightView.setLineSpacing(resources.getDimension(R.dimen.dp_5), rightView.lineSpacingMultiplier)
-        leftView.setPaddingRelative(
-            resources.getDimension(R.dimen.dp_15).toInt(),
-            resources.getDimension(R.dimen.dp_12).toInt(),
-            resources.getDimension(R.dimen.dp_15).toInt(),
-            resources.getDimension(R.dimen.dp_12).toInt()
-        )
-        rightView.setPaddingRelative(
-            resources.getDimension(R.dimen.dp_15).toInt(),
-            resources.getDimension(R.dimen.dp_12).toInt(),
-            resources.getDimension(R.dimen.dp_15).toInt(),
-            resources.getDimension(R.dimen.dp_12).toInt()
-        )
+
+        leftView.setLineSpacing(dp2px(5), leftView.lineSpacingMultiplier)
+        rightView.setLineSpacing(dp2px(5), rightView.lineSpacingMultiplier)
+
+        leftView.setPaddingRelative(dp2px(15).toInt(), dp2px(12).toInt(),
+            dp2px(15).toInt(), dp2px(12).toInt())
+        rightView.setPaddingRelative(dp2px(15).toInt(), dp2px(12).toInt(),
+            dp2px(15).toInt(), dp2px(12).toInt())
+
         val array: TypedArray = getContext().obtainStyledAttributes(attrs, R.styleable.SettingBar)
 
         // 文本设置
@@ -103,38 +107,19 @@ class SettingBar @JvmOverloads constructor(
 
         // 图标显示的大小
         if (array.hasValue(R.styleable.SettingBar_bar_leftDrawableSize)) {
-            setLeftDrawableSize(
-                array.getDimensionPixelSize(
-                    R.styleable.SettingBar_bar_leftDrawableSize,
-                    0
-                )
-            )
+            setLeftDrawableSize(array.getDimensionPixelSize(R.styleable.SettingBar_bar_leftDrawableSize, 0))
         }
+
         if (array.hasValue(R.styleable.SettingBar_bar_rightDrawableSize)) {
-            setRightDrawableSize(
-                array.getDimensionPixelSize(
-                    R.styleable.SettingBar_bar_rightDrawableSize,
-                    0
-                )
-            )
+            setRightDrawableSize(array.getDimensionPixelSize(R.styleable.SettingBar_bar_rightDrawableSize, 0))
         }
 
         // 图标着色器
         if (array.hasValue(R.styleable.SettingBar_bar_leftDrawableTint)) {
-            setLeftDrawableTint(
-                array.getColor(
-                    R.styleable.SettingBar_bar_leftDrawableTint,
-                    NO_COLOR
-                )
-            )
+            setLeftDrawableTint(array.getColor(R.styleable.SettingBar_bar_leftDrawableTint, NO_COLOR))
         }
         if (array.hasValue(R.styleable.SettingBar_bar_rightDrawableTint)) {
-            setRightDrawableTint(
-                array.getColor(
-                    R.styleable.SettingBar_bar_rightDrawableTint,
-                    NO_COLOR
-                )
-            )
+            setRightDrawableTint(array.getColor(R.styleable.SettingBar_bar_rightDrawableTint, NO_COLOR))
         }
 
         // 图标和文字之间的间距
@@ -142,13 +127,13 @@ class SettingBar @JvmOverloads constructor(
             if (array.hasValue(R.styleable.SettingBar_bar_leftDrawablePadding)) array.getDimensionPixelSize(
                 R.styleable.SettingBar_bar_leftDrawablePadding,
                 0
-            ) else resources.getDimension(R.dimen.dp_10).toInt()
+            ) else dp2px(10).toInt()
         )
         setRightDrawablePadding(
             if (array.hasValue(R.styleable.SettingBar_bar_rightDrawablePadding))
                 array.getDimensionPixelSize(R.styleable.SettingBar_bar_rightDrawablePadding, 0)
             else
-                resources.getDimension(R.dimen.dp_10).toInt()
+                dp2px(10).toInt()
         )
 
         // 图标设置
@@ -160,24 +145,14 @@ class SettingBar @JvmOverloads constructor(
         }
 
         // 文字颜色设置
-        setLeftTextColor(
-            array.getColor(
-                R.styleable.SettingBar_bar_leftTextColor,
-                ContextCompat.getColor(getContext(), R.color.black80)
-            )
-        )
-        setRightTextColor(
-            array.getColor(
-                R.styleable.SettingBar_bar_rightTextColor,
-                ContextCompat.getColor(getContext(), R.color.black60)
-            )
-        )
+        setLeftTextColor(array.getColor(R.styleable.SettingBar_bar_leftTextColor, ContextCompat.getColor(getContext(), R.color.black80)))
+        setRightTextColor(array.getColor(R.styleable.SettingBar_bar_rightTextColor, ContextCompat.getColor(getContext(), R.color.black60)))
 
         // 文字大小设置
         setLeftTextSize(TypedValue.COMPLEX_UNIT_PX, array.getDimensionPixelSize(
-            R.styleable.SettingBar_bar_leftTextSize, resources.getDimension(R.dimen.sp_15).toInt()).toFloat())
+            R.styleable.SettingBar_bar_leftTextSize, sp2px(15).toInt()).toFloat())
         setRightTextSize(TypedValue.COMPLEX_UNIT_PX, array.getDimensionPixelSize(
-            R.styleable.SettingBar_bar_rightTextSize, resources.getDimension(R.dimen.sp_14).toInt()).toFloat())
+            R.styleable.SettingBar_bar_rightTextSize, sp2px(14).toInt()).toFloat())
 
         // 分割线设置
         if (array.hasValue(R.styleable.SettingBar_bar_lineDrawable)) {
@@ -194,24 +169,17 @@ class SettingBar @JvmOverloads constructor(
         if (array.hasValue(R.styleable.SettingBar_bar_lineMargin)) {
             setLineMargin(array.getDimensionPixelSize(R.styleable.SettingBar_bar_lineMargin, 0))
         }
+
         if (background == null) {
             val drawable = StateListDrawable()
-            drawable.addState(
-                intArrayOf(android.R.attr.state_pressed),
-                ColorDrawable(ContextCompat.getColor(getContext(), R.color.black5))
-            )
-            drawable.addState(
-                intArrayOf(android.R.attr.state_selected),
-                ColorDrawable(ContextCompat.getColor(getContext(), R.color.black5))
-            )
-            drawable.addState(
-                intArrayOf(android.R.attr.state_focused),
-                ColorDrawable(ContextCompat.getColor(getContext(), R.color.black5))
-            )
-            drawable.addState(
-                intArrayOf(),
-                ColorDrawable(ContextCompat.getColor(getContext(), R.color.white))
-            )
+            drawable.addState(intArrayOf(android.R.attr.state_pressed),
+                ColorDrawable(ContextCompat.getColor(getContext(), R.color.black5)))
+            drawable.addState(intArrayOf(android.R.attr.state_selected),
+                ColorDrawable(ContextCompat.getColor(getContext(), R.color.black5)))
+            drawable.addState(intArrayOf(android.R.attr.state_focused),
+                ColorDrawable(ContextCompat.getColor(getContext(), R.color.black5)))
+            drawable.addState(intArrayOf(),
+                ColorDrawable(ContextCompat.getColor(getContext(), R.color.white)))
             background = drawable
 
             // 必须要设置可点击，否则点击屏幕任何角落都会触发按压事件
@@ -219,10 +187,22 @@ class SettingBar @JvmOverloads constructor(
             isClickable = true
         }
         array.recycle()
+
         mainLayout.addView(leftView)
         mainLayout.addView(rightView)
+
         addView(mainLayout, 0)
         addView(lineView, 1)
+
+        mainLayout.addOnLayoutChangeListener(object : OnLayoutChangeListener {
+
+            override fun onLayoutChange(v: View?, left: Int, top: Int, right: Int, bottom: Int,
+                                        oldLeft: Int, oldTop: Int, oldRight: Int, oldBottom: Int) {
+                v?.removeOnLayoutChangeListener(this)
+                // 限制右边 View 的宽度，避免文本过长挤掉左边 View
+                rightView.maxWidth = (right - left) / 3 * 2
+            }
+        })
     }
 
     /**
@@ -365,7 +345,11 @@ class SettingBar @JvmOverloads constructor(
         val drawable: Drawable? = getLeftDrawable()
         if (drawable != null && color != NO_COLOR) {
             drawable.mutate()
-            drawable.setColorFilter(color, PorterDuff.Mode.SRC_IN)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                drawable.colorFilter = BlendModeColorFilter(color, BlendMode.SRC_IN)
+            } else {
+                drawable.setColorFilter(color, PorterDuff.Mode.SRC_IN)
+            }
         }
     }
 
@@ -377,7 +361,11 @@ class SettingBar @JvmOverloads constructor(
         val drawable: Drawable? = getRightDrawable()
         if (drawable != null && color != NO_COLOR) {
             drawable.mutate()
-            drawable.setColorFilter(color, PorterDuff.Mode.SRC_IN)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                drawable.colorFilter = BlendModeColorFilter(color, BlendMode.SRC_IN)
+            } else {
+                drawable.setColorFilter(color, PorterDuff.Mode.SRC_IN)
+            }
         }
     }
 

@@ -13,14 +13,15 @@ import android.os.SystemClock
 interface HandlerAction {
 
     companion object {
-        val HANDLER: Handler = Handler(Looper.getMainLooper())
-    }
 
-    /**
-     * 获取 Handler
-     */
-    fun getHandler(): Handler {
-        return HANDLER
+        val HANDLER: Handler = Handler(Looper.getMainLooper())
+
+        /**
+         * 获取 Handler 对象
+         */
+        fun getHandler(): Handler {
+            return HANDLER
+        }
     }
 
     /**
@@ -42,14 +43,14 @@ interface HandlerAction {
      */
     fun postAtTime(runnable: Runnable, uptimeMillis: Long): Boolean {
         // 发送和当前对象相关的消息回调
-        return HANDLER.postAtTime(runnable, this, uptimeMillis)
+        return getHandler().postAtTime(runnable, this, uptimeMillis)
     }
 
     /**
      * 移除单个消息回调
      */
     fun removeCallbacks(runnable: Runnable) {
-        HANDLER.removeCallbacks(runnable)
+        getHandler().removeCallbacks(runnable)
     }
 
     /**
@@ -57,6 +58,6 @@ interface HandlerAction {
      */
     fun removeCallbacks() {
         // 移除和当前对象相关的消息回调
-        HANDLER.removeCallbacksAndMessages(this)
+        getHandler().removeCallbacksAndMessages(this)
     }
 }

@@ -29,6 +29,14 @@ class CountdownView @JvmOverloads constructor(
     /** 记录原有的文本 */
     private var recordText: CharSequence? = null
 
+
+    /**
+     * 是否正在倒计时
+     */
+    fun isRunning(): Boolean {
+        return currentSecond > 0
+    }
+
     /**
      * 设置倒计时总秒数
      */

@@ -3,6 +3,7 @@ package com.hjq.demo.other
 import android.content.Context
 import android.graphics.drawable.Drawable
 import android.graphics.drawable.GradientDrawable
+import com.hjq.base.ktx.sp2px
 import com.hjq.demo.R
 import com.hjq.toast.style.BlackToastStyle
 
@@ -24,14 +25,14 @@ class ToastStyle : BlackToastStyle() {
     }
 
     override fun getTextSize(context: Context): Float {
-        return context.resources.getDimension(R.dimen.sp_14)
+        return context.sp2px(14)
     }
 
     override fun getHorizontalPadding(context: Context): Int {
-        return context.resources.getDimension(R.dimen.sp_24).toInt()
+        return context.sp2px(24).toInt()
     }
 
     override fun getVerticalPadding(context: Context): Int {
-        return context.resources.getDimension(R.dimen.sp_16).toInt()
+        return context.sp2px(16).toInt()
     }
 }

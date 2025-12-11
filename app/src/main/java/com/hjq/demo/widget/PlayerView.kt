@@ -3,7 +3,9 @@ package com.hjq.demo.widget
 import android.animation.ValueAnimator
 import android.animation.ValueAnimator.AnimatorUpdateListener
 import android.app.Activity
-import android.content.*
+import android.content.Context
+import android.content.res.Resources
+import android.content.res.Resources.NotFoundException
 import android.media.AudioManager
 import android.media.MediaPlayer
 import android.media.MediaPlayer.OnCompletionListener
@@ -13,9 +15,19 @@ import android.provider.Settings
 import android.provider.Settings.SettingNotFoundException
 import android.text.TextUtils
 import android.util.AttributeSet
-import android.view.*
-import android.widget.*
+import android.view.LayoutInflater
+import android.view.MotionEvent
+import android.view.View
+import android.view.ViewConfiguration
+import android.view.ViewGroup
+import android.view.Window
+import android.view.WindowManager
+import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.SeekBar
 import android.widget.SeekBar.OnSeekBarChangeListener
+import android.widget.TextView
+import android.widget.VideoView
 import androidx.annotation.DrawableRes
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
@@ -23,13 +35,16 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
 import com.airbnb.lottie.LottieAnimationView
 import com.hjq.base.BaseDialog
-import com.hjq.base.action.ActivityAction
+import com.hjq.base.action.ContextAction
+import com.hjq.base.ktx.getActivity
+import com.hjq.base.ktx.lazyFindViewById
 import com.hjq.demo.R
-import com.hjq.demo.ui.dialog.MessageDialog
+import com.hjq.demo.ui.dialog.common.MessageDialog
 import com.hjq.widget.layout.SimpleLayout
 import com.hjq.widget.view.PlayButton
 import java.io.File
-import java.util.*
+import java.util.Formatter
+import java.util.Locale
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
@@ -44,7 +59,7 @@ import kotlin.math.roundToInt
 class PlayerView @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0, defStyleRes: Int = 0) :
     SimpleLayout(context, attrs, defStyleAttr, defStyleRes), LifecycleEventObserver,
-    OnSeekBarChangeListener, View.OnClickListener, ActivityAction, OnPreparedListener,
+    OnSeekBarChangeListener, View.OnClickListener, ContextAction, OnPreparedListener,
     MediaPlayer.OnInfoListener, OnCompletionListener, MediaPlayer.OnErrorListener {
 
     companion object {
@@ -82,19 +97,19 @@ class PlayerView @JvmOverloads constructor(
         }
     }
 
-    private val topLayout: ViewGroup
-    private val titleView: TextView
-    private val leftView: View
-    private val bottomLayout: ViewGroup
-    private val playTime: TextView
-    private val totalTime: TextView
-    private val progressView: SeekBar
-    private val videoView: VideoView
-    private val controlView: PlayButton
-    private val lockView: ImageView
-    private val messageLayout: ViewGroup
-    private val lottieView: LottieAnimationView
-    private val messageView: TextView
+    private val topLayout: ViewGroup by lazyFindViewById(R.id.ll_player_view_top)
+    private val titleView: TextView by lazyFindViewById(R.id.tv_player_view_title)
+    private val leftView: View by lazyFindViewById(R.id.iv_player_view_left)
+    private val bottomLayout: ViewGroup by lazyFindViewById(R.id.ll_player_view_bottom)
+    private val playTime: TextView by lazyFindViewById(R.id.tv_player_view_play_time)
+    private val totalTime: TextView by lazyFindViewById(R.id.tv_player_view_total_time)
+    private val progressView: SeekBar by lazyFindViewById(R.id.sb_player_view_progress)
+    private val videoView: VideoView by lazyFindViewById(R.id.vv_player_view_video)
+    private val controlView: PlayButton by lazyFindViewById(R.id.iv_player_view_control)
+    private val lockView: ImageView by lazyFindViewById(R.id.iv_player_view_lock)
+    private val messageLayout: ViewGroup by lazyFindViewById(R.id.cv_player_view_message)
+    private val lottieView: LottieAnimationView by lazyFindViewById(R.id.lav_player_view_lottie)
+    private val messageView: TextView by lazyFindViewById(R.id.tv_player_view_message)
 
     /** 视频宽度 */
     private var videoWidth: Int = 0
@@ -132,8 +147,8 @@ class PlayerView @JvmOverloads constructor(
     /** 当前音量值 */
     private var currentVolume: Int = 0
 
-    /** 当前亮度值 */
-    private var currentBrightness: Float = 0f
+    /** 当前亮度值百分比 */
+    private var currentBrightnessPercent: Float = 0f
 
     /** 当前窗口对象 */
     private var window: Window? = null
@@ -144,21 +159,74 @@ class PlayerView @JvmOverloads constructor(
     /** 触摸方向 */
     private var touchOrientation: Int = -1
 
+    /**
+     * 刷新任务
+     */
+    private val refreshRunnable: Runnable by lazy { object : Runnable {
+
+        override fun run() {
+            var progress: Int = videoView.currentPosition
+            // 这里优化了播放的秒数计算，将 800 毫秒估算成 1 秒
+            if (progress + 1000 < videoView.duration) {
+                // 进行四舍五入计算
+                progress = (progress / 1000f).roundToInt() * 1000
+            }
+            playTime.text = conversionTime(progress)
+            progressView.progress = progress
+            progressView.secondaryProgress = (videoView.bufferPercentage / 100f * videoView.duration).toInt()
+            if (videoView.isPlaying) {
+                if (!lockMode && bottomLayout.visibility == GONE) {
+                    bottomLayout.visibility = VISIBLE
+                }
+                if (!videoView.getKeepScreenOn()) {
+                    videoView.setKeepScreenOn(true)
+                }
+            } else {
+                if (bottomLayout.visibility == VISIBLE) {
+                    bottomLayout.visibility = GONE
+                }
+                if (videoView.getKeepScreenOn()) {
+                    videoView.setKeepScreenOn(false)
+                }
+            }
+            postDelayed(this, REFRESH_TIME.toLong())
+            listener?.onPlayProgress(this@PlayerView)
+        }
+    }}
+
+    /**
+     * 显示控制面板
+     */
+    private val showControllerRunnable: Runnable by lazy { Runnable {
+        if (!controllerShow) {
+            showController()
+        }
+    }}
+
+    /**
+     * 隐藏控制面板
+     */
+    private val hideControllerRunnable: Runnable by lazy { Runnable {
+        if (controllerShow) {
+            hideController()
+        }
+    }}
+
+    /**
+     * 显示提示
+     */
+    private val showMessageRunnable: Runnable by lazy { Runnable {
+        hideController()
+        messageLayout.visibility = VISIBLE
+    }}
+
+    /**
+     * 隐藏提示
+     */
+    private val hideMessageRunnable: Runnable by lazy { Runnable { messageLayout.visibility = GONE }}
+
     init {
         LayoutInflater.from(getContext()).inflate(R.layout.widget_player_view, this, true)
-        topLayout = findViewById(R.id.ll_player_view_top)
-        leftView = findViewById(R.id.iv_player_view_left)
-        titleView = findViewById(R.id.tv_player_view_title)
-        bottomLayout = findViewById(R.id.ll_player_view_bottom)
-        playTime = findViewById(R.id.tv_player_view_play_time)
-        totalTime = findViewById(R.id.tv_player_view_total_time)
-        progressView = findViewById(R.id.sb_player_view_progress)
-        videoView = findViewById(R.id.vv_player_view_video)
-        lockView = findViewById(R.id.iv_player_view_lock)
-        controlView = findViewById(R.id.iv_player_view_control)
-        messageLayout = findViewById(R.id.cv_player_view_message)
-        lottieView = findViewById(R.id.lav_player_view_lottie)
-        messageView = findViewById(R.id.tv_player_view_message)
         leftView.setOnClickListener(this)
         controlView.setOnClickListener(this)
         lockView.setOnClickListener(this)
@@ -170,7 +238,7 @@ class PlayerView @JvmOverloads constructor(
         videoView.setOnErrorListener(this)
         audioManager = ContextCompat.getSystemService(context, AudioManager::class.java)!!
 
-        val activity = getActivity()
+        val activity = context.getActivity()
         if (activity != null) {
             window = activity.window
         }
@@ -191,6 +259,7 @@ class PlayerView @JvmOverloads constructor(
             Lifecycle.Event.ON_RESUME -> onResume()
             Lifecycle.Event.ON_PAUSE -> onPause()
             Lifecycle.Event.ON_DESTROY -> onDestroy()
+            else -> {}
         }
     }
 
@@ -228,8 +297,8 @@ class PlayerView @JvmOverloads constructor(
         videoView.start()
         controlView.play()
         // 延迟隐藏控制面板
-        removeCallbacks(mHideControllerRunnable)
-        postDelayed(mHideControllerRunnable, CONTROLLER_TIME.toLong())
+        removeCallbacks(hideControllerRunnable)
+        postDelayed(hideControllerRunnable, CONTROLLER_TIME.toLong())
     }
 
     /**
@@ -239,8 +308,8 @@ class PlayerView @JvmOverloads constructor(
         videoView.pause()
         controlView.pause()
         // 延迟隐藏控制面板
-        removeCallbacks(mHideControllerRunnable)
-        postDelayed(mHideControllerRunnable, CONTROLLER_TIME.toLong())
+        removeCallbacks(hideControllerRunnable)
+        postDelayed(hideControllerRunnable, CONTROLLER_TIME.toLong())
     }
 
     /**
@@ -253,8 +322,8 @@ class PlayerView @JvmOverloads constructor(
         bottomLayout.visibility = GONE
         controlView.visibility = GONE
         // 延迟隐藏控制面板
-        removeCallbacks(mHideControllerRunnable)
-        postDelayed(mHideControllerRunnable, CONTROLLER_TIME.toLong())
+        removeCallbacks(hideControllerRunnable)
+        postDelayed(hideControllerRunnable, CONTROLLER_TIME.toLong())
     }
 
     /**
@@ -269,8 +338,8 @@ class PlayerView @JvmOverloads constructor(
         }
         controlView.visibility = VISIBLE
         // 延迟隐藏控制面板
-        removeCallbacks(mHideControllerRunnable)
-        postDelayed(mHideControllerRunnable, CONTROLLER_TIME.toLong())
+        removeCallbacks(hideControllerRunnable)
+        postDelayed(hideControllerRunnable, CONTROLLER_TIME.toLong())
     }
 
     /**
@@ -441,11 +510,11 @@ class PlayerView @JvmOverloads constructor(
 
     fun onDestroy() {
         videoView.stopPlayback()
-        removeCallbacks(mRefreshRunnable)
-        removeCallbacks(mShowControllerRunnable)
-        removeCallbacks(mHideControllerRunnable)
-        removeCallbacks(mShowMessageRunnable)
-        removeCallbacks(mHideMessageRunnable)
+        removeCallbacks(refreshRunnable)
+        removeCallbacks(showControllerRunnable)
+        removeCallbacks(hideControllerRunnable)
+        removeCallbacks(showMessageRunnable)
+        removeCallbacks(hideMessageRunnable)
         removeAllViews()
     }
 
@@ -483,13 +552,13 @@ class PlayerView @JvmOverloads constructor(
     }
 
     override fun onStartTrackingTouch(seekBar: SeekBar?) {
-        removeCallbacks(mRefreshRunnable)
-        removeCallbacks(mHideControllerRunnable)
+        removeCallbacks(refreshRunnable)
+        removeCallbacks(hideControllerRunnable)
     }
 
     override fun onStopTrackingTouch(seekBar: SeekBar) {
-        postDelayed(mRefreshRunnable, REFRESH_TIME.toLong())
-        postDelayed(mHideControllerRunnable, CONTROLLER_TIME.toLong())
+        postDelayed(refreshRunnable, REFRESH_TIME.toLong())
+        postDelayed(hideControllerRunnable, CONTROLLER_TIME.toLong())
         // 设置选择的播放进度
         setProgress(seekBar.progress)
     }
@@ -524,8 +593,8 @@ class PlayerView @JvmOverloads constructor(
         params.width = viewWidth
         params.height = viewHeight
         videoView.layoutParams = params
-        post(mShowControllerRunnable)
-        postDelayed(mRefreshRunnable, (REFRESH_TIME / 2).toLong())
+        post(showControllerRunnable)
+        postDelayed(refreshRunnable, (REFRESH_TIME / 2).toLong())
         listener?.onPlayStart(this)
     }
 
@@ -546,13 +615,13 @@ class PlayerView @JvmOverloads constructor(
                 lottieView.setAnimation(R.raw.progress)
                 lottieView.playAnimation()
                 messageView.setText(R.string.common_loading)
-                post(mShowMessageRunnable)
+                post(showMessageRunnable)
                 return true
             }
             MediaPlayer.MEDIA_INFO_BUFFERING_END -> {
                 lottieView.cancelAnimation()
                 messageView.setText(R.string.common_loading)
-                postDelayed(mHideMessageRunnable, DIALOG_TIME.toLong())
+                postDelayed(hideMessageRunnable, DIALOG_TIME.toLong())
                 return true
             }
         }
@@ -563,7 +632,11 @@ class PlayerView @JvmOverloads constructor(
      * [MediaPlayer.OnErrorListener]
      */
     override fun onError(player: MediaPlayer?, what: Int, extra: Int): Boolean {
-        val activity: Activity = getActivity() ?: return false
+        if (listener != null && listener!!.onPlayError(this, what, extra)) {
+            return true
+        }
+
+        val activity: Activity = context.getActivity() ?: return false
         var message: String? = when (what) {
             MediaPlayer.MEDIA_ERROR_NOT_VALID_FOR_PROGRESSIVE_PLAYBACK -> {
                 activity.getString(R.string.common_video_error_not_support)
@@ -595,17 +668,17 @@ class PlayerView @JvmOverloads constructor(
         if (view === this) {
 
             // 先移除之前发送的
-            removeCallbacks(mShowControllerRunnable)
-            removeCallbacks(mHideControllerRunnable)
+            removeCallbacks(showControllerRunnable)
+            removeCallbacks(hideControllerRunnable)
             if (controllerShow) {
                 // 隐藏控制面板
-                post(mHideControllerRunnable)
+                post(hideControllerRunnable)
                 return
             }
 
             // 显示控制面板
-            post(mShowControllerRunnable)
-            postDelayed(mHideControllerRunnable, CONTROLLER_TIME.toLong())
+            post(showControllerRunnable)
+            postDelayed(hideControllerRunnable, CONTROLLER_TIME.toLong())
 
         } else if (view === leftView) {
 
@@ -622,13 +695,13 @@ class PlayerView @JvmOverloads constructor(
                 start()
             }
             // 先移除之前发送的
-            removeCallbacks(mShowControllerRunnable)
-            removeCallbacks(mHideControllerRunnable)
+            removeCallbacks(showControllerRunnable)
+            removeCallbacks(hideControllerRunnable)
             // 重置显示隐藏面板任务
             if (!controllerShow) {
-                post(mShowControllerRunnable)
+                post(showControllerRunnable)
             }
-            postDelayed(mHideControllerRunnable, CONTROLLER_TIME.toLong())
+            postDelayed(hideControllerRunnable, CONTROLLER_TIME.toLong())
             listener?.onClickPlay(this)
 
         } else if (view === lockView) {
@@ -660,21 +733,20 @@ class PlayerView @JvmOverloads constructor(
             MotionEvent.ACTION_DOWN -> {
                 maxVoice = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC)
                 currentVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC)
-                if (window != null) {
-                    currentBrightness = window!!.attributes.screenBrightness
+                window.let {
+                    if (it == null) {
+                        return@let
+                    }
+
+                    currentBrightnessPercent = it.attributes.screenBrightness
                     // 如果当前亮度是默认的，那么就获取系统当前的屏幕亮度
-                    if (currentBrightness == WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_NONE) {
-                        currentBrightness = try {
-                            // 这里需要注意，Settings.System.SCREEN_BRIGHTNESS 获取到的值在小米手机上面会超过 255
-                            min(Settings.System.getInt(context.contentResolver, Settings.System.SCREEN_BRIGHTNESS), 255) / 255f
-                        } catch (ignored: SettingNotFoundException) {
-                            WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_OFF
-                        }
+                    if (currentBrightnessPercent == WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_NONE) {
+                        currentBrightnessPercent = getBrightness().toFloat() / getMaxBrightness().toFloat()
                     }
                 }
                 viewDownX = event.x
                 viewDownY = event.y
-                removeCallbacks(mHideControllerRunnable)
+                removeCallbacks(hideControllerRunnable)
             }
             MotionEvent.ACTION_MOVE -> run {
                 // 计算偏移的距离（按下的位置 - 当前触摸的位置）
@@ -701,7 +773,7 @@ class PlayerView @JvmOverloads constructor(
                         adjustSecond = second
                         lottieView.setImageResource(if (adjustSecond < 0) R.drawable.video_schedule_rewind_ic else R.drawable.video_schedule_forward_ic)
                         messageView.text = String.format("%s s", abs(adjustSecond))
-                        post(mShowMessageRunnable)
+                        post(showMessageRunnable)
                     }
                     return@run
                 }
@@ -718,13 +790,14 @@ class PlayerView @JvmOverloads constructor(
                         }
 
                         // 更新系统亮度
-                        val brightness: Float = min(max(currentBrightness + delta,
+                        val brightness: Float = min(max(currentBrightnessPercent + delta,
                             WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_OFF),
                             WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_FULL)
                         window?.apply {
                             val attributes: WindowManager.LayoutParams = attributes
                             attributes.screenBrightness = brightness
-                            setAttributes(attributes) }
+                            setAttributes(attributes)
+                        }
                         val percent: Int = (brightness * 100).toInt()
                         @DrawableRes val iconId: Int = when {
                             percent > 100 / 3 * 2 -> {
@@ -739,7 +812,7 @@ class PlayerView @JvmOverloads constructor(
                         }
                         lottieView.setImageResource(iconId)
                         messageView.text = String.format("%s %%", percent)
-                        post(mShowMessageRunnable)
+                        post(showMessageRunnable)
                         return@run
                     }
 
@@ -770,7 +843,7 @@ class PlayerView @JvmOverloads constructor(
                     }
                     lottieView.setImageResource(iconId)
                     messageView.text = String.format("%s %%", percent)
-                    post(mShowMessageRunnable)
+                    post(showMessageRunnable)
                     return@run
                 }
             }
@@ -789,8 +862,8 @@ class PlayerView @JvmOverloads constructor(
                     setProgress(getProgress() + adjustSecond * 1000)
                     adjustSecond = 0
                 }
-                postDelayed(mHideControllerRunnable, CONTROLLER_TIME.toLong())
-                postDelayed(mHideMessageRunnable, DIALOG_TIME.toLong())
+                postDelayed(hideControllerRunnable, CONTROLLER_TIME.toLong())
+                postDelayed(hideMessageRunnable, DIALOG_TIME.toLong())
             }
             MotionEvent.ACTION_CANCEL -> {
                 touchOrientation = -1
@@ -799,72 +872,45 @@ class PlayerView @JvmOverloads constructor(
                     setProgress(getProgress() + adjustSecond * 1000)
                     adjustSecond = 0
                 }
-                postDelayed(mHideControllerRunnable, CONTROLLER_TIME.toLong())
-                postDelayed(mHideMessageRunnable, DIALOG_TIME.toLong())
+                postDelayed(hideControllerRunnable, CONTROLLER_TIME.toLong())
+                postDelayed(hideMessageRunnable, DIALOG_TIME.toLong())
             }
         }
         return true
     }
 
     /**
-     * 刷新任务
+     * 获取屏幕当前的亮度
      */
-    private val mRefreshRunnable: Runnable = object : Runnable {
+    private fun getBrightness(): Int {
+        try {
+            // 这里需要注意，Settings.System.SCREEN_BRIGHTNESS 获取到的值在小米手机上面会超过 255
+            return Settings.System.getInt(
+                context.contentResolver,
+                Settings.System.SCREEN_BRIGHTNESS
+            )
+        } catch (e: SettingNotFoundException) {
+            e.printStackTrace()
+        }
+        // 如果没有取值成功，那么就默认设置为一半亮度，防止突然变得很亮或很暗
+        return getMaxBrightness() / 2
+    }
 
-        override fun run() {
-            var progress: Int = videoView.currentPosition
-            // 这里优化了播放的秒数计算，将 800 毫秒估算成 1 秒
-            if (progress + 1000 < videoView.duration) {
-                // 进行四舍五入计算
-                progress = (progress / 1000f).roundToInt() * 1000
+    /**
+     * 获取屏幕最大显示的亮度，https://blog.csdn.net/jklwan/article/details/93669170
+     */
+    private fun getMaxBrightness(): Int {
+        try {
+            val system = Resources.getSystem()
+            val resId = system.getIdentifier("config_screenBrightnessSettingMaximum", "integer", "android")
+            if (resId != 0) {
+                return system.getInteger(resId)
             }
-            playTime.text = conversionTime(progress)
-            progressView.progress = progress
-            progressView.secondaryProgress = (videoView.bufferPercentage / 100f * videoView.duration).toInt()
-            if (videoView.isPlaying) {
-                if (!lockMode && bottomLayout.visibility == GONE) {
-                    bottomLayout.visibility = VISIBLE
-                }
-            } else {
-                if (bottomLayout.visibility == VISIBLE) {
-                    bottomLayout.visibility = GONE
-                }
-            }
-            postDelayed(this, REFRESH_TIME.toLong())
-            listener?.onPlayProgress(this@PlayerView)
+        } catch (e: NotFoundException) {
+            e.printStackTrace()
         }
+        return 255
     }
-
-    /**
-     * 显示控制面板
-     */
-    private val mShowControllerRunnable: Runnable = Runnable {
-        if (!controllerShow) {
-            showController()
-        }
-    }
-
-    /**
-     * 隐藏控制面板
-     */
-    private val mHideControllerRunnable: Runnable = Runnable {
-        if (controllerShow) {
-            hideController()
-        }
-    }
-
-    /**
-     * 显示提示
-     */
-    private val mShowMessageRunnable: Runnable = Runnable {
-        hideController()
-        messageLayout.visibility = VISIBLE
-    }
-
-    /**
-     * 隐藏提示
-     */
-    private val mHideMessageRunnable: Runnable = Runnable { messageLayout.visibility = GONE }
 
     /**
      * 点击返回监听器
@@ -900,5 +946,12 @@ class PlayerView @JvmOverloads constructor(
          * 播放结束（可在此处结束播放或者循环播放）
          */
         fun onPlayEnd(view: PlayerView) {}
+
+        /**
+         * 播放出错
+         */
+        fun onPlayError(view: PlayerView?, what: Int, extra: Int): Boolean {
+            return false
+        }
     }
 }

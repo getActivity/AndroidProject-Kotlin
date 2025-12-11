@@ -3,27 +3,33 @@ package com.hjq.demo.ui.dialog
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
-import android.content.*
+import android.content.Context
+import android.content.Intent
 import android.graphics.BitmapFactory
 import android.net.Uri
-import android.os.*
+import android.os.Build
+import android.os.Environment
 import android.text.method.ScrollingMovementMethod
-import android.view.*
+import android.view.View
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.core.app.NotificationCompat
 import androidx.core.content.FileProvider
 import com.hjq.base.BaseDialog
 import com.hjq.base.action.AnimAction
+import com.hjq.base.ktx.createIntent
+import com.hjq.base.ktx.lazyFindViewById
 import com.hjq.demo.R
 import com.hjq.demo.aop.CheckNet
-import com.hjq.demo.aop.Permissions
 import com.hjq.demo.aop.SingleClick
 import com.hjq.demo.other.AppConfig
+import com.hjq.demo.permission.PermissionDescription
+import com.hjq.demo.permission.PermissionInterceptor
 import com.hjq.http.EasyHttp
 import com.hjq.http.listener.OnDownloadListener
 import com.hjq.http.model.HttpMethod
-import com.hjq.permissions.Permission
+import com.hjq.permissions.XXPermissions
+import com.hjq.permissions.permission.PermissionLists
 import java.io.File
 
 /**
@@ -36,11 +42,11 @@ class UpdateDialog {
 
     class Builder(context: Context) : BaseDialog.Builder<Builder>(context) {
 
-        private val nameView: TextView? by lazy { findViewById(R.id.tv_update_name) }
-        private val detailsView: TextView? by lazy { findViewById(R.id.tv_update_details) }
-        private val progressView: ProgressBar? by lazy { findViewById(R.id.pb_update_progress) }
-        private val updateView: TextView? by lazy { findViewById(R.id.tv_update_update) }
-        private val closeView: TextView? by lazy { findViewById(R.id.tv_update_close) }
+        private val nameView: TextView? by lazyFindViewById(R.id.tv_update_name)
+        private val detailsView: TextView? by lazyFindViewById(R.id.tv_update_details)
+        private val progressView: ProgressBar? by lazyFindViewById(R.id.pb_update_progress)
+        private val updateView: TextView? by lazyFindViewById(R.id.tv_update_update)
+        private val closeView: TextView? by lazyFindViewById(R.id.tv_update_close)
 
         /** Apk 文件 */
         private var apkFile: File? = null
@@ -112,28 +118,43 @@ class UpdateDialog {
         override fun onClick(view: View) {
             if (view === closeView) {
                 dismiss()
-            } else if (view === updateView) {
+                return
+            }
+
+            if (view === updateView) {
                 // 判断下载状态
                 if (downloadComplete) {
                     if (apkFile!!.isFile) {
                         // 下载完毕，安装 Apk
-                        installApk()
+                        startInstall()
                     } else {
                         // 下载失败，重新下载
-                        downloadApk()
+                        startDownload()
                     }
                 } else if (!downloading) {
                     // 没有下载，开启下载
-                    downloadApk()
+                    startDownload()
                 }
             }
         }
 
-        /**
-         * 下载 Apk
-         */
+        private fun startDownload() {
+            XXPermissions.with(getContext())
+                .permission(PermissionLists.getReadExternalStoragePermission())
+                .permission(PermissionLists.getWriteExternalStoragePermission())
+                .permission(PermissionLists.getRequestInstallPackagesPermission())
+                .interceptor(PermissionInterceptor())
+                .description(PermissionDescription())
+                .request { _, deniedList ->
+                    val allGranted = deniedList.isEmpty()
+                    if (!allGranted) {
+                        return@request
+                    }
+                    downloadApk()
+                }
+        }
+
         @CheckNet
-        @Permissions(Permission.READ_EXTERNAL_STORAGE, Permission.WRITE_EXTERNAL_STORAGE, Permission.REQUEST_INSTALL_PACKAGES)
         private fun downloadApk() {
             // 设置对话框不能被取消
             setCancelable(false)
@@ -178,8 +199,11 @@ class UpdateDialog {
                 .file(apkFile)
                 .url(downloadUrl)
                 .md5(fileMd5)
+                // 设置断点续传（默认不开启）
+                .resumableTransfer(true)
                 .listener(object : OnDownloadListener {
-                    override fun onStart(file: File?) {
+
+                    override fun onDownloadStart(file: File) {
                         // 标记为下载中
                         downloading = true
                         // 标记成未下载完成
@@ -191,7 +215,7 @@ class UpdateDialog {
                         updateView?.setText(R.string.update_status_start)
                     }
 
-                    override fun onProgress(file: File, progress: Int) {
+                    override fun onDownloadProgressChange(file: File, progress: Int) {
                         updateView?.text = String.format(getString(R.string.update_status_running)!!, progress)
                         progressView?.progress = progress
                         // 更新下载通知
@@ -210,7 +234,15 @@ class UpdateDialog {
                         )
                     }
 
-                    override fun onComplete(file: File) {
+                    override fun onDownloadSuccess(file: File) {
+                        val pendingIntentFlag: Int = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                            // Targeting S+ (version 31 and above) requires that one of FLAG_IMMUTABLE or FLAG_MUTABLE be specified when creating a PendingIntent.
+                            // Strongly consider using FLAG_IMMUTABLE, only use FLAG_MUTABLE if some functionality depends on the PendingIntent being mutable, e.g.
+                            // if it needs to be used with inline replies or bubbles.
+                            PendingIntent.FLAG_MUTABLE
+                        } else {
+                            PendingIntent.FLAG_UPDATE_CURRENT
+                        }
                         // 显示下载成功通知
                         notificationManager.notify(
                             notificationId, notificationBuilder
@@ -219,7 +251,8 @@ class UpdateDialog {
                                 // 设置下载的进度
                                 .setProgress(100, 100, false)
                                 // 设置通知点击之后的意图
-                                .setContentIntent(PendingIntent.getActivity(getContext(), 1, getInstallIntent(), Intent.FILL_IN_ACTION))
+                                .setContentIntent(PendingIntent.getActivity(getContext(),
+                                    1, getInstallIntent(), pendingIntentFlag))
                                 // 设置点击通知后是否自动消失
                                 .setAutoCancel(true)
                                 // 是否正在交互中
@@ -230,10 +263,10 @@ class UpdateDialog {
                         // 标记成下载完成
                         downloadComplete = true
                         // 安装 Apk
-                        installApk()
+                        startInstall()
                     }
 
-                    override fun onError(file: File, e: Exception) {
+                    override fun onDownloadFail(file: File, throwable: Throwable) {
                         // 清除通知
                         notificationManager.cancel(notificationId)
                         updateView?.setText(R.string.update_status_failed)
@@ -241,43 +274,49 @@ class UpdateDialog {
                         file.delete()
                     }
 
-                    override fun onEnd(file: File) {
+                    override fun onDownloadEnd(file: File) {
                         // 更新进度条
                         progressView?.progress = 0
                         progressView?.visibility = View.GONE
                         // 标记当前不是下载中
                         downloading = false
                         // 如果当前不是强制更新，对话框就恢复成可取消状态
-                        if (!forceUpdate) {
-                            setCancelable(true)
+                        if (forceUpdate) {
+                            return
                         }
+                        setCancelable(true)
                     }
                 }).start()
         }
 
-        /**
-         * 安装 Apk
-         */
-        @Permissions(Permission.REQUEST_INSTALL_PACKAGES)
-        private fun installApk() {
-            getContext().startActivity(getInstallIntent())
+        private fun startInstall() {
+            XXPermissions.with(getContext())
+                .permission(PermissionLists.getRequestInstallPackagesPermission())
+                .interceptor(PermissionInterceptor())
+                .description(PermissionDescription())
+                .request { _, deniedList ->
+                    val allGranted = deniedList.isEmpty()
+                    if (!allGranted) {
+                        return@request
+                    }
+                    getContext().startActivity(getInstallIntent())
+                }
         }
 
         /**
          * 获取安装意图
          */
         private fun getInstallIntent(): Intent {
-            val intent = Intent()
-            intent.action = Intent.ACTION_VIEW
-            val uri: Uri?
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                uri = FileProvider.getUriForFile(getContext(), AppConfig.getPackageName() + ".provider", apkFile!!)
-                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
+            val intent = getContext().createIntent(Intent.ACTION_VIEW)
+            val uri: Uri? = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                FileProvider.getUriForFile(getContext(), AppConfig.getPackageName() + ".provider", apkFile!!)
             } else {
-                uri = Uri.fromFile(apkFile)
+                Uri.fromFile(apkFile)
             }
             intent.setDataAndType(uri, "application/vnd.android.package-archive")
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            // 对目标应用临时授权该 Uri 读写权限
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
             return intent
         }
     }

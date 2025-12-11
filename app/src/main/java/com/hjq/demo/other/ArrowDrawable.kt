@@ -1,12 +1,21 @@
 package com.hjq.demo.other
 
 import android.content.Context
-import android.graphics.*
+import android.graphics.BlurMaskFilter
+import android.graphics.Canvas
+import android.graphics.ColorFilter
+import android.graphics.Paint
+import android.graphics.Path
+import android.graphics.PixelFormat
+import android.graphics.PointF
+import android.graphics.Rect
+import android.graphics.RectF
 import android.graphics.drawable.Drawable
 import android.view.Gravity
 import android.view.View
 import androidx.annotation.ColorInt
 import androidx.core.content.ContextCompat
+import com.hjq.base.ktx.dp2px
 import com.hjq.demo.R
 import kotlin.math.max
 import kotlin.math.min
@@ -152,8 +161,8 @@ class ArrowDrawable private constructor(private val builder: Builder) : Drawable
         init {
             backgroundColor = ContextCompat.getColor(context, R.color.black)
             shadowColor = ContextCompat.getColor(context, R.color.black20)
-            arrowHeight = context.resources.getDimension(R.dimen.dp_6).toInt()
-            radius = context.resources.getDimension(R.dimen.dp_4).toInt()
+            arrowHeight = context.dp2px(6).toInt()
+            radius = context.dp2px(4).toInt()
             shadowSize = 0
             arrowOffsetX = 0
             arrowOffsetY = 0

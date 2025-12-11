@@ -6,7 +6,11 @@ import com.bumptech.glide.load.HttpException
 import com.bumptech.glide.load.data.DataFetcher
 import com.bumptech.glide.load.model.GlideUrl
 import com.bumptech.glide.util.ContentLengthInputStream
-import okhttp3.*
+import okhttp3.Call
+import okhttp3.Callback
+import okhttp3.Request
+import okhttp3.Response
+import okhttp3.ResponseBody
 import java.io.IOException
 import java.io.InputStream
 
@@ -40,11 +44,11 @@ class OkHttpFetcher internal constructor(
         call?.enqueue(this)
     }
 
-    override fun onFailure(call: Call, e: IOException) {
+    override fun onFailure(call: Call?, e: IOException) {
         dataCallback?.onLoadFailed(e)
     }
 
-    override fun onResponse(call: Call, response: Response) {
+    override fun onResponse(call: Call?, response: Response) {
         responseBody = response.body()
         if (response.isSuccessful) {
             responseBody?.let {

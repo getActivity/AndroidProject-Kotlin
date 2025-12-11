@@ -14,7 +14,7 @@ import com.hjq.demo.app.AppAdapter
  */
 class GuideAdapter constructor(context: Context) : AppAdapter<Int>(context) {
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AppViewHolder {
         return ViewHolder()
     }
 

@@ -2,22 +2,42 @@ package com.hjq.base
 
 import android.app.Activity
 import android.app.Application.ActivityLifecycleCallbacks
-import android.content.*
+import android.content.Context
+import android.content.DialogInterface
 import android.graphics.drawable.Drawable
-import android.os.*
+import android.os.Build
+import android.os.Bundle
 import android.util.SparseArray
-import android.view.*
-import android.view.inputmethod.InputMethodManager
-import android.widget.*
-import androidx.annotation.*
+import android.view.Gravity
+import android.view.KeyEvent
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.view.Window
+import android.view.WindowManager
+import android.widget.FrameLayout
+import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.TextView
+import androidx.annotation.ColorInt
+import androidx.annotation.DrawableRes
+import androidx.annotation.FloatRange
+import androidx.annotation.IdRes
+import androidx.annotation.LayoutRes
+import androidx.annotation.StringRes
+import androidx.annotation.StyleRes
 import androidx.appcompat.app.AppCompatDialog
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LifecycleRegistry
-import com.hjq.base.action.*
+import com.hjq.base.action.AnimAction
+import com.hjq.base.action.ClickAction
+import com.hjq.base.action.ContextAction
+import com.hjq.base.action.HandlerAction
+import com.hjq.base.action.ResourcesAction
+import com.hjq.base.ktx.getActivity
+import com.hjq.base.ktx.hideKeyboard
 import java.lang.ref.SoftReference
-import java.util.*
 
 /**
  *    author : Android 轮子哥
@@ -27,15 +47,77 @@ import java.util.*
  */
 @Suppress("LeakingThis")
 open class BaseDialog constructor(context: Context, @StyleRes themeResId: Int = R.style.BaseDialogTheme) :
-    AppCompatDialog(context, themeResId), LifecycleOwner, ActivityAction, ResourcesAction,
-    HandlerAction, ClickAction, AnimAction, KeyboardAction, DialogInterface.OnShowListener,
+    AppCompatDialog(context, themeResId), LifecycleOwner, ContextAction, ResourcesAction,
+    HandlerAction, ClickAction, AnimAction, DialogInterface.OnShowListener,
     DialogInterface.OnCancelListener, DialogInterface.OnDismissListener {
 
-    private val listeners: ListenersWrapper<BaseDialog> = ListenersWrapper(this)
     private val lifecycle: LifecycleRegistry = LifecycleRegistry(this)
-    private var showListeners: MutableList<OnShowListener?>? = null
-    private var cancelListeners: MutableList<OnCancelListener?>? = null
-    private var dismissListeners: MutableList<OnDismissListener?>? = null
+
+    private val showListeners: MutableList<OnShowListener> by lazy { mutableListOf() }
+    private val cancelListeners: MutableList<OnCancelListener> by lazy { mutableListOf() }
+    private val dismissListeners: MutableList<OnDismissListener> by lazy { mutableListOf() }
+
+    init {
+        // 添加监听为自己，注意这里需要调用父类的方法
+        val listeners = ListenersWrapper(this)
+        super.setOnShowListener(listeners)
+        super.setOnCancelListener(listeners)
+        super.setOnDismissListener(listeners)
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        lifecycle.handleLifecycleEvent(Lifecycle.Event.ON_CREATE)
+    }
+
+    override fun onStart() {
+        super.onStart()
+        lifecycle.handleLifecycleEvent(Lifecycle.Event.ON_START)
+    }
+
+    override fun onStop() {
+        super.onStop()
+        lifecycle.handleLifecycleEvent(Lifecycle.Event.ON_PAUSE)
+        lifecycle.handleLifecycleEvent(Lifecycle.Event.ON_STOP)
+    }
+
+    /**
+     * [DialogInterface.OnShowListener]
+     */
+    override fun onShow(dialog: DialogInterface?) {
+        lifecycle.handleLifecycleEvent(Lifecycle.Event.ON_RESUME)
+        // 这里解释一下为什么要创建一个新的 ArrayList，这是因为执行监听方法可能会删除 List 集合中的元素
+        // 例如 Builder 类中的 postDelayed 方法，就会移除监听对象，所以这里遍历可能出现 ConcurrentModificationException
+        val listeners = ArrayList<OnShowListener>(showListeners)
+        for (listener in listeners) {
+            listener.onShow(this)
+        }
+    }
+
+    /**
+     * [DialogInterface.OnCancelListener]
+     */
+    override fun onCancel(dialog: DialogInterface?) {
+        val listeners = ArrayList<OnCancelListener>(cancelListeners)
+        for (listener in listeners) {
+            listener.onCancel(this)
+        }
+    }
+
+    /**
+     * [DialogInterface.OnDismissListener]
+     */
+    override fun onDismiss(dialog: DialogInterface?) {
+        lifecycle.handleLifecycleEvent(Lifecycle.Event.ON_DESTROY)
+        val listeners = ArrayList<OnDismissListener>(dismissListeners)
+        for (listener in listeners) {
+            listener.onDismiss(this)
+        }
+    }
+
+    override fun getLifecycle(): Lifecycle {
+        return lifecycle
+    }
 
     /**
      * 获取 Dialog 的根布局
@@ -141,13 +223,9 @@ open class BaseDialog constructor(context: Context, @StyleRes themeResId: Int = 
         removeCallbacks()
         val focusView: View? = currentFocus
         if (focusView != null) {
-            getSystemService(InputMethodManager::class.java).hideSoftInputFromWindow(focusView.windowToken, 0)
+            hideKeyboard(focusView)
         }
         super.dismiss()
-    }
-
-    override fun getLifecycle(): Lifecycle {
-        return lifecycle
     }
 
     /**
@@ -202,6 +280,10 @@ open class BaseDialog constructor(context: Context, @StyleRes themeResId: Int = 
     }
 
     open fun setOnKeyListener(listener: OnKeyListener?) {
+        if (listener == null) {
+            super.setOnKeyListener(null)
+            return
+        }
         super.setOnKeyListener(KeyListenerWrapper(listener))
     }
 
@@ -211,11 +293,13 @@ open class BaseDialog constructor(context: Context, @StyleRes themeResId: Int = 
      * @param listener      监听器对象
      */
     open fun addOnShowListener(listener: OnShowListener?) {
-        if (showListeners == null) {
-            showListeners = ArrayList()
-            super.setOnShowListener(listeners)
+        if (listener == null) {
+            return
         }
-        showListeners?.add(listener)
+        if (showListeners.contains(listener)) {
+            return
+        }
+        showListeners.add(listener)
     }
 
     /**
@@ -224,11 +308,13 @@ open class BaseDialog constructor(context: Context, @StyleRes themeResId: Int = 
      * @param listener      监听器对象
      */
     open fun addOnCancelListener(listener: OnCancelListener?) {
-        if (cancelListeners == null) {
-            cancelListeners = ArrayList()
-            super.setOnCancelListener(listeners)
+        if (listener == null) {
+            return
         }
-        cancelListeners?.add(listener)
+        if (cancelListeners.contains(listener)) {
+            return
+        }
+        cancelListeners.add(listener)
     }
 
     /**
@@ -237,11 +323,13 @@ open class BaseDialog constructor(context: Context, @StyleRes themeResId: Int = 
      * @param listener      监听器对象
      */
     open fun addOnDismissListener(listener: OnDismissListener?) {
-        if (dismissListeners == null) {
-            dismissListeners = ArrayList()
-            super.setOnDismissListener(listeners)
+        if (listener == null) {
+            return
         }
-        dismissListeners?.add(listener)
+        if (dismissListeners.contains(listener)) {
+            return
+        }
+        dismissListeners.add(listener)
     }
 
     /**
@@ -250,7 +338,10 @@ open class BaseDialog constructor(context: Context, @StyleRes themeResId: Int = 
      * @param listener      监听器对象
      */
     open fun removeOnShowListener(listener: OnShowListener?) {
-        showListeners?.remove(listener)
+        if (listener == null) {
+            return
+        }
+        showListeners.remove(listener)
     }
 
     /**
@@ -259,7 +350,10 @@ open class BaseDialog constructor(context: Context, @StyleRes themeResId: Int = 
      * @param listener      监听器对象
      */
     open fun removeOnCancelListener(listener: OnCancelListener?) {
-        cancelListeners?.remove(listener)
+        if (listener == null) {
+            return
+        }
+        cancelListeners.remove(listener)
     }
 
     /**
@@ -268,86 +362,15 @@ open class BaseDialog constructor(context: Context, @StyleRes themeResId: Int = 
      * @param listener      监听器对象
      */
     open fun removeOnDismissListener(listener: OnDismissListener?) {
-        dismissListeners?.remove(listener)
-    }
-
-    /**
-     * 设置显示监听器集合
-     */
-    private fun setOnShowListeners(listeners: MutableList<OnShowListener?>?) {
-        super.setOnShowListener(this.listeners)
-        showListeners = listeners
-    }
-
-    /**
-     * 设置取消监听器集合
-     */
-    private fun setOnCancelListeners(listeners: MutableList<OnCancelListener?>?) {
-        super.setOnCancelListener(this.listeners)
-        cancelListeners = listeners
-    }
-
-    /**
-     * 设置销毁监听器集合
-     */
-    private fun setOnDismissListeners(listeners: MutableList<OnDismissListener?>?) {
-        super.setOnDismissListener(this.listeners)
-        dismissListeners = listeners
-    }
-
-    /**
-     * [DialogInterface.OnShowListener]
-     */
-    override fun onShow(dialog: DialogInterface?) {
-        lifecycle.handleLifecycleEvent(Lifecycle.Event.ON_RESUME)
-        showListeners?.let {
-            for (i in it.indices) {
-                it[i]?.onShow(this)
-            }
+        if (listener == null) {
+            return
         }
-    }
-
-    /**
-     * [DialogInterface.OnCancelListener]
-     */
-    override fun onCancel(dialog: DialogInterface?) {
-        cancelListeners?.let {
-            for (i in it.indices) {
-                it[i]?.onCancel(this)
-            }
-        }
-    }
-
-    /**
-     * [DialogInterface.OnDismissListener]
-     */
-    override fun onDismiss(dialog: DialogInterface?) {
-        lifecycle.handleLifecycleEvent(Lifecycle.Event.ON_DESTROY)
-        dismissListeners?.let {
-            for (i in it.indices) {
-                it[i]?.onDismiss(this)
-            }
-        }
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        lifecycle.handleLifecycleEvent(Lifecycle.Event.ON_CREATE)
-    }
-
-    override fun onStart() {
-        super.onStart()
-        lifecycle.handleLifecycleEvent(Lifecycle.Event.ON_START)
-    }
-
-    override fun onStop() {
-        super.onStop()
-        lifecycle.handleLifecycleEvent(Lifecycle.Event.ON_STOP)
+        dismissListeners.remove(listener)
     }
 
     @Suppress("UNCHECKED_CAST")
     open class Builder<B : Builder<B>> constructor(private val context: Context) :
-        ActivityAction, ResourcesAction, ClickAction, KeyboardAction {
+        ContextAction, ResourcesAction, ClickAction {
 
         /** Dialog 对象 */
         private var dialog: BaseDialog? = null
@@ -390,13 +413,13 @@ open class BaseDialog constructor(context: Context, @StyleRes themeResId: Int = 
         private var createListener: OnCreateListener? = null
 
         /** Dialog 显示监听 */
-        private val showListeners: MutableList<OnShowListener?> by lazy { ArrayList() }
+        private val showListeners: MutableList<OnShowListener> by lazy { ArrayList() }
 
         /** Dialog 取消监听 */
-        private val cancelListeners: MutableList<OnCancelListener?> by lazy { ArrayList() }
+        private val cancelListeners: MutableList<OnCancelListener> by lazy { ArrayList() }
 
         /** Dialog 销毁监听 */
-        private val dismissListeners: MutableList<OnDismissListener?> by lazy { ArrayList() }
+        private val dismissListeners: MutableList<OnDismissListener> by lazy { ArrayList() }
 
         /** Dialog 按键监听 */
         private var keyListener: OnKeyListener? = null
@@ -609,24 +632,93 @@ open class BaseDialog constructor(context: Context, @StyleRes themeResId: Int = 
         /**
          * 添加显示监听
          */
-        open fun addOnShowListener(listener: OnShowListener): B {
+        open fun addOnShowListener(listener: OnShowListener?): B {
+            if (listener == null) {
+                return this as B
+            }
+            if (showListeners.contains(listener)) {
+                return this as B
+            }
             showListeners.add(listener)
+            if (isCreated()) {
+                dialog?.addOnShowListener(listener)
+            }
+            return this as B
+        }
+
+        /**
+         * 移除显示监听
+         */
+        open fun removeOnShowListener(listener: OnShowListener?): B {
+            if (listener == null) {
+                return this as B
+            }
+            showListeners.remove(listener)
+            if (isCreated()) {
+                dialog?.removeOnShowListener(listener)
+            }
             return this as B
         }
 
         /**
          * 添加取消监听
          */
-        open fun addOnCancelListener(listener: OnCancelListener): B {
+        open fun addOnCancelListener(listener: OnCancelListener?): B {
+            if (listener == null) {
+                return this as B
+            }
+            if (cancelListeners.contains(listener)) {
+                return this as B
+            }
             cancelListeners.add(listener)
+            if (isCreated()) {
+                dialog?.addOnCancelListener(listener)
+            }
+            return this as B
+        }
+
+        /**
+         * 移除取消监听
+         */
+        open fun removeOnCancelListener(listener: OnCancelListener?): B {
+            if (listener == null) {
+                return this as B
+            }
+            cancelListeners.add(listener)
+            if (isCreated()) {
+                dialog?.removeOnCancelListener(listener)
+            }
             return this as B
         }
 
         /**
          * 添加销毁监听
          */
-        open fun addOnDismissListener(listener: OnDismissListener): B {
+        open fun addOnDismissListener(listener: OnDismissListener?): B {
+            if (listener == null) {
+                return this as B
+            }
+            if (dismissListeners.contains(listener)) {
+                return this as B
+            }
             dismissListeners.add(listener)
+            if (isCreated()) {
+                dialog?.addOnDismissListener(listener)
+            }
+            return this as B
+        }
+
+        /**
+         * 移除销毁监听
+         */
+        open fun removeOnDismissListener(listener: OnDismissListener?): B {
+            if (listener == null) {
+                return this as B
+            }
+            dismissListeners.add(listener)
+            if (isCreated()) {
+                dialog?.removeOnDismissListener(listener)
+            }
             return this as B
         }
 
@@ -685,7 +777,7 @@ open class BaseDialog constructor(context: Context, @StyleRes themeResId: Int = 
          * 设置背景
          */
         open fun setBackground(@IdRes viewId: Int, @DrawableRes drawableId: Int): B {
-            return setBackground(viewId, ContextCompat.getDrawable(context, drawableId))
+            return setBackground(viewId, getDrawable(drawableId))
         }
 
         open fun setBackground(@IdRes id: Int, drawable: Drawable?): B {
@@ -697,7 +789,7 @@ open class BaseDialog constructor(context: Context, @StyleRes themeResId: Int = 
          * 设置图片
          */
         open fun setImageDrawable(@IdRes viewId: Int, @DrawableRes drawableId: Int): B {
-            return setBackground(viewId, ContextCompat.getDrawable(context, drawableId))
+            return setBackground(viewId, getDrawable(drawableId))
         }
 
         open fun setImageDrawable(@IdRes id: Int, drawable: Drawable?): B {
@@ -752,16 +844,29 @@ open class BaseDialog constructor(context: Context, @StyleRes themeResId: Int = 
 
             // 创建新的 Dialog 对象
             dialog = createDialog(context, themeId)
-            dialog!!.let { dialog ->
+            dialog?.let { dialog ->
                 dialog.setContentView(contentView!!)
                 dialog.setCancelable(cancelable)
                 if (cancelable) {
                     dialog.setCanceledOnTouchOutside(canceledOnTouchOutside)
                 }
-                dialog.setOnShowListeners(showListeners)
-                dialog.setOnCancelListeners(cancelListeners)
-                dialog.setOnDismissListeners(dismissListeners)
-                dialog.setOnKeyListener(keyListener)
+
+                for (listener in showListeners) {
+                    dialog.addOnShowListener(listener)
+                }
+
+                for (listener in cancelListeners) {
+                    dialog.addOnCancelListener(listener)
+                }
+
+                for (listener in dismissListeners) {
+                    dialog.addOnDismissListener(listener)
+                }
+
+                if (keyListener != null) {
+                    dialog.setOnKeyListener(keyListener)
+                }
+
                 val window: Window? = dialog.window
                 if (window != null) {
                     val params: WindowManager.LayoutParams = window.attributes
@@ -790,7 +895,7 @@ open class BaseDialog constructor(context: Context, @StyleRes themeResId: Int = 
                     }
                 }
 
-                getActivity()?.let { activity ->
+                getContext().getActivity()?.let { activity ->
                     // 将 Dialog 的生命周期和 Activity 绑定在一起
                     DialogLifecycle.with(activity, dialog)
                 }
@@ -803,7 +908,7 @@ open class BaseDialog constructor(context: Context, @StyleRes themeResId: Int = 
          * 显示
          */
         open fun show() {
-            val activity = getActivity()
+            val activity = getContext().getActivity()
             if (activity == null || activity.isFinishing || activity.isDestroyed) {
                 return
             }
@@ -820,7 +925,7 @@ open class BaseDialog constructor(context: Context, @StyleRes themeResId: Int = 
          * 销毁当前 Dialog
          */
         open fun dismiss() {
-            val activity = getActivity()
+            val activity = getContext().getActivity()
             if (activity == null || activity.isFinishing || activity.isDestroyed) {
                 return
             }
@@ -858,9 +963,16 @@ open class BaseDialog constructor(context: Context, @StyleRes themeResId: Int = 
         open fun post(runnable: Runnable) {
             if (isShowing()) {
                 dialog?.post(runnable)
-            } else {
-                addOnShowListener(ShowPostWrapper(runnable))
+                return
             }
+
+            addOnShowListener(object : OnShowListener {
+
+                override fun onShow(dialog: BaseDialog?) {
+                    removeOnShowListener(this)
+                    dialog?.post(runnable)
+                }
+            })
         }
 
         /**
@@ -869,20 +981,16 @@ open class BaseDialog constructor(context: Context, @StyleRes themeResId: Int = 
         open fun postDelayed(runnable: Runnable, delayMillis: Long) {
             if (isShowing()) {
                 dialog?.postDelayed(runnable, delayMillis)
-            } else {
-                addOnShowListener(ShowPostDelayedWrapper(runnable, delayMillis))
+                return
             }
-        }
 
-        /**
-         * 在指定的时间执行
-         */
-        open fun postAtTime(runnable: Runnable, uptimeMillis: Long) {
-            if (isShowing()) {
-                dialog?.postAtTime(runnable, uptimeMillis)
-            } else {
-                addOnShowListener(ShowPostAtTimeWrapper(runnable, uptimeMillis))
-            }
+            addOnShowListener(object : OnShowListener {
+
+                override fun onShow(dialog: BaseDialog?) {
+                    removeOnShowListener(this)
+                    dialog?.postDelayed(runnable, delayMillis)
+                }
+            })
         }
 
         /**
@@ -1162,7 +1270,7 @@ open class BaseDialog constructor(context: Context, @StyleRes themeResId: Int = 
     /**
      * 点击监听器
      */
-    interface OnClickListener<V : View> {
+    fun interface OnClickListener<V : View> {
 
         /**
          * 点击事件触发了
@@ -1173,7 +1281,7 @@ open class BaseDialog constructor(context: Context, @StyleRes themeResId: Int = 
     /**
      * 创建监听器
      */
-    interface OnCreateListener {
+    fun interface OnCreateListener {
 
         /**
          * Dialog 创建了
@@ -1184,7 +1292,7 @@ open class BaseDialog constructor(context: Context, @StyleRes themeResId: Int = 
     /**
      * 显示监听器
      */
-    interface OnShowListener {
+    fun interface OnShowListener {
 
         /**
          * Dialog 显示了
@@ -1195,7 +1303,7 @@ open class BaseDialog constructor(context: Context, @StyleRes themeResId: Int = 
     /**
      * 取消监听器
      */
-    interface OnCancelListener {
+    fun interface OnCancelListener {
 
         /**
          * Dialog 取消了
@@ -1206,7 +1314,7 @@ open class BaseDialog constructor(context: Context, @StyleRes themeResId: Int = 
     /**
      * 销毁监听器
      */
-    interface OnDismissListener {
+    fun interface OnDismissListener {
 
         /**
          * Dialog 销毁了
@@ -1217,7 +1325,7 @@ open class BaseDialog constructor(context: Context, @StyleRes themeResId: Int = 
     /**
      * 按键监听器
      */
-    interface OnKeyListener {
+    fun interface OnKeyListener {
 
         /**
          * 触发了按键

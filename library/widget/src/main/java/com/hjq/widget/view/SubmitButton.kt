@@ -5,7 +5,13 @@ import android.animation.AnimatorListenerAdapter
 import android.animation.ValueAnimator
 import android.content.Context
 import android.content.res.TypedArray
-import android.graphics.*
+import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.Paint
+import android.graphics.Path
+import android.graphics.PathMeasure
+import android.graphics.PorterDuff
+import android.graphics.RectF
 import android.util.AttributeSet
 import android.util.TypedValue
 import android.view.animation.AccelerateInterpolator
@@ -213,8 +219,8 @@ class SubmitButton @JvmOverloads constructor(
     /**
      * 绘制结果按钮
      */
-    private fun drawResult(canvas: Canvas, isSucceed: Boolean) {
-        if (isSucceed) {
+    private fun drawResult(canvas: Canvas, succeed: Boolean) {
+        if (succeed) {
             resultPath.moveTo(-viewHeight / 6f, 0f)
             resultPath.lineTo(0f, (-viewHeight / 6 + (1 + sqrt(5.0)) * viewHeight / 12).toFloat())
             resultPath.lineTo(viewHeight / 6f, -viewHeight / 6f)

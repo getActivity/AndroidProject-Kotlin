@@ -9,6 +9,8 @@ import android.util.AttributeSet
 import android.view.animation.AccelerateDecelerateInterpolator
 import androidx.annotation.ColorInt
 import androidx.core.graphics.ColorUtils
+import com.hjq.base.ktx.dp2px
+import com.hjq.base.ktx.sp2px
 import com.hjq.demo.R
 import com.scwang.smart.refresh.layout.api.RefreshFooter
 import com.scwang.smart.refresh.layout.api.RefreshLayout
@@ -44,13 +46,13 @@ class SmartBallPulseFooter @JvmOverloads constructor(context: Context, attrs: At
     private val textWidth: Float
 
     init {
-        minimumHeight = resources.getDimension(R.dimen.dp_60).toInt()
+        minimumHeight = dp2px(60).toInt()
         paint.color = Color.WHITE
         paint.style = Paint.Style.FILL
         paint.isAntiAlias = true
         mSpinnerStyle = SpinnerStyle.Translate
-        circleSpacing = resources.getDimension(R.dimen.dp_2)
-        paint.textSize = resources.getDimension(R.dimen.sp_14)
+        circleSpacing = dp2px(2)
+        paint.textSize = sp2px(14)
         textWidth = paint.measureText(getContext().getString(R.string.common_no_more_data))
     }
 

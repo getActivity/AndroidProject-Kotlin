@@ -1,10 +1,11 @@
 package com.hjq.demo.other
 
-import android.app.*
-import android.content.*
+import android.app.Application
+import android.content.Context
+import android.content.SharedPreferences
 import android.os.Process
-import com.hjq.demo.ui.activity.CrashActivity
-import com.hjq.demo.ui.activity.RestartActivity
+import com.hjq.demo.ui.activity.common.CrashActivity
+import com.hjq.demo.ui.activity.common.RestartActivity
 
 /**
  *    author : Android 轮子哥
@@ -18,7 +19,7 @@ class CrashHandler private constructor(private val application: Application) :
     companion object {
 
         /** Crash 文件名 */
-        private const val CRASH_FILE_NAME: String = "crash_file"
+        private const val CRASH_FILE_NAME: String = "crash_config"
 
         /** Crash 时间记录 */
         private const val KEY_CRASH_TIME: String = "key_crash_time"
@@ -34,7 +35,7 @@ class CrashHandler private constructor(private val application: Application) :
     private val nextHandler: Thread.UncaughtExceptionHandler? = Thread.getDefaultUncaughtExceptionHandler()
 
     init {
-        if ((javaClass.name == nextHandler?.javaClass?.name)) {
+        if (nextHandler != null && javaClass.name == nextHandler.javaClass.name) {
             // 请不要重复注册 Crash 监听
             throw IllegalStateException("are you ok?")
         }
@@ -49,12 +50,11 @@ class CrashHandler private constructor(private val application: Application) :
         // 记录当前崩溃的时间，以便下次崩溃时进行比对
         sharedPreferences.edit().putLong(KEY_CRASH_TIME, currentCrashTime).commit()
 
-        // 致命异常标记：如果上次崩溃的时间距离当前崩溃小于 5 分钟，那么判定为致命异常
-        val deadlyCrash: Boolean = currentCrashTime - lastCrashTime < 1000 * 60 * 5
         if (AppConfig.isDebug()) {
             CrashActivity.start(application, throwable)
         } else {
-            if (!deadlyCrash) {
+            // 致命异常标记：如果上次崩溃的时间距离当前崩溃小于 5 分钟，那么判定为致命异常
+            if (currentCrashTime - lastCrashTime > 1000 * 60 * 5) {
                 // 如果不是致命的异常就自动重启应用
                 RestartActivity.start(application)
             }

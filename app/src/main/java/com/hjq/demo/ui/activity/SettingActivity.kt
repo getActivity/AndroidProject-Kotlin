@@ -5,20 +5,27 @@ import android.view.View
 import androidx.lifecycle.lifecycleScope
 import com.hjq.base.BaseDialog
 import com.hjq.base.action.AnimAction
+import com.hjq.base.ktx.lazyFindViewById
+import com.hjq.base.ktx.startActivity
 import com.hjq.demo.R
 import com.hjq.demo.aop.SingleClick
 import com.hjq.demo.app.AppActivity
 import com.hjq.demo.http.api.LogoutApi
 import com.hjq.demo.http.glide.GlideApp
 import com.hjq.demo.http.model.HttpData
+import com.hjq.demo.ktx.toast
 import com.hjq.demo.manager.ActivityManager
 import com.hjq.demo.manager.CacheDataManager
 import com.hjq.demo.other.AppConfig
-import com.hjq.demo.ui.dialog.MenuDialog
+import com.hjq.demo.ui.activity.account.LoginActivity
+import com.hjq.demo.ui.activity.account.PasswordResetActivity
+import com.hjq.demo.ui.activity.account.PhoneResetActivity
+import com.hjq.demo.ui.activity.common.BrowserActivity
 import com.hjq.demo.ui.dialog.SafeDialog
 import com.hjq.demo.ui.dialog.UpdateDialog
+import com.hjq.demo.ui.dialog.common.MenuDialog
 import com.hjq.http.EasyHttp
-import com.hjq.http.listener.HttpCallback
+import com.hjq.http.listener.HttpCallbackProxy
 import com.hjq.widget.layout.SettingBar
 import com.hjq.widget.view.SwitchButton
 import kotlinx.coroutines.Dispatchers
@@ -33,11 +40,11 @@ import kotlinx.coroutines.withContext
  */
 class SettingActivity : AppActivity(), SwitchButton.OnCheckedChangeListener {
 
-    private val languageView: SettingBar? by lazy { findViewById(R.id.sb_setting_language) }
-    private val phoneView: SettingBar? by lazy { findViewById(R.id.sb_setting_phone) }
-    private val passwordView: SettingBar? by lazy { findViewById(R.id.sb_setting_password) }
-    private val cleanCacheView: SettingBar? by lazy { findViewById(R.id.sb_setting_cache) }
-    private val autoSwitchView: SwitchButton? by lazy { findViewById(R.id.sb_setting_switch) }
+    private val languageView: SettingBar? by lazyFindViewById(R.id.sb_setting_language)
+    private val phoneView: SettingBar? by lazyFindViewById(R.id.sb_setting_phone)
+    private val passwordView: SettingBar? by lazyFindViewById(R.id.sb_setting_password)
+    private val cleanCacheView: SettingBar? by lazyFindViewById(R.id.sb_setting_cache)
+    private val autoSwitchView: SwitchButton? by lazyFindViewById(R.id.sb_setting_switch)
 
     override fun getLayoutId(): Int {
         return R.layout.setting_activity
@@ -87,8 +94,8 @@ class SettingActivity : AppActivity(), SwitchButton.OnCheckedChangeListener {
                         .setVersionName("2.0")
                         .setForceUpdate(false)
                         .setUpdateLog("修复Bug\n优化用户体验")
-                        .setDownloadUrl("https://down.qq.com/qqweb/QQ_1/android_apk/Android_8.5.0.5025_537066738.apk")
-                        .setFileMd5("560017dc94e8f9b65f4ca997c7feb326")
+                        .setDownloadUrl("https://dldir1.qq.com/weixin/android/weixin8015android2020_arm64.apk")
+                        .setFileMd5("b05b25d4738ea31091dd9f80f4416469")
                         .show()
                 } else {
                     toast(R.string.update_no_update)
@@ -150,21 +157,19 @@ class SettingActivity : AppActivity(), SwitchButton.OnCheckedChangeListener {
                 if (true) {
                     startActivity(LoginActivity::class.java)
                     // 进行内存优化，销毁除登录页之外的所有界面
-                    ActivityManager.getInstance().finishAllActivities(
-                        LoginActivity::class.java
-                    )
+                    ActivityManager.finishAllActivities(LoginActivity::class.java)
                     return
                 }
 
                 // 退出登录
                 EasyHttp.post(this)
                     .api(LogoutApi())
-                    .request(object : HttpCallback<HttpData<Void?>>(this) {
+                    .request(object : HttpCallbackProxy<HttpData<Void?>>(this) {
 
-                        override fun onSucceed(data: HttpData<Void?>?) {
+                        override fun onHttpSuccess(data: HttpData<Void?>) {
                             startActivity(LoginActivity::class.java)
                             // 进行内存优化，销毁除登录页之外的所有界面
-                            ActivityManager.getInstance().finishAllActivities(LoginActivity::class.java)
+                            ActivityManager.finishAllActivities(LoginActivity::class.java)
                         }
                     })
             }

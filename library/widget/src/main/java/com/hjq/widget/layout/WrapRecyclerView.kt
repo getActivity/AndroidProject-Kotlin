@@ -10,7 +10,6 @@ import androidx.annotation.LayoutRes
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.GridLayoutManager.SpanSizeLookup
 import androidx.recyclerview.widget.RecyclerView
-import java.util.*
 
 /**
  *    author : Android 轮子哥
@@ -18,6 +17,7 @@ import java.util.*
  *    time   : 2019/09/21
  *    desc   : 支持添加头部和底部的 RecyclerView
  */
+@Suppress("NotifyDataSetChanged")
 class WrapRecyclerView @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0) :
     RecyclerView(context, attrs, defStyleAttr) {
@@ -284,21 +284,30 @@ class WrapRecyclerView @JvmOverloads constructor(
         }
 
         override fun onFailedToRecycleView(holder: ViewHolder): Boolean {
-            if (realAdapter == null) {
-                return super.onFailedToRecycleView(holder)
+            realAdapter.let {
+                if (it == null || holder is WrapViewHolder) {
+                    return super.onFailedToRecycleView(holder)
+                }
+                return it.onFailedToRecycleView(holder)
             }
-            return realAdapter!!.onFailedToRecycleView(holder)
         }
 
         override fun onViewAttachedToWindow(holder: ViewHolder) {
-            if (realAdapter == null) {
-                return
+            realAdapter.let {
+                if (it == null || holder is WrapViewHolder) {
+                    return
+                }
+                it.onViewAttachedToWindow(holder)
             }
-            realAdapter!!.onViewAttachedToWindow(holder)
         }
 
         override fun onViewDetachedFromWindow(holder: ViewHolder) {
-            realAdapter?.onViewDetachedFromWindow(holder)
+            realAdapter.let {
+                if (it == null || holder is WrapViewHolder) {
+                    return
+                }
+                it.onViewDetachedFromWindow(holder)
+            }
         }
 
         /**

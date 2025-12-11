@@ -1,14 +1,16 @@
 package com.hjq.base
 
-import android.content.*
+import android.content.Context
 import android.util.SparseArray
-import android.view.*
+import android.view.LayoutInflater
+import android.view.View
 import android.view.View.OnLongClickListener
 import androidx.annotation.IdRes
 import androidx.annotation.LayoutRes
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.hjq.base.action.ResourcesAction
+
 
 /**
  *    author : Android 轮子哥
@@ -35,14 +37,7 @@ abstract class BaseAdapter<VH : BaseAdapter<VH>.BaseViewHolder> (private val con
     /** 条目子 View 长按监听器 */
     private val childLongClickListeners: SparseArray<OnChildLongClickListener?> by lazy { SparseArray() }
 
-    /** ViewHolder 位置偏移值 */
-    private var positionOffset: Int = 0
-
     override fun onBindViewHolder(holder: VH, position: Int) {
-        // 根据 ViewHolder 绑定的位置和传入的位置进行对比
-        // 一般情况下这两个位置值是相等的，但是有一种特殊的情况
-        // 在外层添加头部 View 的情况下，这两个位置值是不对等的
-        positionOffset = position - holder.adapterPosition
         holder.onBindView(position)
     }
 
@@ -55,6 +50,21 @@ abstract class BaseAdapter<VH : BaseAdapter<VH>.BaseViewHolder> (private val con
 
     override fun getContext(): Context {
         return context
+    }
+
+    override fun onViewAttachedToWindow(holder: VH) {
+        super.onViewAttachedToWindow(holder)
+        holder.onAttached()
+    }
+
+    override fun onViewDetachedFromWindow(holder: VH) {
+        super.onViewDetachedFromWindow(holder)
+        holder.onDetached()
+    }
+
+    override fun onViewRecycled(holder: VH) {
+        super.onViewRecycled(holder)
+        holder.onRecycled()
     }
 
     /**
@@ -94,13 +104,25 @@ abstract class BaseAdapter<VH : BaseAdapter<VH>.BaseViewHolder> (private val con
         abstract fun onBindView(position: Int)
 
         /**
+         * ViewHolder 绑定到窗口回调
+         */
+        open fun onAttached() {}
+
+        /**
+         * ViewHolder 从窗口解绑回调
+         */
+        open fun onDetached() {}
+
+        /**
+         * ViewHolder 回收回调
+         */
+        open fun onRecycled() {}
+
+        /**
          * 获取 ViewHolder 位置
          */
         protected open fun getViewHolderPosition(): Int {
-            // 这里解释一下为什么用 getLayoutPosition 而不用 getAdapterPosition
-            // 如果是使用 getAdapterPosition 会导致一个问题，那就是快速点击删除条目的时候会出现 -1 的情况，因为这个 ViewHolder 已经解绑了
-            // 而使用 getLayoutPosition 则不会出现位置为 -1 的情况，因为解绑之后在布局中不会立马消失，所以不用担心在动画执行中获取位置有异常的情况
-            return layoutPosition + positionOffset
+            return layoutPosition
         }
 
         /**
@@ -144,7 +166,7 @@ abstract class BaseAdapter<VH : BaseAdapter<VH>.BaseViewHolder> (private val con
         }
 
         open fun <V : View?> findViewById(@IdRes id: Int): V? {
-            return getItemView().findViewById(id)
+            return itemView.findViewById(id)
         }
     }
 
@@ -212,7 +234,7 @@ abstract class BaseAdapter<VH : BaseAdapter<VH>.BaseViewHolder> (private val con
     /**
      * RecyclerView 条目点击监听类
      */
-    interface OnItemClickListener {
+    fun interface OnItemClickListener {
 
         /**
          * 当 RecyclerView 某个条目被点击时回调
@@ -227,7 +249,7 @@ abstract class BaseAdapter<VH : BaseAdapter<VH>.BaseViewHolder> (private val con
     /**
      * RecyclerView 条目长按监听类
      */
-    interface OnItemLongClickListener {
+    fun interface OnItemLongClickListener {
 
         /**
          * 当 RecyclerView 某个条目被长按时回调
@@ -243,7 +265,7 @@ abstract class BaseAdapter<VH : BaseAdapter<VH>.BaseViewHolder> (private val con
     /**
      * RecyclerView 条目子 View 点击监听类
      */
-    interface OnChildClickListener {
+    fun interface OnChildClickListener {
 
         /**
          * 当 RecyclerView 某个条目 子 View 被点击时回调
@@ -258,7 +280,7 @@ abstract class BaseAdapter<VH : BaseAdapter<VH>.BaseViewHolder> (private val con
     /**
      * RecyclerView 条目子 View 长按监听类
      */
-    interface OnChildLongClickListener {
+    fun interface OnChildLongClickListener {
 
         /**
          * 当 RecyclerView 某个条目子 View 被长按时回调

@@ -26,9 +26,9 @@
 
 * [为什么不拆成多个框架来做这件事](#为什么不拆成多个框架来做这件事)
 
-* [为什么最低兼容到 Android 5](#为什么最低兼容到-android-5)
+* [为什么最低兼容到 Android 5.0](#为什么最低兼容到-android-50)
 
-* [为什么不加入扫描二维码功能](#为什么不加入扫描二维码功能)
+* [为什么不加入 XXX 功能](#为什么不加入-xxx-功能)
 
 * [为什么不加入 EventBus](#为什么不加入-eventbus)
 
@@ -50,15 +50,17 @@
 
 * [为什么不用谷歌 ActivityResultContracts](#为什么不用谷歌-activityresultcontracts)
 
+* [为什么新版移除了权限申请的 AOP 注解](#为什么新版移除了权限申请的-aop-注解)
+
 * [轮子哥你怎么看待层出不穷的新技术](#轮子哥你怎么看待层出不穷的新技术)
 
 #### 为什么没有用 MVP
 
-![](picture/help/mvp1.jpg)
+![](picture/help/mvp_issue_1.jpg)
 
-![](picture/help/mvp2.jpg)
+![](picture/help/mvp_issue_2.jpg)
 
-![](picture/help/mvp3.jpg)
+![](picture/help/mvvm_issue.jpg)
 
 * AndroidProject 舍弃 MVP 的最大一个原因，需要写各种类，各种回调，如果这个页面比较简单的话，使用 MVP 会让原本简单的代码变复杂，导致后续开发和维护成本是非常高，前期付出的代价和后期的维护不成正比关系，当然这种说法只适用于各种中小型项目，大型的项目我还没有经历过，不过我觉得，无论是 MVC、MVP、MVVM，它们出现的目的是为了解决代码多并且乱的问题，作用就是给代码做分类，但是可以跟大家分享我的心得，我并不看好 MVP，因为它让我开发和维护都很痛苦，所以我就直接将它从 AndroidProject 移除，目的也很简单，不推荐大家使用，因为 MVP 不适合大多数项目的开发和维护。我更推荐大家直接将代码写在 Activity，但是有一个前提条件需要大家遵守，大家要做好代码封装和重复代码的抽取，尽量让 Activity 成为只有业务代码的类，这样一个项目里面的大多数 Activity 代码量都能很好控制在 1000 行代码以内。但是这种看似简单的操作，但是实际要做到是一件不容易的事情，这里面不仅要解决代码带来的问题，还要解决带来的各种人性矛盾，困难重重，这种想法经过很长一段时间的思考，虽然写法在开发和维护中效率是非常高的，但是不被大多数人认可，大家更愿意相信 MVC、MVP、MVVM，而很少有人理解这三种模式的本质是什么，就是为了给代码做分类，但这三种模式都不够灵活，很生硬，像是一套套规则，而这样的代码分类，只会让大多数人的开发越来越头疼。
 
@@ -100,7 +102,7 @@ binding.tv_data_name.setText("字符串");
 
 * DataBinding 最大的优势在于，因为它可以在 xml 直接给 View 赋值，但它的优点正是它最致命的缺点，当业务逻辑简单时，会显得格外美好，但是一旦判断条件复杂起来，由于 xml 属性不能换行的特性，会导致无法在 xml 直接赋值又或者很长的一段代码堆在布局中，间接导致 CodeReview 时异常艰难，更别说在原有的基础上继续更新迭代，这对每一个开发者来讲无疑是一个巨大的灾难。
 
-* 还有一个是 DataBinding 的学习成本比较高，其次成本也挺高，使用前需要做很多封装，另外每次使用时都需要添加 `layout` 和 `data` 节点，然后在 Java 代码中初始化 DataBinding 对象，无法在基类中封装处理，每次都要写 `binding.xxx` 才能操作控件，和 ViewBinding 的问题差不多。
+* 还有一个是 DataBinding 的学习成本比较高，其次使用成本也挺高，使用前需要做很多封装，另外每次使用时都需要添加 `layout` 和 `data` 节点，然后在 Java 代码中初始化 DataBinding 对象，无法在基类中封装处理，每次都要写 `binding.xxx` 才能操作控件，和 ViewBinding 的问题差不多。
 
 ```java
 ActivityXxxxBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_xxxx);
@@ -118,7 +120,7 @@ ActivityXxxxBinding binding = DataBindingUtil.setContentView(this, R.layout.acti
 
 * AndroidProject 其实有加入过这个功能，但是在 [v9.0 版本](https://github.com/getActivity/AndroidProject/releases/tag/9.0) 就移除了，原因是第三方侧滑框架 [BGASwipeBackLayout](https://github.com/bingoogolapple/BGASwipeBackLayout-Android) 在 Android 9.0 上面会[闪屏](https://github.com/bingoogolapple/BGASwipeBackLayout-Android/issues/173)，并且还是 **100% 必现**，**用户体验极差**，我也跟作者反馈过这个问题，但结果不了了之，所以不得不移除。但是到了 [v10.0 版本](https://github.com/getActivity/AndroidProject/releases/tag/10.0)，我又加上界面侧滑功能了，不过这次我换成了 [SmartSwipe](https://github.com/luckybilly/SmartSwipe) 来做，但是我又再一次失望了，这个框架在 Android 11 上面，如果 Activity 上有 WindowManager 正在显示，然后使用界面侧滑，那么会出现闪屏的情况，具体效果如下图：
 
-![](picture/help/Swipe.jpg)
+![](picture/help/swipe_issue.jpg)
 
 * 就这个情况我也联系过作者，并详细阐述了产生的原因和具体的复现步骤，但是我等了三天连个回复都没有，实属有些让我心寒，在等待的期间我看到 Github 的 issue 已经基本没有回复了，并且最后一次提交是在 13 个月前了，种种迹象都已经表明，所以经过慎重考虑，最终决定在 [v12.1 版本](https://github.com/getActivity/AndroidProject/releases/tag/12.1) 移除界面侧滑功能。
 
@@ -139,7 +141,7 @@ xxhdpi：1dp=3px
 
 xxxhdpi：1dp=4px
 ```
-	
+
 * 这个是谷歌对屏幕适配的一种默认方式，厂商也可以根据需要去修改默认的基数，从而达到最优的显示效果。
 
 * 谷歌的屏幕适配方案也不是百分之一百完美的，其实会存在一些需求不能满足的问题。谷歌的设计理念是屏幕越大显示的东西越多，这种想法并没有错，但有些 App 可能对这块会有要求，希望根据屏幕大小对控件进行百分比压缩。这个时候谷歌那套适配方案的设计已经和需求完全不一致了。
@@ -148,7 +150,7 @@ xxxhdpi：1dp=4px
 
 * 另外谈谈我的经历，我自己之前的公司主要是做平板上面的应用，所以也用过 [AutoSize 框架](https://github.com/JessYanCoding/AndroidAutoSize)，一年多的使用体验下来，发现这个框架 Bug 还算是比较多的，例如框架会偶尔出现机型适配失效，重写了 **getResources** 方法情况之后出现的情况少了一些，但是仍然还有一些奇奇怪怪的问题，这里就不一一举例了，最后总结下来就是框架还不够成熟，但是框架的思想还是很不错的。我后面换了一家公司，也是做平板应用，项目用的是用[通配符的适配方案](https://github.com/wildma/ScreenAdaptation)，跟 AutoSize 相对比，没有了那些奇奇怪怪的问题，但是代码的侵入性比较高。这两种方案各有优缺点，大家看着选择。
 
-![](picture/help/vote2.jpg)
+![](picture/help/vote_2.jpg)
 
 * 在这块我也发起过群投票，相比谷歌的适配方案，大多数人更认同那种百分比适配方案，秉承着少数服从多数的理念，我在 AndroidProject [v13.0 版本](https://github.com/getActivity/AndroidProject/releases/tag/13.0) 加入了通配符的适配方案。虽然有一部分人不认同，但是我想跟这些人说的是：我的每一个决定都是十分谨慎的，因为这其中涉及到许多人的利益，AndroidProject 虽然是我创造的，但是它早就不是我一个人的了，而是大家的，每个重要的决定我都会考虑再三才会去做，在做决定的时候我会把大众的利益放在第一位，把自己的利益放在最后一位，所以大家唯一能做的是，相信我的选择。或许你可能觉得这样不太对，也随时欢迎你提出不同的意见给到我，我不认为自己做的决定一定都是对的，但是我会一直朝着对的方向前进。
 
@@ -164,11 +166,11 @@ xxxhdpi：1dp=4px
 
 * DialogFragment 的出现就是为了解决 Dialog 和 Activity 生命周期不同步导致的内存泄漏问题，在 AndroidProject 曾经引入过，也经过了很多个版本的更新迭代，不过在 [10.0](https://github.com/getActivity/AndroidProject/releases/tag/10.0) 版本后就被移除了，原因是 Dialog 虽然有坑，但是 DialogFragment 也有坑，可以说解决了一个问题又引发了各种问题。先来细数我在 DialogFragment 上踩过的各种坑：
 
-    1. DialogFragment 会占用 Dialog 的 Cancel 和 Dismiss 监听，为了就是在 Dialog 消失之后将自己（Fragment）从 Activity 上移除，这样的操作看起很合理，但是会引发一个问题，那么就是会导致我们原先给 Dialog 设置的 Cancel 和 Dismiss 监听被覆盖掉，间接导致我们无法使用这个监听，因为 Dialog 的监听器只能有一个观察者，而 AndroidProject 前期解决这个问题的方式是：将 Dialog 的监听器使用的观察者模式，从一对一改造成一对多，也就是一个被观察者可以有很多个观察者，由此来解决这个问题。
- 
-    2. DialogFragment 的显示和隐藏操作都不能在后台中进行，否则会出现一个报错 `java.lang.IllegalStateException: Can not perform this action after onSaveInstanceState`，这个是因为 DialogFragment 的 show 和 dismiss 方法使用了 FragmentTransaction.commit 方法，这个 commit 方法会触发对 Activity 状态的检查，如果 Activity 的状态已经保存了（即已经调用了 onSaveInstanceState 方法），这个时候把 Fragment commit 到 Activity 上会抛出异常，这种场景在执行异步操作（例如请求网络）未结束前，用户手动将 App 返回到桌面，然后异步操作执行完毕，下一步就是回调异步监听器，这个时候我们的 App 已经处于后台状态，那么我们如果在监听回调中 show 或 dismiss DialogFragment，那么就会触发这个异常。AndroidProject 前期对于这个问题的解决方案是重写 DialogFragment.show 方法，加一个对 Activity 的状态判断，如果 Activity 处于后台状态，那么不去调用 super.show()，但是这样会导致一个问题，虽然解决了崩溃的问题，但是又会导致 Dialog 没显示出来，而重写 DialogFragment.dismiss 方法，直接调用 dismissAllowingStateLoss 方法，因为这个方法不会去检查 Activity 的状态。虽然这种解决方式不够完美，但却是我那个时候能想到的最好方法。
+  1. DialogFragment 会占用 Dialog 的 Cancel 和 Dismiss 监听，为了就是在 Dialog 消失之后将自己（Fragment）从 Activity 上移除，这样的操作看起很合理，但是会引发一个问题，那么就是会导致我们原先给 Dialog 设置的 Cancel 和 Dismiss 监听被覆盖掉，间接导致我们无法使用这个监听，因为 Dialog 的监听器只能有一个观察者，而 AndroidProject 前期解决这个问题的方式是：将 Dialog 的监听器使用的观察者模式，从一对一改造成一对多，也就是一个被观察者可以有很多个观察者，由此来解决这个问题。
 
-    3. 最后一个问题是关于 DialogFragment 屏幕旋转的问题，首先 DialogFragment 是通过自身 onCreateDialog 方法来获取 Dialog 对象的，但是如果我们直接通过外层给 DialogFragment 传入 Dialog 的对象时，这样的代码逻辑貌似没有问题，但是在用户进行屏幕旋转，而刚好我们的应用没有固定屏幕方向时，DialogFragment 对象会跟随 Activity 销毁重建，因为它本身就是一个 Fragment，但是会导致之前的外层传入 Dialog 对象被回收并置空，然后再调用到 onCreateDialog 方法时，返回的是一个空对象的 Dialog，那么就会直接 DialogFragment 内部引发空指针异常，而 AndroidProject 前期解决这个问题的方案是，重写 onActivityCreated，赶在 onCreateDialog 方法调用之前，先判断 DialogFragment 对象内部持有的 Dialog 是否为空，如果是一个空对象，那么就将自己 dismissAllowingStateLoss 掉。
+  2. DialogFragment 的显示和隐藏操作都不能在后台中进行，否则会出现一个报错 `java.lang.IllegalStateException: Can not perform this action after onSaveInstanceState`，这个是因为 DialogFragment 的 show 和 dismiss 方法使用了 FragmentTransaction.commit 方法，这个 commit 方法会触发对 Activity 状态的检查，如果 Activity 的状态已经保存了（即已经调用了 onSaveInstanceState 方法），这个时候把 Fragment commit 到 Activity 上会抛出异常，这种场景在执行异步操作（例如请求网络）未结束前，用户手动将 App 返回到桌面，然后异步操作执行完毕，下一步就是回调异步监听器，这个时候我们的 App 已经处于后台状态，那么我们如果在监听回调中 show 或 dismiss DialogFragment，那么就会触发这个异常。AndroidProject 前期对于这个问题的解决方案是重写 DialogFragment.show 方法，加一个对 Activity 的状态判断，如果 Activity 处于后台状态，那么不去调用 super.show()，但是这样会导致一个问题，虽然解决了崩溃的问题，但是又会导致 Dialog 没显示出来，而重写 DialogFragment.dismiss 方法，直接调用 dismissAllowingStateLoss 方法，因为这个方法不会去检查 Activity 的状态。虽然这种解决方式不够完美，但却是我那个时候能想到的最好方法。
+
+  3. 最后一个问题是关于 DialogFragment 屏幕旋转的问题，首先 DialogFragment 是通过自身 onCreateDialog 方法来获取 Dialog 对象的，但是如果我们直接通过外层给 DialogFragment 传入 Dialog 的对象时，这样的代码逻辑貌似没有问题，但是在用户进行屏幕旋转，而刚好我们的应用没有固定屏幕方向时，DialogFragment 对象会跟随 Activity 销毁重建，因为它本身就是一个 Fragment，但是会导致之前的外层传入 Dialog 对象被回收并置空，然后再调用到 onCreateDialog 方法时，返回的是一个空对象的 Dialog，那么就会直接 DialogFragment 内部引发空指针异常，而 AndroidProject 前期解决这个问题的方案是，重写 onActivityCreated，赶在 onCreateDialog 方法调用之前，先判断 DialogFragment 对象内部持有的 Dialog 是否为空，如果是一个空对象，那么就将自己 dismissAllowingStateLoss 掉。
 
 * 看过这些问题，你是不是和我一样，感觉这 DialogFragment 不是一般的坑，不过最终我放弃了使用 DialogFragment，并不是因为 DialogFragment 又出现了新问题，而是我想到了更好的方案来代替 DialogFragment，方案就是 Application.registerActivityLifecycleCallbacks，想必大家现在已经猜到我想干啥，和 DialogFragment 的作用一样，通过监听 Activity 的方式来管控 Dialog 的生命周期，但唯一不同的是，它不会出现刚刚说过 DialogFragment 的那些问题，这种方式在 AndroidProject 上迭代了几个版本过后，这期间没有发现新的问题，也没有收到别人反馈过这块的问题，证明这种方式是可行的。
 
@@ -176,9 +178,9 @@ xxxhdpi：1dp=4px
 
 * 首先我问大家一个问题，腾讯出品的 X5 WebView  就一定比原生 WebView 好吗？我觉得未必，我依稀记得 Android 9.0 还是 Android 10 刚出来的时候，我点了升级按钮，然后就发现微信和 QQ 的网页浏览卡得让我怀疑人生，不过后面突然某一天就变好了，从这件事可以得出两点结论：
 
-    1. 第一个 SDK 有自我更新功能，意味着 WebView 掌控权握在腾讯公司手中
+  1. 第一个 SDK 有自我更新功能，意味着 WebView 掌控权握在腾讯公司手中
 
-    2. 第二个是 SDK 需要腾讯来持续维护，意味着这个项目的生命周期会跟随腾讯公司的发展和决策
+  2. 第二个是 SDK 需要腾讯来持续维护，意味着这个项目的生命周期会跟随腾讯公司的发展和决策
 
 * 基于以上两点，我的个人建议是优先使用原生 WebView，如果不满足需求了，可以自行替换成 X5 WebView，当然不是说 X5 WebView 一定不好，用原生 WebView 一定就好，而是 AndroidProject 的目标是稳中求胜，另外一个是 AndroidProject 中有针对 WebView 做统一封装，后续替换成 X5 WebView 的成本还算是相对较低的。
 
@@ -186,11 +188,11 @@ xxxhdpi：1dp=4px
 
 * 这个问题在前几年是一个比较火热的话题，我表示很能理解，因为新鲜的事物总是能勾起人的好奇，让人忍不住试一试，但是我先问大家一个问题，单 Activity 多 Fragment 和写多个 Activity 有什么优点？大家第一个反应应该是每写一个页面都不需要在清单文件中注册了，但是这个真的是优点吗？我可以很明确地告诉大家，我已经写了那么多句代码，不差那句在清单文件注册的代码。那么究竟什么才是对我们有价值的？我觉得就两点，一是减少前期开发的工作量，二是降低后续维护的难度。所以省那一两句有前途吗？我们是差那一两句代码的人吗？如果这种模式能够帮助我们写好代码，这个当然是有价值的，非常值得一试的，否则就是纯属瞎扯淡。不仅如此，我个人觉得这种模式有很大的弊端，会引发很多问题，例如：
 
-    1. 有的页面是全屏有的页面是非全屏，有的页面是固定竖屏有的页面是横屏，进入时怎么切换？返回时怎么切换回来？然后又该怎么去做统一的封装？
+  1. 有的页面是全屏有的页面是非全屏，有的页面是固定竖屏有的页面是横屏，进入时怎么切换？返回时怎么切换回来？然后又该怎么去做统一的封装？
 
-    2. 不同 Fragment 之间应该怎样通讯？Activity 有 onActivityResult 方法可以用，但是 Fragment 有什么方法可以用？还是全用 EventBus 来处理？如果是这样做会不会太低效了？每次都要写一个 Event 类，并且在代码中找起来是不是也不太好找？
+  2. 不同 Fragment 之间应该怎样通讯？Activity 有 onActivityResult 方法可以用，但是 Fragment 有什么方法可以用？还是全用 EventBus 来处理？如果是这样做会不会太低效了？每次都要写一个 Event 类，并且在代码中找起来是不是也不太好找？
 
-    3. 如何保证这个 Activity 被系统回收之后，然后引发重建操作，又该如何保证这个 Activity 中的多个 Fragment 之间的回退栈是否正常？假设这个 Activity 里面有 10 个Fragment，一下子引发 10 个 Fragment 创建是否会对内存和性能造成影响呢？
+  3. 如何保证这个 Activity 被系统回收之后，然后引发重建操作，又该如何保证这个 Activity 中的多个 Fragment 之间的回退栈是否正常？假设这个 Activity 里面有 10 个Fragment，一下子引发 10 个 Fragment 创建是否会对内存和性能造成影响呢？
 
 * 如果单 Activity 多 Fragment 不能为我们创造太大的价值时，这种模式根本就不值得我们去做，因为我们最终得到的，永远抵不上付出的。
 
@@ -198,13 +200,13 @@ xxxhdpi：1dp=4px
 
 * 大家如果有仔细观察的话，会发现 AndroidProject 其实没有用到 ConstraintLayout 布局，在这里谈谈我对这个布局的看法，约束布局有一个优点，没有布局嵌套，所以能减少测量次数，从而提升布局绘制的速度，但是优点也是它的缺点，正是因为没有布局嵌套，View 也就没有层级概念，所以它需要定义很多 ViewID 来约束相邻的 View 的位置，就算这个 View 我们在 Java 代码中没有用到，但是在约束布局中还是要定义。这样带来的弊端有几个：
 
-    1. 我们每次都要想好这个 ViewID 的名称叫什么，这个就有点烧脑筋了，既要符合代码规范，也要明确和突出其作用。
+  1. 我们每次都要想好这个 ViewID 的名称叫什么，这个就有点烧脑筋了，既要符合代码规范，也要明确和突出其作用。
 
-    2. 要考虑好每个 View 上下左右之间的约束关系，否则就会容易出现越界的情况，例如一个 TextView 设计图上有 5 个字，但是后台返回了 10 个字，这个时候 TextView 的控件宽度会被拉长，如果没有设置好右边的约束，极有可能出现遮盖右边 View 的情况。
+  2. 要考虑好每个 View 上下左右之间的约束关系，否则就会容易出现越界的情况，例如一个 TextView 设计图上有 5 个字，但是后台返回了 10 个字，这个时候 TextView 的控件宽度会被拉长，如果没有设置好右边的约束，极有可能出现遮盖右边 View 的情况。
 
-    3. View 之间的关系会变得复杂起来，具体表现为布局一旦发生变更，例如删除或增加某一个 View，都会影响整个 ConstraintLayout 布局，因为很多约束关系会因此发生改变，并且在布局预览中就会变得错乱起来，简单通俗点来讲就是，你拆了一块瓦，很可能会导致房倒屋塌。
+  3. View 之间的关系会变得复杂起来，具体表现为布局一旦发生变更，例如删除或增加某一个 View，都会影响整个 ConstraintLayout 布局，因为很多约束关系会因此发生改变，并且在布局预览中就会变得错乱起来，简单通俗点来讲就是，你拆了一块瓦，很可能会导致房倒屋塌。
 
-    4. 是我们无法直接在布局中无法直接预判这个 View 在 Java 代码中是否有使用到，因为每个 View 几乎都有定义 ID，要想知道这个 View 有没有用到，还是得在 Java 代码中找一找。
+  4. 是我们无法直接在布局中无法直接预判这个 View 在 Java 代码中是否有使用到，因为每个 View 几乎都有定义 ID，要想知道这个 View 有没有用到，还是得在 Java 代码中找一找。
 
 * 我的想法是：项目里面大多数页面还是比较简单的，可以结合 LinearLayout 和 FrameLayout 布局来写，并且不需要嵌套得太深，我觉得合理的嵌套是 2~3 层，如果超过 5 层可以考虑用 ConstraintLayout 布局来写，当然这种情况在实际项目中还是比较少的。
 
@@ -212,19 +214,19 @@ xxxhdpi：1dp=4px
 
 #### 为什么不拆成多个框架来做这件事
 
-* AndroidProject 其实一直有这样做，把很多组件都拆成了独立的框架，例如：权限请求框架 [XXPermissions](https://github.com/getActivity/XXPermissions)，网络请求框架 [EasyHttp](https://github.com/getActivity/EasyHttp)、吐司框架 [ToastUtils](https://github.com/getActivity/ToastUtils) 等等，我都是将它抽离在 AndroidProject 之外，作为一个单独的开源项目进行开发和维护，至于说为什么还有一些代码没有抽取出来，主要原因有几点：
+* AndroidProject 其实一直有这样做，把很多组件都拆成了独立的框架，例如：权限请求框架 [XXPermissions](https://github.com/getActivity/XXPermissions)，网络请求框架 [EasyHttp](https://github.com/getActivity/EasyHttp)、吐司框架 [Toaster](https://github.com/getActivity/Toaster) 等等，我都是将它抽离在 AndroidProject 之外，作为一个单独的开源项目进行开发和维护，至于说为什么还有一些代码没有抽取出来，主要原因有几点：
 
-    1. 和业务的耦合性高，例如 Dialog 组件引用了很多项目的基类，例如 **BaseDialog**、**BaseAdapter** 等
+  1. 和业务的耦合性高，例如 Dialog 组件引用了很多项目的基类，例如 **BaseDialog**、**BaseAdapter** 等
 
-    2. 业务有定制化需求，因为 Dialog 的 UI 风格要跟随项目的设计走，所以代码如果在项目中，修改起来会非常方便，如果抽取到框架中，要怎么修改和统一 UI 风格呢？我个人认为框架不适合做 UI 定制化，因为每个产品的设计风格都不一样，就算开放再多的 API 给外部调用的人设置 UI 风格，也无法满足所有人的需求。
+  2. 业务有定制化需求，因为 Dialog 的 UI 风格要跟随项目的设计走，所以代码如果在项目中，修改起来会非常方便，如果抽取到框架中，要怎么修改和统一 UI 风格呢？我个人认为框架不适合做 UI 定制化，因为每个产品的设计风格都不一样，就算开放再多的 API 给外部调用的人设置 UI 风格，也无法满足所有人的需求。
 
 * 基于以上几点，我并不认为所有的东西都适合抽取成框架给大家用，有些东西还是跟随 **AndroidProject** 一起更新比较好。当然像权限请求这种东西，我个人觉得抽成框架是比较合适的，因为它和业务的关联性不大，更重要的是，如果某一天你觉得 **XXPermissions** 做得不够好，你随时可以在 **AndroidProject** 替换掉它，并且整个过程不需要太大的改动。
 
-#### 为什么最低兼容到 Android 5
+#### 为什么最低兼容到 Android 5.0
 
 * AndroidProject 从 [v11.0 版本](https://github.com/getActivity/AndroidProject/releases/tag/11.0)，已经将 minSdkVersion 从 19 升级到 21，原因也很简单，我不推荐大家兼容 Android 4.4 版本，因为这个版本兼容性的问题太多，对 **dex 分包**、**矢量图**的支持不是特别好，这个我们开发者处理不了，除此之外还有很多 API 要做高低版本兼容，这个我们开发者能做，但是我觉得没什么必要性，因为这个版本的机型会越来越少，会逐步退出历史舞台，而 AndroidProject 一旦投入到项目中使用，minSdkVersion 基本不会有变动，所以我的想法是，不如在一开始就不兼容这个版本，免得后面给大家带来一些不必要的麻烦，Android 4.4 有些问题是**真硬伤**，这是一个非常**令人头疼**的问题。
 
-#### 为什么不加入扫描二维码功能
+#### 为什么不加入 XXX 功能
 
 * AndroidProject 的定位是做一个技术架构，不是什么都做的 Demo 工程，如果只是解决大家的需求问题，那样在我看来意义其实并不大，当然实现需求固然很重要，但并不是所有的技术点在不同项目都会用到，AndroidProject 只是在做架构的同时顺道把模板做了，如果说架构是理论，那么模板就是实践，代码写得再好，如果不实践，那么也只是纸上谈兵，又或者中看不中用。
 
@@ -238,11 +240,11 @@ xxxhdpi：1dp=4px
 
 * 我想问大家一个问题，这两个框架搭配起来好用吗？可能大家的回答都不一致，但是我个人觉得不好用，接下来让我们分析一下 Retrofit 有什么问题：
 
-    1. 功能太少：如果你用过 Retrofit，一说到功能这个词，我相信你的脑海中第一个想到能不能用 OkHttp 的拦截器来实现，没错常用的功能 Retrofit 都没有封装，例如最常用的功能有：添加通用请求头和参数、请求和响应的日志打印、动态 Host 及多域名配置，Retrofit 统统都没有，需要自己去实现。有时候我在想，如果 Retrofit 没有 **Square 公司背书**，现在应该估计不会有多少人用吧。
+  1. 功能太少：如果你用过 Retrofit，一说到功能这个词，我相信你的脑海中第一个想到能不能用 OkHttp 的拦截器来实现，没错常用的功能 Retrofit 都没有封装，例如最常用的功能有：添加通用请求头和参数、请求和响应的日志打印、动态 Host 及多域名配置，Retrofit 统统都没有，需要自己去实现。有时候我在想，如果 Retrofit 没有 **Square 公司背书**，现在应该估计不会有多少人用吧。
 
-    2. 不够灵活：Retrofit 其实是支持上传的，但是有一个缺点，不能获取进度监听，只能获取到成功和失败。当然网上也有一些解决方案，例如通过设置拦截器，来对 RequestBody 进行二次包装来获取上传进度，但是整个实现的过程十分地麻烦，在 Retrofit 上也没有给出一个好的方案，明明可以由 Retrofit 来做的事，为什么要分发到每个开发者上面。
+  2. 不够灵活：Retrofit 其实是支持上传的，但是有一个缺点，不能获取进度监听，只能获取到成功和失败。当然网上也有一些解决方案，例如通过设置拦截器，来对 RequestBody 进行二次包装来获取上传进度，但是整个实现的过程十分地麻烦，在 Retrofit 上也没有给出一个好的方案，明明可以由 Retrofit 来做的事，为什么要分发到每个开发者上面。
 
-    3. 学习成本高：Retrofit 主要的学习成本来源于它的注解，我现在把它里面所有注解罗列出来：@Url、@Body、@Field、@FieldMap、@FormUrlEncoded、@Header、@HeaderMap、@Headers、@HTTP、@Multipart、@Part、@PartMap、@Path、@Query、@QueryMap、@QueryName、@Streaming。我们了解过多少个注解的作用？这个时候大多数人肯定会说，我都是按照别人的写法复制一遍，具体有什么作用我还真的不知道。其实这个是学习成本高带来的弊端，人们往往只会记住最常用的那几个。
+  3. 学习成本高：Retrofit 主要的学习成本来源于它的注解，我现在把它里面所有注解罗列出来：@Url、@Body、@Field、@FieldMap、@FormUrlEncoded、@Header、@HeaderMap、@Headers、@HTTP、@Multipart、@Part、@PartMap、@Path、@Query、@QueryMap、@QueryName、@Streaming。我们了解过多少个注解的作用？这个时候大多数人肯定会说，我都是按照别人的写法复制一遍，具体有什么作用我还真的不知道。其实这个是学习成本高带来的弊端，人们往往只会记住最常用的那几个。
 
 * 我感觉，大家用的不一定就是最好的，盲目地从众不是件好事，谈谈我的看法，在选用一个框架之前，我会分析它在项目实战中的优缺点，如果缺点大于优点，那是肯定不能接受的，如果优点过多，同时现有的缺点还能接受，还是可以考虑投入到项目中使用的。
 
@@ -262,7 +264,7 @@ xxxhdpi：1dp=4px
 
 * 常用的图片加载框架无非就两种，最常用的是 Glide，其次是 Fresco。我曾做过一个技术调研：
 
-![](picture/help/vote1.jpg)
+![](picture/help/vote_1.jpg)
 
 * 无疑 Glide 已成大家最喜爱的图片加载框架，当然也有人使用 Fresco，但是占比极少。
 
@@ -292,7 +294,7 @@ xxxhdpi：1dp=4px
 
 #### 假设 AndroidProject 更新了该怎么升级它
 
-* 原因和解释：首先纠正一点，AndroidProject 严格意义上来说，不是框架一种，而属于架构一种，架构升级本身就是一件大事，并且存在很多未知的风险点，我不推荐已使用 AndroidProject 开发的项目去做升级，因为开发和测试的成本极其高，间接能为业务带来价值其实很低，很多时候我知道大家很喜欢 AndroidProject 的代码，想用到公司项目中去，但是我仍然不推荐你那么做，假设这是你的个人项目可以那么做，但是公司项目最好不要，因为公司和你都是要靠这个项目赚钱，谁也不希望项目出现问题，如果是公司要开发人员重构公司项目，也可以考虑那么做，毕竟这个时候的风险公司已经承担了大部分了，接下来的话只需要服从公司安排即可。
+* 原因和解释：首先纠正一点，AndroidProject 严格意义上来说，不是框架一种，而属于架构一种，架构升级本身就是一件大事，并且存在很多未知的风险点，我不推荐已使用 AndroidProject 开发的项目去做升级，因为开发和测试的成本极其高，间接能为业务带来价值其实很低，很多时候我知道大家很喜欢 AndroidProject 的代码，想用最新的代码到公司项目中去，但是我仍然不推荐你那么做，假设这是你的个人项目可以那么做，但是公司项目最好不要，因为公司和你都是要靠这个项目赚钱，谁也不希望项目出现问题，如果是公司要开发人员重构公司项目，也可以考虑那么做，毕竟这个时候的风险公司已经承担了大部分了，接下来的话只需要服从公司安排即可。
 
 * 更新的方式：由于 AndroidProject 不是一个单独的框架那么简单，无法通过更新远程依赖的方式进行升级，所以只能通过替换代码的形式进行更新，需要注意的是，代码覆盖完需要经过严格的自测及测试，测试是做这件事情的关键流程，需要重视起来，对每一处功能进行详细测试，一定要详细，特别涉及到主流程的功能。
 
@@ -379,15 +381,90 @@ startActivityForResult(HomeActivity.class, new OnActivityCallback() {
 
 * 对这两种经过对比，得出结论如下：
 
-    1. 谷歌原生的没有 AndroidProject 封装得那么人性化，谷歌那种方式调用稍微麻烦一点
+  1. 谷歌原生的没有 AndroidProject 封装得那么人性化，谷歌那种方式调用稍微麻烦一点
 
-    2. 谷歌那种方式直接集成进 AndroidX 包的，要比直接在 BaseActivity 中封装要好
+  2. 谷歌那种方式直接集成进 AndroidX 包的，要比直接在 BaseActivity 中封装要好
 
-    3. AndroidProject 封装 onActivityResult 回调至少要比谷歌要早一两年，并非谷歌之后的产物
+  3. AndroidProject 封装 onActivityResult 回调至少要比谷歌要早一两年，并非谷歌之后的产物
 
-    4. 之前使用 AndroidProject 的人群已经习惯和记忆了那种方式，所以 API 不能删也不能改
+  4. 之前使用 AndroidProject 的人群已经习惯和记忆了那种方式，所以 API 不能删也不能改
 
 * 所以并不是我不想用，而是谷歌封装得还不够好，至少在我看来还不够好，抛去 AndroidProject 封装的时间早不说，谷歌封装出来的效果也是强差人意，我感觉谷歌工程师的封装得越来越敷衍了，看起来像是在完成任务，而不是在做好一件事。
+
+#### 为什么新版移除了权限申请的 AOP 注解
+
+* 具体原因可以看这个 [`wurensen/gradle_plugin_android_aspectjx/issues/60`](https://github.com/wurensen/gradle_plugin_android_aspectjx/issues/60)，这里就不展开讲了，我的解决方案是移除权限申请的 AOP 注解，避免后面的人踩同样的坑，如果你已经知晓问题的原因，但是就是想用怎么办？我可以把删除的代码贴出来，到底要不要加进去大家自行斟酌。
+
+```kotlin
+@Retention(AnnotationRetention.RUNTIME)
+@Target(AnnotationTarget.FUNCTION,
+    AnnotationTarget.PROPERTY_GETTER,
+    AnnotationTarget.PROPERTY_SETTER)
+annotation class Permissions constructor(
+    /**
+     * 需要申请权限的集合
+     */
+    vararg val value: String
+)
+```
+
+```kotlin
+@Suppress("unused")
+@Aspect
+class PermissionsAspect {
+
+    /**
+     * 方法切入点
+     */
+    @Pointcut("execution(@com.hjq.demo.aop.Permissions * *(..))")
+    fun method() {}
+
+    /**
+     * 在连接点进行方法替换
+     */
+    @Around("method() && @annotation(permissions)")
+    fun aroundJoinPoint(joinPoint: ProceedingJoinPoint, permissions: Permissions) {
+        var activity: Activity? = null
+
+        // 方法参数值集合
+        val parameterValues: Array<Any?> = joinPoint.args
+        for (arg: Any? in parameterValues) {
+            if (arg !is Activity) {
+                continue
+            }
+            activity = arg
+            break
+        }
+        if ((activity == null) || activity.isFinishing || activity.isDestroyed) {
+            activity = ActivityManager.getTopActivity()
+        }
+        if ((activity == null) || activity.isFinishing || activity.isDestroyed) {
+            Timber.e("The activity has been destroyed and permission requests cannot be made")
+            return
+        }
+        requestPermissions(joinPoint, activity, permissions.value)
+    }
+
+    private fun requestPermissions(joinPoint: ProceedingJoinPoint, activity: Activity, requestPermissions: Array<out String>) {
+        XXPermissions.with(activity)
+            .permission(*requestPermissions)
+            .interceptor(PermissionInterceptor())
+            .description(PermissionDescription())
+            .request { grantedList, deniedList ->
+                if (!allGranted) {
+                    return@request
+                }
+                try {
+                    // 获得权限，执行原方法
+                    joinPoint.proceed()
+                } catch (e: Throwable) {
+                    e.printStackTrace()
+                    CrashReport.postCatchedException(e)
+                }
+            }
+    }
+}
+```
 
 #### 轮子哥你怎么看待层出不穷的新技术
 

@@ -1,20 +1,27 @@
 package com.hjq.demo.ui.activity
 
-import android.animation.*
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
 import android.content.Intent
-import android.view.*
+import android.view.View
 import com.airbnb.lottie.LottieAnimationView
 import com.gyf.immersionbar.BarHide
 import com.gyf.immersionbar.ImmersionBar
+import com.hjq.base.BaseDialog
+import com.hjq.base.ktx.lazyFindViewById
 import com.hjq.demo.R
 import com.hjq.demo.app.AppActivity
 import com.hjq.demo.http.api.UserInfoApi
 import com.hjq.demo.http.model.HttpData
+import com.hjq.demo.manager.ActivityManager
+import com.hjq.demo.manager.InitManager
 import com.hjq.demo.other.AppConfig
+import com.hjq.demo.ui.dialog.PrivacyAgreementDialog
+import com.hjq.demo.ui.dialog.common.MessageDialog
 import com.hjq.http.EasyHttp
-import com.hjq.http.listener.HttpCallback
+import com.hjq.http.listener.HttpCallbackProxy
 import com.hjq.widget.view.SlantedTextView
-import java.util.*
+import java.util.Locale
 
 /**
  *    author : Android 轮子哥
@@ -24,8 +31,8 @@ import java.util.*
  */
 class SplashActivity : AppActivity() {
 
-    private val lottieView: LottieAnimationView? by lazy { findViewById(R.id.lav_splash_lottie) }
-    private val debugView: SlantedTextView? by lazy { findViewById(R.id.iv_splash_debug) }
+    private val lottieView: LottieAnimationView? by lazyFindViewById(R.id.lav_splash_lottie)
+    private val debugView: SlantedTextView? by lazyFindViewById(R.id.iv_splash_debug)
 
     override fun getLayoutId(): Int {
         return R.layout.splash_activity
@@ -34,10 +41,29 @@ class SplashActivity : AppActivity() {
     override fun initView() {
         // 设置动画监听
         lottieView?.addAnimatorListener(object : AnimatorListenerAdapter() {
-            override fun onAnimationEnd(animation: Animator?) {
+
+            override fun onAnimationEnd(animation: Animator) {
                 lottieView?.removeAnimatorListener(this)
-                HomeActivity.start(this@SplashActivity)
-                finish()
+
+                if (InitManager.isAgreePrivacy(this@SplashActivity)) {
+                    agreePrivacyAfter()
+                    return
+                }
+
+                // 弹窗用户协议与隐私政策对话框
+                PrivacyAgreementDialog.Builder(this@SplashActivity)
+                    .setListener(object : MessageDialog.OnListener {
+
+                        override fun onConfirm(dialog: BaseDialog?) {
+                            InitManager.setAgreePrivacy(this@SplashActivity, true)
+                            agreePrivacyAfter()
+                        }
+
+                        override fun onCancel(dialog: BaseDialog?) {
+                            ActivityManager.finishAllActivities()
+                        }
+                    })
+                    .show()
             }
         })
     }
@@ -58,9 +84,9 @@ class SplashActivity : AppActivity() {
         // 刷新用户信息
         EasyHttp.post(this)
             .api(UserInfoApi())
-            .request(object : HttpCallback<HttpData<UserInfoApi.Bean?>>(this) {
+            .request(object : HttpCallbackProxy<HttpData<UserInfoApi.Bean?>>(this) {
 
-                override fun onSucceed(data: HttpData<UserInfoApi.Bean?>) {
+                override fun onHttpSuccess(data: HttpData<UserInfoApi.Bean?>) {
 
                 }
             })
@@ -97,5 +123,14 @@ class SplashActivity : AppActivity() {
         // 因为修复了一个启动页被重复启动的问题，所以有可能 Activity 还没有初始化完成就已经销毁了
         // 所以如果需要在此处释放对象资源需要先对这个对象进行判空，否则可能会导致空指针异常
         super.onDestroy()
+    }
+
+    /**
+     * 同意隐私后需要做的事情
+     */
+    private fun agreePrivacyAfter() {
+        InitManager.initSdk(application)
+        HomeActivity.start(this)
+        finish()
     }
 }

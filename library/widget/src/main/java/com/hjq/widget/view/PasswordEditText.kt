@@ -3,7 +3,6 @@ package com.hjq.widget.view
 import android.content.Context
 import android.graphics.drawable.Drawable
 import android.text.Editable
-import android.text.InputType
 import android.text.TextUtils
 import android.text.TextWatcher
 import android.text.method.HideReturnsTransformationMethod
@@ -42,13 +41,12 @@ class PasswordEditText @JvmOverloads constructor(
         invisibleDrawable.setBounds(0, 0, invisibleDrawable.intrinsicWidth, invisibleDrawable.intrinsicHeight)
         currentDrawable = visibleDrawable
 
-        // 密码不可见
-        addInputType(InputType.TYPE_TEXT_VARIATION_PASSWORD)
         if (getInputRegex() == null) {
             // 密码输入规则
-            setInputRegex(REGEX_NONNULL)
+            setInputRegex(REGEX_PASSWORD)
         }
         setDrawableVisible(false)
+        setPasswordMode(true)
         super.setOnTouchListener(this)
         super.setOnFocusChangeListener(this)
         super.addTextChangedListener(this)
@@ -61,6 +59,16 @@ class PasswordEditText @JvmOverloads constructor(
         currentDrawable.setVisible(visible, false)
         val drawables: Array<Drawable?> = compoundDrawablesRelative
         setCompoundDrawablesRelative(drawables[0], drawables[1], if (visible) currentDrawable else null, drawables[3])
+    }
+
+    private fun setPasswordMode(passwordMode: Boolean) {
+        transformationMethod = if (passwordMode) {
+            // 密码不可见
+            PasswordTransformationMethod.getInstance()
+        } else {
+            // 密码可见
+            HideReturnsTransformationMethod.getInstance()
+        }
     }
 
     private fun refreshDrawableStatus() {
@@ -106,13 +114,11 @@ class PasswordEditText @JvmOverloads constructor(
             if (event.action == MotionEvent.ACTION_UP) {
                 if (currentDrawable === visibleDrawable) {
                     currentDrawable = invisibleDrawable
-                    // 密码可见
-                    transformationMethod = HideReturnsTransformationMethod.getInstance()
+                    setPasswordMode(false)
                     refreshDrawableStatus()
                 } else if (currentDrawable === invisibleDrawable) {
                     currentDrawable = visibleDrawable
-                    // 密码不可见
-                    transformationMethod = PasswordTransformationMethod.getInstance()
+                    setPasswordMode(true)
                     refreshDrawableStatus()
                 }
                 val editable: Editable? = text

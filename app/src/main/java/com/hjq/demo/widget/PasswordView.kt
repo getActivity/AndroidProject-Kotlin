@@ -7,7 +7,7 @@ import android.graphics.Paint
 import android.graphics.Path
 import android.util.AttributeSet
 import android.view.View
-import com.hjq.demo.R
+import com.hjq.base.ktx.dp2px
 
 /**
  *    author : Android 轮子哥
@@ -40,10 +40,10 @@ class PasswordView @JvmOverloads constructor
     private val pointPaint: Paint = Paint()
 
     /** 单个密码框的宽度 */
-    private val itemWidth: Int = resources.getDimension(R.dimen.dp_44).toInt()
+    private val itemWidth: Int = dp2px(44).toInt()
 
     /** 单个密码框的高度 */
-    private val itemHeight: Int = resources.getDimension(R.dimen.dp_41).toInt()
+    private val itemHeight: Int = dp2px(41).toInt()
 
     /** 已经输入的密码个数，也就是需要显示的小黑点个数 */
     private var currentIndex: Int = 0

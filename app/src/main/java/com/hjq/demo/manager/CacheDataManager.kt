@@ -2,7 +2,6 @@ package com.hjq.demo.manager
 
 import android.content.Context
 import android.os.Environment
-import com.tencent.bugly.crashreport.CrashReport
 import java.io.File
 import java.math.BigDecimal
 
@@ -20,7 +19,10 @@ object CacheDataManager {
     fun getTotalCacheSize(context: Context): String {
         var cacheSize: Long = getFolderSize(context.cacheDir)
         if ((Environment.getExternalStorageState() == Environment.MEDIA_MOUNTED)) {
-            cacheSize += getFolderSize(context.externalCacheDir!!)
+            val externalCacheDir = context.externalCacheDir
+            if (externalCacheDir != null) {
+                cacheSize += getFolderSize(externalCacheDir)
+            }
         }
         return getFormatSize(cacheSize.toDouble())
     }
@@ -68,7 +70,7 @@ object CacheDataManager {
                 }
             }
         } catch (e: Exception) {
-            CrashReport.postCatchedException(e)
+            e.printStackTrace()
         }
         return size
     }

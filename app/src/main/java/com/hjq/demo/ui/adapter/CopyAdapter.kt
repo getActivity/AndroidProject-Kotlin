@@ -17,11 +17,14 @@ class CopyAdapter constructor(context: Context) : AppAdapter<String?>(context) {
         return 10
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AppViewHolder {
         return ViewHolder()
     }
 
     inner class ViewHolder : AppViewHolder(R.layout.copy_item) {
-        override fun onBindView(position: Int) {}
+
+        override fun onBindView(position: Int) {
+
+        }
     }
 }

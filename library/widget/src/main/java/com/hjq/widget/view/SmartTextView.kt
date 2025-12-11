@@ -1,6 +1,6 @@
 package com.hjq.widget.view
 
-import android.content.*
+import android.content.Context
 import android.graphics.drawable.Drawable
 import android.text.TextUtils
 import android.util.AttributeSet
@@ -41,8 +41,10 @@ class SmartTextView @JvmOverloads constructor(
      */
     private fun refreshVisibilityStatus() {
         // 判断当前有没有设置文本达到自动隐藏和显示的效果
-        if (isEmptyContent() && visibility != GONE) {
-            visibility = GONE
+        if (isEmptyContent()) {
+            if (visibility != GONE) {
+                visibility = GONE
+            }
             return
         }
         if (visibility != VISIBLE) {

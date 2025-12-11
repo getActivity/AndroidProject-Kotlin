@@ -1,23 +1,36 @@
 package com.hjq.demo.ui.activity
 
-import android.content.Intent
-import android.view.*
-import android.widget.*
+import android.view.Gravity
+import android.view.View
+import com.hjq.bar.TitleBar
 import com.hjq.base.BaseDialog
 import com.hjq.base.BasePopupWindow
 import com.hjq.base.action.AnimAction
 import com.hjq.demo.R
 import com.hjq.demo.aop.SingleClick
 import com.hjq.demo.app.AppActivity
+import com.hjq.demo.ktx.toast
 import com.hjq.demo.manager.DialogManager
-import com.hjq.demo.ui.dialog.*
+import com.hjq.demo.ui.dialog.PayPasswordDialog
+import com.hjq.demo.ui.dialog.SafeDialog
+import com.hjq.demo.ui.dialog.UpdateDialog
+import com.hjq.demo.ui.dialog.common.AddressDialog
+import com.hjq.demo.ui.dialog.common.DateDialog
+import com.hjq.demo.ui.dialog.common.InputDialog
+import com.hjq.demo.ui.dialog.common.MenuDialog
+import com.hjq.demo.ui.dialog.common.MessageDialog
+import com.hjq.demo.ui.dialog.common.SelectDialog
+import com.hjq.demo.ui.dialog.common.SelectDialog.OnSingleListener
+import com.hjq.demo.ui.dialog.common.ShareDialog
+import com.hjq.demo.ui.dialog.common.TimeDialog
+import com.hjq.demo.ui.dialog.common.TipsDialog
+import com.hjq.demo.ui.dialog.common.WaitDialog
 import com.hjq.demo.ui.popup.ListPopup
 import com.hjq.umeng.Platform
-import com.hjq.umeng.UmengClient
 import com.hjq.umeng.UmengShare.OnShareListener
 import com.umeng.socialize.media.UMImage
 import com.umeng.socialize.media.UMWeb
-import java.util.*
+import java.util.Calendar
 
 /**
  *    author : Android 轮子哥
@@ -110,7 +123,7 @@ class DialogActivity : AppActivity() {
             R.id.btn_dialog_bottom_menu -> {
 
                 val data = ArrayList<String>()
-                for (i in 0..9) {
+                for (i in 0..19) {
                     data.add("我是数据" + (i + 1))
                 }
 
@@ -137,7 +150,7 @@ class DialogActivity : AppActivity() {
             R.id.btn_dialog_center_menu -> {
 
                 val data = ArrayList<String>()
-                for (i in 0..9) {
+                for (i in 0..19) {
                     data.add("我是数据" + (i + 1))
                 }
                 // 居中选择框
@@ -166,15 +179,12 @@ class DialogActivity : AppActivity() {
                 // 单选对话框
                 SelectDialog.Builder(this)
                     .setTitle("请选择你的性别")
-                    .setList("男", "女")
-                    // 设置单选模式
-                    .setSingleSelect()
-                    // 设置默认选中
+                    .setList("男", "女") // 设置单选模式
+                    .setSingleSelect() // 设置默认选中
                     .setSelect(0)
-                    .setListener(object : SelectDialog.OnListener<String> {
-
-                        override fun onSelected(dialog: BaseDialog?, data: HashMap<Int, String>) {
-                            toast("确定了：$data")
+                    .setSingleListener(object : OnSingleListener<String?> {
+                        override fun onSelected(dialog: BaseDialog?, position: Int, data: String?) {
+                            toast("位置：$position，数据：$data")
                         }
 
                         override fun onCancel(dialog: BaseDialog?) {
@@ -182,7 +192,6 @@ class DialogActivity : AppActivity() {
                         }
                     })
                     .show()
-
             }
             R.id.btn_dialog_more_select -> {
 
@@ -194,7 +203,7 @@ class DialogActivity : AppActivity() {
                     .setMaxSelect(3)
                     // 设置默认选中
                     .setSelect(2, 3, 4)
-                    .setListener(object : SelectDialog.OnListener<String> {
+                    .setMultiListener(object : SelectDialog.OnMultiListener<String> {
 
                         override fun onSelected(dialog: BaseDialog?, data: HashMap<Int, String>) {
                             toast("确定了：$data")
@@ -394,15 +403,15 @@ class DialogActivity : AppActivity() {
                     .setShareLink(content)
                     .setListener(object : OnShareListener {
 
-                        override fun onSucceed(platform: Platform?) {
+                        override fun onShareSuccess(platform: Platform?) {
                             toast("分享成功")
                         }
 
-                        override fun onError(platform: Platform?, t: Throwable) {
+                        override fun onShareFail(platform: Platform?, t: Throwable) {
                             toast(t.message)
                         }
 
-                        override fun onCancel(platform: Platform?) {
+                        override fun onShareCancel(platform: Platform?) {
                             toast("分享取消")
                         }
                     })
@@ -420,9 +429,9 @@ class DialogActivity : AppActivity() {
                     // 更新日志
                     .setUpdateLog("到底更新了啥\n到底更新了啥\n到底更新了啥\n到底更新了啥\n到底更新了啥\n到底更新了啥")
                     // 下载 URL
-                    .setDownloadUrl("https://dldir1.qq.com/weixin/android/weixin807android1920_arm64.apk")
+                    .setDownloadUrl("https://dldir1.qq.com/weixin/android/weixin8015android2020_arm64.apk")
                     // 文件 MD5
-                    .setFileMd5("df2f045dfa854d8461d9cefe08b813c8")
+                    .setFileMd5("b05b25d4738ea31091dd9f80f4416469")
                     .show()
 
             }
@@ -444,97 +453,65 @@ class DialogActivity : AppActivity() {
             R.id.btn_dialog_custom -> {
 
                 // 自定义对话框
-                BaseDialog.Builder<BaseDialog.Builder<*>>(this)
+                BaseDialog.Builder(this)
                     .setContentView(R.layout.custom_dialog)
                     .setAnimStyle(AnimAction.ANIM_SCALE) //.setText(id, "我是预设置的文本")
-                    .setOnClickListener(R.id.btn_dialog_custom_ok, object : BaseDialog.OnClickListener<Button> {
-                        override fun onClick(dialog: BaseDialog?, view: Button) {
-                            dialog?.dismiss()
-                        }
-                    })
-                    .setOnCreateListener(object : BaseDialog.OnCreateListener {
-
-                        override fun onCreate(dialog: BaseDialog?) {
-                            toast("Dialog 创建了")
-                        }
-                    })
-                    .addOnShowListener(object : BaseDialog.OnShowListener {
-
-                        override fun onShow(dialog: BaseDialog?) {
-                            toast("Dialog 显示了")
-                        }
-                    })
-                    .addOnCancelListener(object : BaseDialog.OnCancelListener {
-
-                        override fun onCancel(dialog: BaseDialog?) {
-                            toast("Dialog 取消了")
-                        }
-                    })
-                    .addOnDismissListener(object : BaseDialog.OnDismissListener {
-
-                        override fun onDismiss(dialog: BaseDialog?) {
-                            toast("Dialog 销毁了")
-                        }
-                    })
-                    .setOnKeyListener(object : BaseDialog.OnKeyListener {
-
-                        override fun onKey(dialog: BaseDialog?, event: KeyEvent?): Boolean {
-                            toast("按键代码：" + event?.keyCode)
-                            return false
-                        }
-                    })
+                    .setOnClickListener(R.id.btn_dialog_custom_ok) { dialog, _ ->
+                        dialog?.dismiss()
+                    }
+                    .setOnCreateListener { toast("Dialog 创建了") }
+                    .addOnShowListener { toast("Dialog 显示了") }
+                    .addOnCancelListener { toast("Dialog 取消了") }
+                    .addOnDismissListener { toast("Dialog 销毁了") }
+                    .setOnKeyListener { dialog, event ->
+                        toast("按键代码：" + event?.keyCode)
+                        return@setOnKeyListener false
+                    }
                     .show()
-
             }
             R.id.btn_dialog_multi -> {
 
-                val dialog1: BaseDialog = MessageDialog.Builder(this)
+                val dialog1 = MessageDialog.Builder(this)
                     .setTitle("温馨提示")
                     .setMessage("我是第一个弹出的对话框")
                     .setConfirm(getString(R.string.common_confirm))
                     .setCancel(getString(R.string.common_cancel))
                     .create()
 
-                val dialog2: BaseDialog = MessageDialog.Builder(this)
+                val dialog2 = MessageDialog.Builder(this)
                     .setTitle("温馨提示")
                     .setMessage("我是第二个弹出的对话框")
                     .setConfirm(getString(R.string.common_confirm))
                     .setCancel(getString(R.string.common_cancel))
                     .create()
-                DialogManager.getInstance(this).addShow(dialog1)
-                DialogManager.getInstance(this).addShow(dialog2)
+
+                val dialog3 = MessageDialog.Builder(this)
+                    .setTitle("温馨提示")
+                    .setMessage("我是第三个弹出的对话框")
+                    .setConfirm(getString(R.string.common_confirm))
+                    .setCancel(getString(R.string.common_cancel))
+                    .create()
+
+                DialogManager.getInstance(this).addDialog(dialog1)
+                DialogManager.getInstance(this).addDialog(dialog2)
+                DialogManager.getInstance(this).addDialog(dialog3)
+                DialogManager.getInstance(this).startShow()
             }
         }
     }
 
-    override fun onRightClick(view: View) {
+    override fun onRightClick(titleBar: TitleBar) {
         // 菜单弹窗
         ListPopup.Builder(this)
             .setList("选择拍照", "选取相册")
-            .addOnShowListener(object : BasePopupWindow.OnShowListener {
-
-                override fun onShow(popupWindow: BasePopupWindow?) {
-                    toast("PopupWindow 显示了")
-                }
-            })
-            .addOnDismissListener(object : BasePopupWindow.OnDismissListener {
-
-                override fun onDismiss(popupWindow: BasePopupWindow?) {
-                    toast("PopupWindow 销毁了")
-                }
-            })
+            .addOnShowListener { toast("PopupWindow 显示了") }
+            .addOnDismissListener { toast("PopupWindow 销毁了") }
             .setListener(object : ListPopup.OnListener<String> {
 
                 override fun onSelected(popupWindow: BasePopupWindow?, position: Int, data: String) {
                     toast("点击了：$data")
                 }
             })
-            .showAsDropDown(view)
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        // 友盟回调
-        UmengClient.onActivityResult(this, requestCode, resultCode, data)
+            .showAsDropDown(titleBar.rightView)
     }
 }

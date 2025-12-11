@@ -2,12 +2,12 @@ package com.hjq.demo.manager
 
 import android.app.Activity
 import android.app.Application.ActivityLifecycleCallbacks
-import android.os.*
+import android.os.Build
+import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.view.*
+import android.view.View
 import android.widget.TextView
-import java.util.*
 
 /**
  *    author : Android 轮子哥

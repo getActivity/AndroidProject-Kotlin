@@ -77,7 +77,7 @@ object UmengClient {
             if (listener == null) {
                 return
             }
-            listener.onError(platform, PackageManager.NameNotFoundException("Is not installed"))
+            listener.onShareFail(platform, PackageManager.NameNotFoundException(activity?.getString(R.string.umeng_not_installed_hint)))
             return
         }
         action.setPlatform(platform.getThirdParty())
@@ -101,7 +101,7 @@ object UmengClient {
             if (listener == null) {
                 return
             }
-            listener.onError(platform, PackageManager.NameNotFoundException("Is not installed"))
+            listener.onLoginFail(platform, PackageManager.NameNotFoundException(activity?.getString(R.string.umeng_not_installed_hint)))
             return
         }
         try {

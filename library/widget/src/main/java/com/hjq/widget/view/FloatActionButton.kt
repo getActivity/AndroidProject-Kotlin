@@ -1,7 +1,7 @@
 package com.hjq.widget.view
 
 import android.animation.ValueAnimator
-import android.content.*
+import android.content.Context
 import android.util.AttributeSet
 import androidx.appcompat.widget.AppCompatImageView
 

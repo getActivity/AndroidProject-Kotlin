@@ -1,10 +1,12 @@
 package com.hjq.demo.widget
 
-import android.content.*
+import android.content.Context
 import android.content.res.TypedArray
 import android.graphics.drawable.Drawable
 import android.util.AttributeSet
-import android.view.*
+import android.view.LayoutInflater
+import android.view.View.OnClickListener
+import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.annotation.DrawableRes
@@ -119,7 +121,7 @@ class StatusLayout @JvmOverloads constructor(
     private fun initLayout() {
         mainLayout = LayoutInflater.from(context).inflate(R.layout.widget_status_layout, this, false) as ViewGroup
         lottieView = mainLayout!!.findViewById(R.id.iv_status_icon)
-        textView = mainLayout!!.findViewById(R.id.iv_status_text)
+        textView = mainLayout!!.findViewById(R.id.tv_status_text)
         retryView = mainLayout!!.findViewById(R.id.iv_status_retry)
         if (mainLayout!!.background == null) {
             // 默认使用 windowBackground 作为背景
