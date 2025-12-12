@@ -29,7 +29,7 @@ import com.hjq.demo.R
 import com.hjq.demo.aop.SingleClick
 import com.hjq.demo.app.AppActivity
 import com.hjq.demo.other.AppConfig
-import com.tencent.bugly.crashreport.CrashReport
+import com.tencent.bugly.library.Bugly
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.io.PrintWriter
@@ -210,7 +210,7 @@ class CrashActivity : AppActivity() {
             }
         } catch (e: PackageManager.NameNotFoundException) {
             e.printStackTrace()
-            CrashReport.postCatchedException(e)
+            Bugly.handleCatchException(Thread.currentThread(), e, e.message, null, true)
         }
     }
 

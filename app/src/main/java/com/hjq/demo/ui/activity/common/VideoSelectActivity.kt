@@ -15,7 +15,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import com.hjq.bar.TitleBar
 import com.hjq.base.BaseActivity
-import com.hjq.base.BaseActivity.OnActivityCallback
 import com.hjq.base.BaseAdapter
 import com.hjq.base.BaseDialog
 import com.hjq.base.ktx.dp2px
@@ -38,7 +37,7 @@ import com.hjq.demo.widget.StatusLayout
 import com.hjq.permissions.XXPermissions
 import com.hjq.permissions.permission.PermissionLists
 import com.hjq.widget.view.FloatActionButton
-import com.tencent.bugly.crashreport.CrashReport
+import com.tencent.bugly.library.Bugly
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.io.File
@@ -560,7 +559,7 @@ class VideoSelectActivity : AppActivity(), StatusAction, Runnable, BaseAdapter.O
                     // 荣耀 LLD AL20 Android 8.0 出现：java.lang.IllegalArgumentException
                     // 荣耀 HLK AL00 Android 10.0 出现：java.lang.RuntimeException：setDataSource failed: status = 0x80000000
                     e.printStackTrace()
-                    CrashReport.postCatchedException(e)
+                    Bugly.handleCatchException(Thread.currentThread(), e, e.message, null, true)
                 }
                 val videoSize: Long = File(videoPath).length()
                 return VideoBean(videoPath, videoWidth, videoHeight, videoDuration, videoSize)

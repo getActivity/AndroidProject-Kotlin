@@ -21,7 +21,7 @@ import com.hjq.demo.app.AppAdapter
 import com.hjq.demo.ui.adapter.common.TabAdapter
 import com.hjq.demo.ui.adapter.common.TabAdapter.OnTabListener
 import com.hjq.demo.ui.dialog.common.AddressDialog.RecyclerViewAdapter.OnSelectListener
-import com.tencent.bugly.crashreport.CrashReport
+import com.tencent.bugly.library.Bugly
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
@@ -421,7 +421,7 @@ class AddressDialog {
                 return list
             } catch (e: JSONException) {
                 e.printStackTrace()
-                CrashReport.postCatchedException(e)
+                Bugly.handleCatchException(Thread.currentThread(), e, e.message, null, true)
             }
             return null
         }
@@ -447,7 +447,7 @@ class AddressDialog {
                 list
             } catch (e: JSONException) {
                 e.printStackTrace()
-                CrashReport.postCatchedException(e)
+                Bugly.handleCatchException(Thread.currentThread(), e, e.message, null, true)
                 null
             }
         }
@@ -469,7 +469,7 @@ class AddressDialog {
                 list
             } catch (e: JSONException) {
                 e.printStackTrace()
-                CrashReport.postCatchedException(e)
+                Bugly.handleCatchException(Thread.currentThread(), e, e.message, null, true)
                 null
             }
         }
@@ -492,10 +492,10 @@ class AddressDialog {
                 return JSONArray(outStream.toString())
             } catch (e: IOException) {
                 e.printStackTrace()
-                CrashReport.postCatchedException(e)
+                Bugly.handleCatchException(Thread.currentThread(), e, e.message, null, true)
             } catch (e: JSONException) {
                 e.printStackTrace()
-                CrashReport.postCatchedException(e)
+                Bugly.handleCatchException(Thread.currentThread(), e, e.message, null, true)
             }
             return null
         }

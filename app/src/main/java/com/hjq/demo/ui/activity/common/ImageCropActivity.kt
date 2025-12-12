@@ -10,7 +10,6 @@ import android.os.Environment
 import android.provider.MediaStore
 import androidx.core.content.FileProvider
 import com.hjq.base.BaseActivity
-import com.hjq.base.BaseActivity.OnActivityCallback
 import com.hjq.base.ktx.createIntent
 import com.hjq.base.ktx.startActivityForResult
 import com.hjq.demo.R
@@ -21,7 +20,7 @@ import com.hjq.demo.permission.PermissionDescription
 import com.hjq.demo.permission.PermissionInterceptor
 import com.hjq.permissions.XXPermissions
 import com.hjq.permissions.permission.PermissionLists
-import com.tencent.bugly.crashreport.CrashReport
+import com.tencent.bugly.library.Bugly
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -220,7 +219,7 @@ class ImageCropActivity : AppActivity() {
             })
         } catch (e: ActivityNotFoundException) {
             e.printStackTrace()
-            CrashReport.postCatchedException(e)
+            Bugly.handleCatchException(Thread.currentThread(), e, e.message, null, true)
             setResult(RESULT_ERROR, Intent().putExtra(INTENT_KEY_OUT_ERROR, getString(R.string.image_crop_error_not_support)))
             finish()
         }

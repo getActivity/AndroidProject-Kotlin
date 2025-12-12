@@ -17,6 +17,9 @@ import com.hjq.demo.http.model.RequestHandler
 import com.hjq.demo.http.model.RequestServer
 import com.hjq.demo.ktx.toast
 import com.hjq.demo.other.AppConfig
+import com.hjq.demo.other.AppConfig.getBuglyId
+import com.hjq.demo.other.AppConfig.getBuglyKey
+import com.hjq.demo.other.AppConfig.isDebug
 import com.hjq.demo.other.CrashHandler
 import com.hjq.demo.other.DebugLoggerTree
 import com.hjq.demo.other.MaterialHeader
@@ -36,7 +39,8 @@ import com.hjq.umeng.UmengClient
 import com.hjq.umeng.UmengClient.getDeviceOaid
 import com.scwang.smart.refresh.layout.SmartRefreshLayout
 import com.scwang.smart.refresh.layout.api.RefreshLayout
-import com.tencent.bugly.crashreport.CrashReport
+import com.tencent.bugly.library.Bugly
+import com.tencent.bugly.library.BuglyBuilder
 import com.tencent.mmkv.MMKV
 import okhttp3.OkHttpClient
 import timber.log.Timber
@@ -123,7 +127,10 @@ object InitManager {
         UmengClient.init(application, AppConfig.isLogEnable())
 
         // Bugly 异常捕捉
-        CrashReport.initCrashReport(application, AppConfig.getBuglyId(), AppConfig.isDebug())
+        // Bugly 异常捕捉
+        val builder = BuglyBuilder(getBuglyId(), getBuglyKey())
+        builder.debugMode = isDebug()
+        Bugly.init(application, builder)
 
         // Activity 栈管理初始化
         ActivityManager.init(application)
@@ -172,9 +179,13 @@ object InitManager {
             }
 
             private fun handlerGsonParseException(message: String) {
-                require(!AppConfig.isDebug()) { message }
-                // 上报到 Bugly 错误列表中
-                CrashReport.postCatchedException(java.lang.IllegalArgumentException(message))
+                val e = IllegalArgumentException(message)
+                if (isDebug()) {
+                    throw e
+                } else {
+                    // 上报到 Bugly 错误列表中
+                    Bugly.handleCatchException(Thread.currentThread(), e, e.message, null, true)
+                }
             }
         })
 

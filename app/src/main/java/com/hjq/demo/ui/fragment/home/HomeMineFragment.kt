@@ -33,7 +33,7 @@ import com.hjq.demo.ui.activity.common.VideoSelectActivity.OnVideoSelectListener
 import com.hjq.demo.ui.activity.common.VideoSelectActivity.VideoBean
 import com.hjq.demo.ui.dialog.common.InputDialog
 import com.hjq.demo.ui.dialog.common.MessageDialog
-import com.tencent.bugly.crashreport.CrashReport
+import com.tencent.bugly.library.Bugly
 
 /**
  *    author : Android 轮子哥
@@ -158,11 +158,12 @@ class HomeMineFragment : TitleBarFragment<HomeActivity>() {
             }
             R.id.btn_home_mine_crash -> {
 
+                val e = IllegalStateException("are you ok?")
                 // 上报错误到 Bugly 上
-                CrashReport.postCatchedException(IllegalStateException("are you ok?"))
+                Bugly.handleCatchException(Thread.currentThread(), e, e.message, null, true)
                 // 关闭 Bugly 异常捕捉
-                CrashReport.closeBugly()
-                throw IllegalStateException("are you ok?")
+                Bugly.setCrashMonitorAble(Bugly.JAVA_CRASH, false)
+                throw e
             }
             R.id.btn_home_mine_donate -> {
 

@@ -52,16 +52,23 @@ object AppConfig {
     }
 
     /**
-     * 获取 Bugly Id
+     * 获取服务器主机地址
+     */
+    fun getHostUrl(): String {
+        return BuildConfig.HOST_URL
+    }
+
+    /**
+     * 获取 BuglyId
      */
     fun getBuglyId(): String {
         return BuildConfig.BUGLY_ID
     }
 
     /**
-     * 获取服务器主机地址
+     * 获取 BuglyKey
      */
-    fun getHostUrl(): String {
-        return BuildConfig.HOST_URL
+    fun getBuglyKey(): String {
+        return BuildConfig.BUGLY_KEY
     }
 }
