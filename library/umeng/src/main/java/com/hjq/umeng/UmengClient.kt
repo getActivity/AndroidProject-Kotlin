@@ -9,6 +9,7 @@ import com.hjq.umeng.UmengLogin.LoginListenerWrapper
 import com.hjq.umeng.UmengLogin.OnLoginListener
 import com.hjq.umeng.UmengShare.OnShareListener
 import com.hjq.umeng.UmengShare.ShareListenerWrapper
+import com.tencent.tauth.Tencent
 import com.umeng.analytics.MobclickAgent
 import com.umeng.commonsdk.UMConfigure
 import com.umeng.socialize.PlatformConfig
@@ -34,6 +35,9 @@ object UmengClient {
         UMConfigure.init(application, BuildConfig.UM_KEY, "umeng", UMConfigure.DEVICE_TYPE_PHONE, "")
         // 获取设备的 oaid
         UMConfigure.getOaid(application) { oaid: String? -> deviceOaid = oaid }
+        // QQ SDK 提示用户未授权，暂时无法使用QQ登录及分享等功能的解决方案
+        // https://wiki.connect.qq.com/%E5%BC%80%E5%8F%91%E8%81%94%E8%B0%83%E7%9B%B8%E5%85%B3%E9%97%AE%E9%A2%98
+        Tencent.setIsPermissionGranted(true)
     }
 
     /**
