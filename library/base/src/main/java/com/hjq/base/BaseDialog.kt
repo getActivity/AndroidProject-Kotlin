@@ -51,7 +51,7 @@ open class BaseDialog constructor(context: Context, @StyleRes themeResId: Int = 
     HandlerAction, ClickAction, AnimAction, DialogInterface.OnShowListener,
     DialogInterface.OnCancelListener, DialogInterface.OnDismissListener {
 
-    private val lifecycle: LifecycleRegistry = LifecycleRegistry(this)
+    override val lifecycle: LifecycleRegistry = LifecycleRegistry(this)
 
     private val showListeners: MutableList<OnShowListener> by lazy { mutableListOf() }
     private val cancelListeners: MutableList<OnCancelListener> by lazy { mutableListOf() }
@@ -113,10 +113,6 @@ open class BaseDialog constructor(context: Context, @StyleRes themeResId: Int = 
         for (listener in listeners) {
             listener.onDismiss(this)
         }
-    }
-
-    override fun getLifecycle(): Lifecycle {
-        return lifecycle
     }
 
     /**

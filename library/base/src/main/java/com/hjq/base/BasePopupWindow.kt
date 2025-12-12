@@ -49,7 +49,7 @@ import java.lang.ref.SoftReference
 open class BasePopupWindow constructor(private val context: Context) : PopupWindow(context),
     LifecycleOwner, ContextAction, HandlerAction, ClickAction, AnimAction, PopupWindow.OnDismissListener {
 
-    private val lifecycle: LifecycleRegistry = LifecycleRegistry(this)
+    override val lifecycle: LifecycleRegistry = LifecycleRegistry(this)
 
     private var popupBackground: PopupBackground? = null
 
@@ -59,10 +59,6 @@ open class BasePopupWindow constructor(private val context: Context) : PopupWind
     init {
         // 添加监听为自己，注意这里需要调用父类的方法
         super.setOnDismissListener(ListenersWrapper(this))
-    }
-
-    override fun getLifecycle(): Lifecycle {
-        return lifecycle
     }
 
     override fun getContext(): Context {

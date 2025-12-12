@@ -173,11 +173,11 @@ abstract class BaseFragment<A : BaseActivity> : Fragment(),
     /**
      * Fragment 按键事件派发
      */
-    open fun dispatchKeyEvent(event: KeyEvent?): Boolean {
+    open fun dispatchKeyEvent(event: KeyEvent): Boolean {
         val fragments: MutableList<Fragment?> = childFragmentManager.fragments
         for (fragment: Fragment? in fragments) {
             // 这个子 Fragment 必须是 BaseFragment 的子类，并且处于可见状态
-            if (fragment !is BaseFragment<*> || fragment.getLifecycle().currentState != Lifecycle.State.RESUMED) {
+            if (fragment !is BaseFragment<*> || fragment.lifecycle.currentState != Lifecycle.State.RESUMED) {
                 continue
             }
             // 将按键事件派发给子 Fragment 进行处理
@@ -186,7 +186,7 @@ abstract class BaseFragment<A : BaseActivity> : Fragment(),
                 return true
             }
         }
-        return when (event?.action) {
+        return when (event.action) {
             KeyEvent.ACTION_DOWN -> onKeyDown(event.keyCode, event)
             KeyEvent.ACTION_UP -> onKeyUp(event.keyCode, event)
             else -> false
