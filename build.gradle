@@ -8,7 +8,7 @@ plugins {
     // 如果需要自定义切面，并且使用 android-aop-ksp 这个库的话需要配置，下边版本号根据你项目的 Kotlin 版本决定
     id 'com.google.devtools.ksp' version '2.3.2' apply false
     // 多 buildType 图标插件：https://github.com/usefulness/easylauncher-gradle-plugin
-//    id 'com.starter.easylauncher' version '6.1.0' apply false
+    id 'com.starter.easylauncher' version '6.4.1' apply false
 }
 
 // 导入配置文件
