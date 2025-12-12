@@ -37,7 +37,9 @@ android {
         // 调试版本
         debug {}
         // 预览版本
-        preview {}
+        preview {
+            matchingFallbacks = ['debug']
+        }
         // 正式版本
         release {}
     }
@@ -72,17 +74,12 @@ dependencies {
     // 依赖 libs 目录下所有的 jar 和 aar 包
     implementation fileTree(include: ['*.jar', '*.aar'], dir: 'libs')
 
-    // AndroidX 库：https://github.com/androidx/androidx
-    // 更新日志：https://developer.android.google.cn/jetpack/androidx/releases/appcompat?hl=zh-cn
-    implementation 'androidx.appcompat:appcompat:1.7.1'
-    // Material 库：https://github.com/material-components/material-components-android
-    implementation 'com.google.android.material:material:1.13.0'
-    // Lifecycle KTX：https://developer.android.google.cn/kotlin/ktx?hl=zh-cn#lifecycle
-    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.10.0'
-    // ViewModel KTX：https://developer.android.google.cn/kotlin/ktx?hl=zh-cn#viewmodel
-    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.10.0'
+    implementation libs.appCompat
+    implementation libs.material
 
-    // Kotlin 协程：https://github.com/Kotlin/kotlinx.coroutines
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2'
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2'
+    implementation libs.lifecycleRuntimeKTX
+    implementation libs.lifecycleViewModelKTX
+
+    implementation libs.kotlinxCoroutinesCore
+    implementation libs.kotlinxCoroutinesAndroid
 }
