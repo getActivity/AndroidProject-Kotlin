@@ -3,13 +3,13 @@ package com.hjq.demo.other
 import android.app.Activity
 import android.app.Application.ActivityLifecycleCallbacks
 import android.graphics.Rect
-import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.view.ViewTreeObserver
 import android.view.ViewTreeObserver.OnGlobalLayoutListener
 import android.view.Window
 import android.view.WindowManager
+import com.hjq.demo.ktx.isAndroid10
 
 /**
  *    author : Android 轮子哥
@@ -33,7 +33,7 @@ class KeyboardWatcher private constructor(private var activity: Activity) :
     private var statusBarHeight: Int = 0
 
     init {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+        if (isAndroid10()) {
             activity.registerActivityLifecycleCallbacks(this)
         } else {
             activity.application.registerActivityLifecycleCallbacks(this)
@@ -94,7 +94,7 @@ class KeyboardWatcher private constructor(private var activity: Activity) :
 
     override fun onActivityDestroyed(activity: Activity) {
         if (this.activity === activity) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            if (isAndroid10()) {
                 this.activity.unregisterActivityLifecycleCallbacks(this)
             } else {
                 this.activity.application.unregisterActivityLifecycleCallbacks(this)

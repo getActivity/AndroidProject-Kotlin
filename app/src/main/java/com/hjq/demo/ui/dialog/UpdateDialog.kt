@@ -7,7 +7,6 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.BitmapFactory
 import android.net.Uri
-import android.os.Build
 import android.os.Environment
 import android.text.method.ScrollingMovementMethod
 import android.view.View
@@ -22,6 +21,9 @@ import com.hjq.base.ktx.lazyFindViewById
 import com.hjq.demo.R
 import com.hjq.demo.aop.CheckNet
 import com.hjq.demo.aop.SingleClick
+import com.hjq.demo.ktx.isAndroid12
+import com.hjq.demo.ktx.isAndroid7
+import com.hjq.demo.ktx.isAndroid8
 import com.hjq.demo.other.AppConfig
 import com.hjq.demo.permission.PermissionDescription
 import com.hjq.demo.permission.PermissionInterceptor
@@ -160,7 +162,7 @@ class UpdateDialog {
             val notificationId = getContext().applicationInfo.uid
             var channelId = ""
             // 适配 Android 8.0 通知渠道新特性
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            if (isAndroid8()) {
                 val channel = NotificationChannel(getString(R.string.update_notification_channel_id),
                     getString(R.string.update_notification_channel_name), NotificationManager.IMPORTANCE_LOW)
                 channel.enableLights(false)
@@ -233,7 +235,7 @@ class UpdateDialog {
                     }
 
                     override fun onDownloadSuccess(file: File) {
-                        val pendingIntentFlag: Int = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                        val pendingIntentFlag: Int = if (isAndroid12()) {
                             // Targeting S+ (version 31 and above) requires that one of FLAG_IMMUTABLE or FLAG_MUTABLE be specified when creating a PendingIntent.
                             // Strongly consider using FLAG_IMMUTABLE, only use FLAG_MUTABLE if some functionality depends on the PendingIntent being mutable, e.g.
                             // if it needs to be used with inline replies or bubbles.
@@ -306,7 +308,7 @@ class UpdateDialog {
          */
         private fun getInstallIntent(): Intent {
             val intent = getContext().createIntent(Intent.ACTION_VIEW)
-            val uri: Uri? = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            val uri: Uri? = if (isAndroid7()) {
                 FileProvider.getUriForFile(getContext(), AppConfig.getPackageName() + ".provider", apkFile!!)
             } else {
                 Uri.fromFile(apkFile)

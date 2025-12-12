@@ -2,12 +2,12 @@ package com.hjq.demo.manager
 
 import android.app.Activity
 import android.app.Application.ActivityLifecycleCallbacks
-import android.os.Build
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
 import android.widget.TextView
+import com.hjq.demo.ktx.isAndroid10
 
 /**
  *    author : Android 轮子哥
@@ -217,7 +217,7 @@ class InputTextManager private constructor(view: View, alpha: Boolean) : TextWat
 
             fun register(activity: Activity, helper: InputTextManager?) {
                 val lifecycle = TextInputLifecycle(activity, helper)
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                if (isAndroid10()) {
                     activity.registerActivityLifecycleCallbacks(lifecycle)
                 } else {
                     activity.application.registerActivityLifecycleCallbacks(lifecycle)
@@ -242,7 +242,7 @@ class InputTextManager private constructor(view: View, alpha: Boolean) : TextWat
                 return
             }
             textHelper?.removeAllViews()
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            if (isAndroid10()) {
                 this.activity?.unregisterActivityLifecycleCallbacks(this)
             } else {
                 this.activity?.application?.unregisterActivityLifecycleCallbacks(this)

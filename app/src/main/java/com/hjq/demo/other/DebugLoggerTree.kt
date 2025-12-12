@@ -1,6 +1,6 @@
 package com.hjq.demo.other
 
-import android.os.Build
+import com.hjq.demo.ktx.isAndroid8
 import timber.log.Timber.DebugTree
 
 /**
@@ -21,8 +21,9 @@ class DebugLoggerTree : DebugTree() {
     override fun createStackElementTag(element: StackTraceElement): String {
         val tag = "(" + element.fileName + ":" + element.lineNumber + ")"
         // 日志 TAG 长度限制已经在 Android 8.0 被移除
-        return if (tag.length <= MAX_TAG_LENGTH || Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        return if (tag.length <= MAX_TAG_LENGTH || isAndroid8()) {
             tag
-        } else tag.substring(0, MAX_TAG_LENGTH)
+        } else
+            tag.substring(0, MAX_TAG_LENGTH)
     }
 }

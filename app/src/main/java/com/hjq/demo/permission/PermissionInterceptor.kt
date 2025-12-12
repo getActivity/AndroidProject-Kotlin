@@ -7,6 +7,7 @@ import android.os.Build.VERSION_CODES
 import android.text.TextUtils
 import com.hjq.base.BaseDialog
 import com.hjq.demo.R
+import com.hjq.demo.ktx.isAndroid10
 import com.hjq.demo.ktx.toast
 import com.hjq.demo.permission.PermissionConverter.getNickNamesByPermissions
 import com.hjq.demo.ui.dialog.common.MessageDialog
@@ -112,7 +113,7 @@ class PermissionInterceptor : OnPermissionInterceptor {
             }
         }
 
-        if (deniedLocationPermissionCount == deniedPermissionCount && VERSION.SDK_INT >= VERSION_CODES.Q) {
+        if (deniedLocationPermissionCount == deniedPermissionCount && isAndroid10()) {
             if (deniedLocationPermissionCount == 1) {
                 if (XXPermissions.equalsPermission(deniedList[0], PermissionNames.ACCESS_BACKGROUND_LOCATION)) {
                     return activity.getString(

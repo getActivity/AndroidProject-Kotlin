@@ -5,7 +5,6 @@ import android.app.Application
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.Network
-import android.os.Build
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
@@ -15,6 +14,7 @@ import com.hjq.bar.TitleBar
 import com.hjq.demo.R
 import com.hjq.demo.http.model.RequestHandler
 import com.hjq.demo.http.model.RequestServer
+import com.hjq.demo.ktx.isAndroid7
 import com.hjq.demo.ktx.toast
 import com.hjq.demo.other.AppConfig
 import com.hjq.demo.other.AppConfig.getBuglyId
@@ -191,7 +191,7 @@ object InitManager {
 
         // 注册网络状态变化监听
         val connectivityManager: ConnectivityManager? = ContextCompat.getSystemService(application, ConnectivityManager::class.java)
-        if (connectivityManager != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+        if (connectivityManager != null && isAndroid7()) {
             connectivityManager.registerDefaultNetworkCallback(object : ConnectivityManager.NetworkCallback() {
                 override fun onLost(network: Network) {
                     val topActivity: Activity? = ActivityManager.getTopActivity()

@@ -5,9 +5,9 @@ import android.app.Activity
 import android.app.Application
 import android.app.Application.ActivityLifecycleCallbacks
 import android.content.Context
-import android.os.Build
 import android.os.Bundle
 import android.text.TextUtils
+import com.hjq.demo.ktx.isAndroid9
 import timber.log.Timber
 import java.io.FileInputStream
 import java.io.IOException
@@ -227,7 +227,7 @@ object ActivityManager : ActivityLifecycleCallbacks {
     @SuppressLint("PrivateApi, DiscouragedPrivateApi")
     fun getProcessName(): String? {
         var processName: String? = null
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+        if (isAndroid9()) {
             processName = Application.getProcessName()
         } else {
             try {
