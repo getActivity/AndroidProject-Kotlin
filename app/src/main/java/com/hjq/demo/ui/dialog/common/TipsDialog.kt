@@ -20,9 +20,9 @@ import com.hjq.demo.R
 class TipsDialog {
 
     companion object {
-        const val ICON_FINISH: Int = R.drawable.tips_finish_ic
-        const val ICON_ERROR: Int = R.drawable.tips_error_ic
-        const val ICON_WARNING: Int = R.drawable.tips_warning_ic
+        var ICON_FINISH: Int = R.drawable.tips_finish_ic
+        var ICON_ERROR: Int = R.drawable.tips_error_ic
+        var ICON_WARNING: Int = R.drawable.tips_warning_ic
     }
 
     class Builder(context: Context) : BaseDialog.Builder<Builder>(context),
