@@ -26,11 +26,10 @@ import com.hjq.demo.ui.activity.account.RegisterActivity
 import com.hjq.demo.ui.activity.common.BrowserActivity
 import com.hjq.demo.ui.activity.common.ImagePreviewActivity
 import com.hjq.demo.ui.activity.common.ImageSelectActivity
-import com.hjq.demo.ui.activity.common.ImageSelectActivity.OnPhotoSelectListener
+import com.hjq.demo.ui.activity.common.ImageSelectActivity.OnImageSelectListener
 import com.hjq.demo.ui.activity.common.VideoPlayActivity
 import com.hjq.demo.ui.activity.common.VideoSelectActivity
 import com.hjq.demo.ui.activity.common.VideoSelectActivity.OnVideoSelectListener
-import com.hjq.demo.ui.activity.common.VideoSelectActivity.VideoBean
 import com.hjq.demo.ui.dialog.common.InputDialog
 import com.hjq.demo.ui.dialog.common.MessageDialog
 import com.tencent.bugly.library.Bugly
@@ -117,7 +116,7 @@ class HomeMineFragment : TitleBarFragment<HomeActivity>() {
             }
             R.id.btn_home_mine_image_select -> {
 
-                ImageSelectActivity.start(getAttachActivity()!!, object : OnPhotoSelectListener {
+                ImageSelectActivity.start(getAttachActivity()!!, object : OnImageSelectListener {
 
                     override fun onSelected(data: MutableList<String>) {
                         toast("选择了$data")
@@ -139,7 +138,7 @@ class HomeMineFragment : TitleBarFragment<HomeActivity>() {
 
                 VideoSelectActivity.start(getAttachActivity()!!, object : OnVideoSelectListener {
 
-                    override fun onSelected(data: MutableList<VideoBean>) {
+                    override fun onSelected(data: MutableList<String>) {
                         toast("选择了$data")
                     }
 

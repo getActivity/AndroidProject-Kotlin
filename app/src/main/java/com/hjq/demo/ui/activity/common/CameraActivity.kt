@@ -8,7 +8,6 @@ import android.os.Environment
 import android.provider.MediaStore
 import androidx.core.content.FileProvider
 import com.hjq.base.BaseActivity
-import com.hjq.base.BaseActivity.OnActivityCallback
 import com.hjq.base.ktx.createIntent
 import com.hjq.base.ktx.startActivityForResult
 import com.hjq.demo.R
@@ -45,8 +44,6 @@ class CameraActivity : AppActivity() {
         @Log
         fun start(activity: BaseActivity, video: Boolean, listener: OnCameraListener?) {
             XXPermissions.with(activity)
-                .permission(PermissionLists.getWriteExternalStoragePermission())
-                .permission(PermissionLists.getReadExternalStoragePermission())
                 .permission(PermissionLists.getCameraPermission())
                 .interceptor(PermissionInterceptor())
                 .description(PermissionDescription())
@@ -123,10 +120,7 @@ class CameraActivity : AppActivity() {
             // 拍摄照片
             intent.action = MediaStore.ACTION_IMAGE_CAPTURE
         }
-        if (intent.resolveActivity(packageManager) == null || !XXPermissions.isGrantedPermissions(this,
-                                                                mutableListOf(PermissionLists.getReadExternalStoragePermission(),
-                                                                              PermissionLists.getWriteExternalStoragePermission(),
-                                                                              PermissionLists.getCameraPermission()))) {
+        if (intent.resolveActivity(packageManager) == null || !XXPermissions.isGrantedPermission(this, PermissionLists.getCameraPermission())) {
             setResult(RESULT_ERROR, Intent().putExtra(INTENT_KEY_OUT_ERROR, getString(R.string.camera_launch_fail)))
             finish()
             return

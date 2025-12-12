@@ -40,7 +40,7 @@ subprojects {
                 // 最低安装版本
                 minSdkVersion(23)
                 // Android 版本适配指南：https://github.com/getActivity/AndroidVersionAdapter
-                targetSdkVersion(32)
+                targetSdkVersion(36)
                 versionName("1.0")
                 versionCode(10)
             }

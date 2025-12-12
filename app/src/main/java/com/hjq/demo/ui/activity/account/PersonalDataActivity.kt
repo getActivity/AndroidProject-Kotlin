@@ -1,10 +1,10 @@
 package com.hjq.demo.ui.activity.account
 
 import android.net.Uri
-import android.os.Build
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import androidx.core.net.toUri
 import com.bumptech.glide.load.MultiTransformation
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.load.resource.bitmap.CircleCrop
@@ -13,21 +13,12 @@ import com.hjq.base.ktx.lazyFindViewById
 import com.hjq.demo.R
 import com.hjq.demo.aop.SingleClick
 import com.hjq.demo.app.AppActivity
-import com.hjq.demo.http.api.UpdateImageApi
 import com.hjq.demo.http.glide.GlideApp
-import com.hjq.demo.http.model.HttpData
-import com.hjq.demo.ui.activity.common.ImageCropActivity
 import com.hjq.demo.ui.activity.common.ImagePreviewActivity
 import com.hjq.demo.ui.activity.common.ImageSelectActivity
 import com.hjq.demo.ui.dialog.common.AddressDialog
 import com.hjq.demo.ui.dialog.common.InputDialog
-import com.hjq.http.EasyHttp
-import com.hjq.http.listener.HttpCallbackProxy
-import com.hjq.http.model.FileContentResolver
 import com.hjq.widget.layout.SettingBar
-import java.io.File
-import java.net.URI
-import java.net.URISyntaxException
 
 /**
  *    author : Android 轮子哥
@@ -82,11 +73,11 @@ class PersonalDataActivity : AppActivity() {
     @SingleClick
     override fun onClick(view: View) {
         if (view === avatarLayout) {
-            ImageSelectActivity.start(this, object : ImageSelectActivity.OnPhotoSelectListener {
+            ImageSelectActivity.start(this, object : ImageSelectActivity.OnImageSelectListener {
 
                 override fun onSelected(data: MutableList<String>) {
                     // 裁剪头像
-                    cropImageFile(File(data[0]))
+                    cropImageFile(data[0])
                 }
             })
         } else if (view === avatarView) {
@@ -146,63 +137,13 @@ class PersonalDataActivity : AppActivity() {
     /**
      * 裁剪图片
      */
-    private fun cropImageFile(sourceFile: File) {
-        ImageCropActivity.start(this, sourceFile, 1, 1, object : ImageCropActivity.OnCropListener {
-
-            override fun onImageCropSuccess(fileUri: Uri, fileName: String) {
-                val outputFile: File = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                    FileContentResolver(getContext(), fileUri, fileName)
-                } else {
-                    try {
-                        File(URI(fileUri.toString()))
-                    } catch (e: URISyntaxException) {
-                        e.printStackTrace()
-                        File(fileUri.toString())
-                    }
-                }
-                updateCropImage(outputFile, true)
-            }
-
-            override fun onImageCropError(details: String) {
-                // 没有的话就不裁剪，直接上传原图片
-                // 但是这种情况极其少见，可以忽略不计
-                updateCropImage(sourceFile, false)
-            }
-        })
-    }
-
-    /**
-     * 上传裁剪后的图片
-     */
-    private fun updateCropImage(file: File, deleteFile: Boolean) {
-        if (true) {
-            avatarUrl = if (file is FileContentResolver) { file.contentUri } else { Uri.fromFile(file) }
-            avatarView?.let {
-                GlideApp.with(this)
-                    .load(avatarUrl)
-                    .transform(MultiTransformation(CenterCrop(), CircleCrop()))
-                    .into(it)
-            }
-            return
+    private fun cropImageFile(imagePath: String) {
+        avatarUrl = imagePath.toUri()
+        avatarView?.let {
+            GlideApp.with(this)
+                .load(imagePath)
+                .transform(MultiTransformation(CenterCrop(), CircleCrop()))
+                .into(it)
         }
-
-        EasyHttp.post(this)
-            .api(UpdateImageApi().apply {
-                setImage(file)
-            })
-            .request(object : HttpCallbackProxy<HttpData<String?>>(this) {
-                override fun onHttpSuccess(data: HttpData<String?>) {
-                    avatarUrl = Uri.parse(data.getData())
-                    avatarView?.let {
-                        GlideApp.with(this@PersonalDataActivity)
-                            .load(avatarUrl)
-                            .transform(MultiTransformation(CenterCrop(), CircleCrop()))
-                            .into(it)
-                    }
-                    if (deleteFile) {
-                        file.delete()
-                    }
-                }
-            })
     }
 }

@@ -11,6 +11,9 @@ import android.os.Parcelable
 import android.provider.MediaStore
 import android.view.View
 import android.view.animation.AnimationUtils
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts.PickMultipleVisualMedia
+import androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import com.hjq.bar.TitleBar
@@ -67,11 +70,45 @@ class VideoSelectActivity : AppActivity(), StatusAction, Runnable, BaseAdapter.O
                 // 最少要选择一个视频
                 throw IllegalArgumentException("are you ok?")
             }
+
+            if (PickVisualMedia.isPhotoPickerAvailable(activity)) {
+                val visualMediaRequest = PickVisualMediaRequest.Builder()
+                    // 只选择视频
+                    .setMediaType(PickVisualMedia.VideoOnly)
+                    .build()
+
+                if (maxSelect > 1) {
+                    val multipleVisualMedia = PickMultipleVisualMedia(maxSelect)
+                    val intent = multipleVisualMedia.createIntent(activity, visualMediaRequest)
+                    activity.startActivityForResult(intent, null, OnActivityCallback { resultCode, data ->
+                        val uris: List<Uri> = multipleVisualMedia.parseResult(resultCode, data)
+                        if (uris.isEmpty()) {
+                            return@OnActivityCallback
+                        }
+                        val list: MutableList<String> = mutableListOf()
+                        for (i in uris.indices) {
+                            list.add(uris[i].toString())
+                        }
+                        listener?.onSelected(list)
+                    })
+                } else {
+                    val pickVisualMedia = PickVisualMedia()
+                    val intent = pickVisualMedia.createIntent(activity, visualMediaRequest)
+                    activity.startActivityForResult(intent, null, OnActivityCallback { resultCode, data ->
+                        val uri = pickVisualMedia.parseResult(resultCode, data) ?: return@OnActivityCallback
+                        val list: MutableList<String> = mutableListOf()
+                        list.add(uri.toString())
+                        listener?.onSelected(list)
+                    })
+                }
+                return
+            }
+
             XXPermissions.with(activity)
                 .permission(PermissionLists.getReadExternalStoragePermission())
-                .permission(PermissionLists.getWriteExternalStoragePermission())
                 .interceptor(PermissionInterceptor())
                 .description(PermissionDescription())
+                .unchecked()
                 .request { _, deniedList ->
                     val allGranted = deniedList.isEmpty()
                     if (!allGranted) {
@@ -81,31 +118,33 @@ class VideoSelectActivity : AppActivity(), StatusAction, Runnable, BaseAdapter.O
                     activity.startActivityForResult(VideoSelectActivity::class.java, {
                         putExtra(INTENT_KEY_IN_MAX_SELECT, maxSelect)
                     }, OnActivityCallback { resultCode, data ->
-                        if (listener == null) {
-                            return@OnActivityCallback
-                        }
                         if (data == null) {
-                            listener.onCancel()
+                            listener?.onCancel()
                             return@OnActivityCallback
                         }
-                        val list: ArrayList<VideoBean>? = data.getParcelableArrayListExtra(
+                        val videoBeans: ArrayList<VideoBean>? = data.getParcelableArrayListExtra(
                             INTENT_KEY_OUT_VIDEO_LIST
                         )
-                        if (list.isNullOrEmpty()) {
-                            listener.onCancel()
+                        if (videoBeans.isNullOrEmpty()) {
+                            listener?.onCancel()
                             return@OnActivityCallback
                         }
-                        val iterator: MutableIterator<VideoBean> = list.iterator()
+                        val iterator: MutableIterator<VideoBean> = videoBeans.iterator()
                         while (iterator.hasNext()) {
                             if (!File(iterator.next().getVideoPath()).isFile) {
                                 iterator.remove()
                             }
                         }
+
+                        val list: MutableList<String> = mutableListOf()
+                        for (videoBean in videoBeans) {
+                            list.add(videoBean.getVideoPath())
+                        }
                         if (resultCode == RESULT_OK && list.isNotEmpty()) {
-                            listener.onSelected(list)
+                            listener?.onSelected(list)
                             return@OnActivityCallback
                         }
-                        listener.onCancel()
+                        listener?.onCancel()
                     })
                 }
         }
@@ -588,7 +627,7 @@ class VideoSelectActivity : AppActivity(), StatusAction, Runnable, BaseAdapter.O
          *
          * @param data          视频列表
          */
-        fun onSelected(data: MutableList<VideoBean>)
+        fun onSelected(data: MutableList<String>)
 
         /**
          * 取消回调

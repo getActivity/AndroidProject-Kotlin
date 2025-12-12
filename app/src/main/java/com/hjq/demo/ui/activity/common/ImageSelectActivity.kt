@@ -8,11 +8,13 @@ import android.provider.MediaStore
 import android.text.TextUtils
 import android.view.View
 import android.view.animation.AnimationUtils
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts.PickMultipleVisualMedia
+import androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import com.hjq.bar.TitleBar
 import com.hjq.base.BaseActivity
-import com.hjq.base.BaseActivity.OnActivityCallback
 import com.hjq.base.BaseAdapter
 import com.hjq.base.BaseDialog
 import com.hjq.base.ktx.dp2px
@@ -54,21 +56,55 @@ class ImageSelectActivity : AppActivity(), StatusAction, Runnable,
         private const val INTENT_KEY_IN_MAX_SELECT: String = "maxSelect"
         private const val INTENT_KEY_OUT_IMAGE_LIST: String = "imageList"
 
-        fun start(activity: BaseActivity, listener: OnPhotoSelectListener?) {
+        fun start(activity: BaseActivity, listener: OnImageSelectListener?) {
             start(activity, 1, listener)
         }
 
         @Log
-        fun start(activity: BaseActivity, maxSelect: Int, listener: OnPhotoSelectListener?) {
+        fun start(activity: BaseActivity, maxSelect: Int, listener: OnImageSelectListener?) {
             if (maxSelect < 1) {
                 // 最少要选择一个图片
                 throw IllegalArgumentException("are you ok?")
             }
+
+            if (PickVisualMedia.isPhotoPickerAvailable(activity)) {
+                val visualMediaRequest = PickVisualMediaRequest.Builder()
+                    // 只选择图片
+                    .setMediaType(PickVisualMedia.ImageOnly)
+                    .build()
+
+                if (maxSelect > 1) {
+                    val multipleVisualMedia = PickMultipleVisualMedia(maxSelect)
+                    val intent = multipleVisualMedia.createIntent(activity, visualMediaRequest)
+                    activity.startActivityForResult(intent, null, OnActivityCallback { resultCode, data ->
+                        val uris: List<Uri> = multipleVisualMedia.parseResult(resultCode, data)
+                        if (uris.isEmpty()) {
+                            return@OnActivityCallback
+                        }
+                        val list: MutableList<String> = mutableListOf()
+                        for (i in uris.indices) {
+                            list.add(uris[i].toString())
+                        }
+                        listener?.onSelected(list)
+                    })
+                } else {
+                    val pickVisualMedia = PickVisualMedia()
+                    val intent = pickVisualMedia.createIntent(activity, visualMediaRequest)
+                    activity.startActivityForResult(intent, null, OnActivityCallback { resultCode, data ->
+                        val uri = pickVisualMedia.parseResult(resultCode, data) ?: return@OnActivityCallback
+                        val list: MutableList<String> = mutableListOf()
+                        list.add(uri.toString())
+                        listener?.onSelected(list)
+                    })
+                }
+                return
+            }
+
             XXPermissions.with(activity)
                 .permission(PermissionLists.getReadExternalStoragePermission())
-                .permission(PermissionLists.getWriteExternalStoragePermission())
                 .interceptor(PermissionInterceptor())
                 .description(PermissionDescription())
+                .unchecked()
                 .request { _, deniedList ->
                     val allGranted = deniedList.isEmpty()
                     if (!allGranted) {
@@ -360,7 +396,7 @@ class ImageSelectActivity : AppActivity(), StatusAction, Runnable,
             MediaStore.MediaColumns.DISPLAY_NAME, MediaStore.MediaColumns.DATE_MODIFIED, MediaStore.MediaColumns.MIME_TYPE,
             MediaStore.MediaColumns.WIDTH, MediaStore.MediaColumns.HEIGHT, MediaStore.MediaColumns.SIZE)
         var cursor: Cursor? = null
-        if (XXPermissions.isGrantedPermissions(this, mutableListOf(PermissionLists.getReadExternalStoragePermission(), PermissionLists.getWriteExternalStoragePermission()))) {
+        if (XXPermissions.isGrantedPermission(this, PermissionLists.getReadExternalStoragePermission())) {
             cursor = contentResolver.query(contentUri, projections, selection,
                 arrayOf<String?>(MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE.toString()), sortOrder)
         }
@@ -451,7 +487,7 @@ class ImageSelectActivity : AppActivity(), StatusAction, Runnable,
     /**
      * 图片选择监听
      */
-    interface OnPhotoSelectListener {
+    interface OnImageSelectListener {
 
         /**
          * 选择回调

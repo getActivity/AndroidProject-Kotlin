@@ -3,7 +3,6 @@ package com.hjq.demo.widget.webview
 import android.app.Activity
 import android.content.Intent
 import android.net.Uri
-import android.text.TextUtils
 import android.util.Log
 import android.webkit.ConsoleMessage
 import android.webkit.GeolocationPermissions
@@ -21,8 +20,6 @@ import com.hjq.base.ktx.startActivityForResult
 import com.hjq.demo.R
 import com.hjq.demo.permission.PermissionDescription
 import com.hjq.demo.permission.PermissionInterceptor
-import com.hjq.demo.ui.activity.common.ImageSelectActivity
-import com.hjq.demo.ui.activity.common.VideoSelectActivity
 import com.hjq.demo.ui.dialog.common.InputDialog
 import com.hjq.demo.ui.dialog.common.MessageDialog
 import com.hjq.demo.ui.dialog.common.TipsDialog
@@ -30,7 +27,6 @@ import com.hjq.permissions.XXPermissions
 import com.hjq.permissions.permission.PermissionLists
 import com.hjq.permissions.permission.base.IPermission
 import timber.log.Timber
-import java.io.File
 import java.util.Arrays
 
 /**
@@ -255,7 +251,6 @@ open class BrowserChromeClient(private val browserView: BrowserView) : WebChrome
 
         XXPermissions.with(activity)
             .permission(PermissionLists.getReadExternalStoragePermission())
-            .permission(PermissionLists.getWriteExternalStoragePermission())
             .interceptor(PermissionInterceptor())
             .description(PermissionDescription())
             .request { _, deniedList ->
@@ -275,61 +270,8 @@ open class BrowserChromeClient(private val browserView: BrowserView) : WebChrome
      */
     private fun openSystemFileChooser(activity: BaseActivity, params: FileChooserParams, callback: ValueCallback<Array<Uri>>) {
         val intent: Intent = params.createIntent()
-        val mimeTypes: Array<String>? = params.acceptTypes
-        val multipleSelect: Boolean = params.mode == FileChooserParams.MODE_OPEN_MULTIPLE
-        if (!mimeTypes.isNullOrEmpty() && !TextUtils.isEmpty(mimeTypes[0])) {
-            // 要过滤的文件类型
-            intent.putExtra(Intent.EXTRA_MIME_TYPES, mimeTypes)
-            if (mimeTypes.size == 1) {
-                when (mimeTypes[0]) {
-                    "image/*" -> {
-                        ImageSelectActivity.start(activity, if (multipleSelect) Int.MAX_VALUE else 1,
-                            object : ImageSelectActivity.OnPhotoSelectListener {
-
-                                override fun onSelected(data: MutableList<String>) {
-                                    val uris: MutableList<Uri> = ArrayList(data.size)
-                                    for (filePath in data) {
-                                        uris.add(Uri.fromFile(File(filePath)))
-                                    }
-                                    val result = uris.toTypedArray()
-                                    log(String.format("onShowFileChooser: callback.onReceiveValue(%s)", result.contentToString()))
-                                    callback.onReceiveValue(result)
-                                }
-
-                                override fun onCancel() {
-                                    log("onShowFileChooser: callback.onReceiveValue(null)")
-                                    callback.onReceiveValue(null)
-                                }
-                            })
-                        return
-                    }
-                    "video/*" -> {
-                        VideoSelectActivity.start(activity, if (multipleSelect) Int.MAX_VALUE else 1,
-                            object : VideoSelectActivity.OnVideoSelectListener {
-
-                                override fun onSelected(data: MutableList<VideoSelectActivity.VideoBean>) {
-                                    val uris: MutableList<Uri> = ArrayList(data.size)
-                                    for (bean in data) {
-                                        uris.add(Uri.fromFile(File(bean.getVideoPath())))
-                                    }
-                                    val result = uris.toTypedArray()
-                                    log(String.format("onShowFileChooser: callback.onReceiveValue(%s)", result.contentToString()))
-                                    callback.onReceiveValue(result)
-                                }
-
-                                override fun onCancel() {
-                                    log("onShowFileChooser: callback.onReceiveValue(null)")
-                                    callback.onReceiveValue(null)
-                                }
-                            })
-                        return
-                    }
-                }
-            }
-        }
-
         // 是否是多选模式
-        intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, multipleSelect)
+        intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, params.mode == FileChooserParams.MODE_OPEN_MULTIPLE)
         activity.startActivityForResult(activity.createChooserIntent(intent, params.title), null, { resultCode, data ->
             val uris: MutableList<Uri> = ArrayList()
             if (resultCode == Activity.RESULT_OK && data != null) {
