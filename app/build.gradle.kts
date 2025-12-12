@@ -93,8 +93,6 @@ android {
             // 调试模式开关
             isDebuggable = true
             isJniDebuggable = true
-            // 压缩对齐开关
-            isZipAlignEnabled = false
             // 移除无用的资源
             isShrinkResources = false
             // 代码混淆开关
@@ -120,8 +118,6 @@ android {
             // 调试模式开关
             isDebuggable = false
             isJniDebuggable = false
-            // 压缩对齐开关
-            isZipAlignEnabled = true
             // 移除无用的资源
             isShrinkResources = true
             // 代码混淆开关
