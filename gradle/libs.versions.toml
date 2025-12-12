@@ -62,6 +62,8 @@ material = { module = "com.google.android.material:material", version.ref = "mat
 lifecycleRuntimeKTX = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "lifecycleKTX" }
 # ViewModel KTX：https://developer.android.google.cn/kotlin/ktx?hl=zh-cn#viewmodel
 lifecycleViewModelKTX = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref = "lifecycleKTX" }
+# LiveData KTX：https://developer.android.google.cn/kotlin/ktx?hl=zh-cn#livedata
+lifecycleLiveDatalKTX = { module = "androidx.lifecycle:lifecycle-livedata-ktx", version.ref = "lifecycleKTX" }
 
 # Kotlin 协程：https://github.com/Kotlin/kotlinx.coroutines
 kotlinxCoroutinesCore = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinxCoroutines" }

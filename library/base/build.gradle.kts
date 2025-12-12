@@ -1,22 +1,21 @@
 plugins {
     alias(libs.plugins.library)
 }
-apply from : '../../common.gradle'
 
 android {
-    namespace 'com.hjq.base'
+    namespace = "com.hjq.base"
 
     defaultConfig {
         // 模块混淆配置
-        consumerProguardFiles 'proguard-base.pro'
+        consumerProguardFiles("proguard-base.pro")
     }
 
     sourceSets {
-        main {
+        getByName("main") {
             // res 资源目录配置
             res.srcDirs(
-                    'src/main/res',
-                    'src/main/res-sw'
+                    "src/main/res",
+                    "src/main/res-sw"
             )
         }
     }
