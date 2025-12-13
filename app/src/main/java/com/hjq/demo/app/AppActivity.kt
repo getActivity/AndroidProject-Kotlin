@@ -26,7 +26,6 @@ import com.hjq.umeng.UmengClient.onActivityResult
  */
 abstract class AppActivity : BaseActivity(), TitleBarAction, ImmersionAction, OnHttpListener<Any> {
 
-    /** 标题栏对象 */
     private var titleBar: TitleBar? = null
 
     /** 状态栏沉浸 */

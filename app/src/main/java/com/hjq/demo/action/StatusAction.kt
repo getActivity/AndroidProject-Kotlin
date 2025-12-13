@@ -22,13 +22,13 @@ interface StatusAction {
     /**
      * 获取状态布局
      */
-    fun getStatusLayout(): StatusLayout?
+    fun acquireStatusLayout(): StatusLayout?
 
     /**
      * 显示加载中
      */
     fun showLoading(@RawRes id: Int = R.raw.loading) {
-        getStatusLayout()?.let {
+        acquireStatusLayout()?.let {
             it.show()
             it.setAnimResource(id)
             it.setHint("")
@@ -40,7 +40,7 @@ interface StatusAction {
      * 显示加载完成
      */
     fun showComplete() {
-        getStatusLayout()?.let {
+        acquireStatusLayout()?.let {
             if (!it.isShow()) {
                 return
             }
@@ -59,7 +59,7 @@ interface StatusAction {
      * 显示错误提示
      */
     fun showError(listener: OnRetryListener?) {
-        getStatusLayout()?.let {
+        acquireStatusLayout()?.let {
             val manager: ConnectivityManager? = ContextCompat.getSystemService(it.context, ConnectivityManager::class.java)
             if (manager != null) {
                 val info: NetworkInfo? = manager.activeNetworkInfo
@@ -77,13 +77,13 @@ interface StatusAction {
      * 显示自定义提示
      */
     fun showLayout(@DrawableRes drawableId: Int, @StringRes stringId: Int, listener: OnRetryListener?) {
-        getStatusLayout()?.let {
+        acquireStatusLayout()?.let {
             showLayout(ContextCompat.getDrawable(it.context, drawableId), it.context.getString(stringId), listener)
         }
     }
 
     fun showLayout(drawable: Drawable?, hint: CharSequence?, listener: OnRetryListener?) {
-        getStatusLayout()?.let {
+        acquireStatusLayout()?.let {
             it.show()
             it.setIcon(drawable)
             it.setHint(hint)

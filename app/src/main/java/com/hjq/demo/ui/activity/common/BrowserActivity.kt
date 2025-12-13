@@ -54,7 +54,7 @@ class BrowserActivity : AppActivity(), StatusAction, OnRefreshListener {
 
     private val fullScreenModeController by lazy { FullScreenModeController() }
 
-    private val hintLayout: StatusLayout? by lazyFindViewById(R.id.hl_browser_hint)
+    private val statusLayout: StatusLayout? by lazyFindViewById(R.id.sl_browser_status)
     private val progressBar: ProgressBar? by lazyFindViewById(R.id.pb_browser_progress)
     private val refreshLayout: SmartRefreshLayout? by lazyFindViewById(R.id.sl_browser_refresh)
     private val browserView: BrowserView? by lazyFindViewById(R.id.wv_browser_view)
@@ -83,11 +83,11 @@ class BrowserActivity : AppActivity(), StatusAction, OnRefreshListener {
     }
 
     override fun getImmersionBottomView(): View? {
-        return hintLayout
+        return statusLayout
     }
 
-    override fun getStatusLayout(): StatusLayout? {
-        return hintLayout
+    override fun acquireStatusLayout(): StatusLayout? {
+        return statusLayout
     }
 
     override fun onLeftClick(titleBar: TitleBar) {

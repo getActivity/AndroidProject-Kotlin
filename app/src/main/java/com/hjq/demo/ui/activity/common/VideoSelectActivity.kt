@@ -150,7 +150,7 @@ class VideoSelectActivity : AppActivity(), StatusAction, Runnable, BaseAdapter.O
         }
     }
 
-    private val hintLayout: StatusLayout? by lazyFindViewById(R.id.hl_video_select_hint)
+    private val statusLayout: StatusLayout? by lazyFindViewById(R.id.sl_video_select_status)
     private val recyclerView: RecyclerView? by lazyFindViewById(R.id.rv_video_select_list)
     private val floatingView: FloatActionButton? by lazyFindViewById(R.id.fab_video_select_floating)
 
@@ -211,8 +211,8 @@ class VideoSelectActivity : AppActivity(), StatusAction, Runnable, BaseAdapter.O
         lifecycleScope.launch(Dispatchers.IO) { run() }
     }
 
-    override fun getStatusLayout(): StatusLayout? {
-        return hintLayout
+    override fun acquireStatusLayout(): StatusLayout? {
+        return statusLayout
     }
 
     @SingleClick

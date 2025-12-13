@@ -18,7 +18,7 @@ import com.hjq.demo.widget.StatusLayout.OnRetryListener
  */
 class StatusActivity : AppActivity(), StatusAction {
 
-    private val hintLayout: StatusLayout? by lazyFindViewById(R.id.hl_status_hint)
+    private val statusLayout: StatusLayout? by lazyFindViewById(R.id.sl_demo_status)
 
     override fun getLayoutId(): Int {
         return R.layout.status_activity
@@ -58,7 +58,7 @@ class StatusActivity : AppActivity(), StatusAction {
             .show()
     }
 
-    override fun getStatusLayout(): StatusLayout? {
-        return hintLayout
+    override fun acquireStatusLayout(): StatusLayout? {
+        return statusLayout
     }
 }

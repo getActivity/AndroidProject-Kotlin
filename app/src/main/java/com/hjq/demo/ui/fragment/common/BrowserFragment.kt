@@ -48,7 +48,7 @@ class BrowserFragment : AppFragment<AppActivity>(), StatusAction, OnRefreshListe
 
     private val fullScreenModeController by lazy { FullScreenModeController() }
 
-    private val hintLayout: StatusLayout? by lazyFindViewById(R.id.hl_browser_hint)
+    private val statusLayout: StatusLayout? by lazyFindViewById(R.id.sl_browser_status)
     private val refreshLayout: SmartRefreshLayout? by lazyFindViewById(R.id.sl_browser_refresh)
     private val browserView: BrowserView? by lazyFindViewById(R.id.wv_browser_view)
 
@@ -75,8 +75,8 @@ class BrowserFragment : AppFragment<AppActivity>(), StatusAction, OnRefreshListe
         showLoading()
     }
 
-    override fun getStatusLayout(): StatusLayout {
-        return hintLayout!!
+    override fun acquireStatusLayout(): StatusLayout? {
+        return statusLayout
     }
 
     /**

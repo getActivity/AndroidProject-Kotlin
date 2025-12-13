@@ -143,7 +143,7 @@ class ImageSelectActivity : AppActivity(), StatusAction, Runnable,
         }
     }
 
-    private val hintLayout: StatusLayout? by lazyFindViewById(R.id.hl_image_select_hint)
+    private val statusLayout: StatusLayout? by lazyFindViewById(R.id.sl_image_select_status)
     private val recyclerView: RecyclerView? by lazyFindViewById(R.id.rv_image_select_list)
     private val floatingView: FloatActionButton? by lazyFindViewById(R.id.fab_image_select_floating)
 
@@ -205,8 +205,8 @@ class ImageSelectActivity : AppActivity(), StatusAction, Runnable,
         lifecycleScope.launch(Dispatchers.IO) { run() }
     }
 
-    override fun getStatusLayout(): StatusLayout? {
-        return hintLayout
+    override fun acquireStatusLayout(): StatusLayout? {
+        return statusLayout
     }
 
     @SingleClick
