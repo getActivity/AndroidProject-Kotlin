@@ -2,7 +2,6 @@ package com.hjq.demo.ui.activity.account
 
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
-import android.annotation.SuppressLint
 import android.content.Context
 import android.view.KeyEvent
 import android.view.View
@@ -120,6 +119,14 @@ class LoginActivity : AppActivity(), UmengLogin.OnLoginListener,
         // 自动填充手机号和密码
         phoneView?.setText(getString(INTENT_KEY_IN_PHONE))
         passwordView?.setText(getString(INTENT_KEY_IN_PASSWORD))
+    }
+
+    override fun getImmersionTopView(): View? {
+        return findViewById(R.id.fl_login_bar)
+    }
+
+    override fun getImmersionBottomView(): View? {
+        return findViewById(R.id.ll_login_platform)
     }
 
     @SingleClick
@@ -346,10 +353,5 @@ class LoginActivity : AppActivity(), UmengLogin.OnLoginListener,
         return super.createStatusBarConfig()
             // 指定导航栏背景颜色
             .navigationBarColor(R.color.white)
-    }
-
-    @SuppressLint("WrongViewCast")
-    override fun getImmersionView(): View? {
-        return findViewById(R.id.fl_login_bar)
     }
 }

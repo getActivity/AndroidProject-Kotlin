@@ -1,6 +1,5 @@
 package com.hjq.demo.ui.activity.account
 
-import android.annotation.SuppressLint
 import android.content.Intent
 import android.view.KeyEvent
 import android.view.View
@@ -11,7 +10,6 @@ import android.widget.TextView
 import android.widget.TextView.OnEditorActionListener
 import com.gyf.immersionbar.ImmersionBar
 import com.hjq.base.BaseActivity
-import com.hjq.base.BaseActivity.OnActivityCallback
 import com.hjq.base.ktx.createIntent
 import com.hjq.base.ktx.hideKeyboard
 import com.hjq.base.ktx.lazyFindViewById
@@ -98,6 +96,14 @@ class RegisterActivity : AppActivity(), OnEditorActionListener {
         phoneView?.setText(getString(INTENT_KEY_PHONE))
         firstPassword?.setText(getString(INTENT_KEY_PASSWORD))
         secondPassword?.setText(getString(INTENT_KEY_PASSWORD))
+    }
+
+    public override fun getImmersionTopView(): View? {
+        return findViewById<View?>(R.id.fl_register_container)
+    }
+
+    override fun getImmersionBottomView(): View? {
+        return findViewById<View?>(R.id.fl_register_container)
     }
 
     @SingleClick
@@ -229,11 +235,6 @@ class RegisterActivity : AppActivity(), OnEditorActionListener {
             return true
         }
         return false
-    }
-
-    @SuppressLint("WrongViewCast")
-    override fun getImmersionView(): View? {
-        return findViewById(R.id.fl_register_container)
     }
 
     /**

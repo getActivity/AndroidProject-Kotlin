@@ -3,6 +3,7 @@ package com.hjq.demo.ui.activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager.widget.ViewPager
@@ -76,6 +77,10 @@ class HomeActivity : AppActivity(), NavigationAdapter.OnNavigationListener {
             viewPager?.adapter = this
         }
         onNewIntent(intent)
+    }
+
+    override fun getImmersionBottomView(): View? {
+        return navigationView
     }
 
     override fun onNewIntent(intent: Intent?) {

@@ -1,13 +1,13 @@
 package com.hjq.demo.ui.fragment.home
 
 import android.content.res.ColorStateList
-import android.view.View
 import android.widget.TextView
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager.widget.ViewPager
 import androidx.viewpager.widget.ViewPager.OnPageChangeListener
+import com.gyf.immersionbar.ImmersionBar
 import com.hjq.base.BasePagerAdapter
 import com.hjq.base.ktx.lazyFindViewById
 import com.hjq.demo.R
@@ -61,6 +61,8 @@ class HomeMainFragment : TitleBarFragment<HomeActivity>(), OnTabListener,
         tabAdapter = TabAdapter(getAttachActivity()!!)
         tabView?.adapter = tabAdapter
 
+        ImmersionBar.setTitleBarMarginTop(getAttachActivity(), findViewById(R.id.tb_home_main_title))
+
         // 设置渐变监听
         collapsingToolbarLayout?.setOnScrimsListener(this)
     }
@@ -77,10 +79,6 @@ class HomeMainFragment : TitleBarFragment<HomeActivity>(), OnTabListener,
     override fun isStatusBarEnabled(): Boolean {
         // 使用沉浸式状态栏
         return !super.isStatusBarEnabled()
-    }
-
-    override fun getImmersionView(): View? {
-        return findViewById(R.id.tb_home_main_title)
     }
 
     override fun isStatusBarDarkFont(): Boolean {

@@ -82,6 +82,10 @@ class BrowserActivity : AppActivity(), StatusAction, OnRefreshListener {
         }
     }
 
+    override fun getImmersionBottomView(): View? {
+        return hintLayout
+    }
+
     override fun getStatusLayout(): StatusLayout? {
         return hintLayout
     }

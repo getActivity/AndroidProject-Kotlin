@@ -1,5 +1,6 @@
 package com.hjq.demo.ui.activity
 
+import android.view.View
 import com.hjq.demo.R
 import com.hjq.demo.app.AppActivity
 
@@ -18,4 +19,8 @@ class AboutActivity : AppActivity() {
     override fun initView() {}
 
     override fun initData() {}
+
+    override fun getImmersionBottomView(): View? {
+        return findViewById(R.id.tv_about_copyright)
+    }
 }

@@ -76,6 +76,10 @@ class GuideActivity : AppActivity() {
         indicatorView?.setViewPager(viewPager)
     }
 
+    override fun getImmersionBottomView(): View? {
+        return findViewById(R.id.fl_guide_control)
+    }
+
     @SingleClick
     override fun onClick(view: View) {
         if (view === completeView) {

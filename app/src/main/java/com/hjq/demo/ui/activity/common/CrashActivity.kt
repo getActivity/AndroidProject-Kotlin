@@ -245,7 +245,7 @@ class CrashActivity : AppActivity() {
     }
 
     @SuppressLint("WrongViewCast")
-    override fun getImmersionView(): View? {
+    override fun getImmersionTopView(): View? {
         return findViewById(R.id.ll_crash_bar)
     }
 

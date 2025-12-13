@@ -2,13 +2,16 @@ package com.hjq.demo.app
 
 import android.content.Intent
 import android.view.View
+import android.view.WindowInsets
 import androidx.annotation.StringRes
 import com.gyf.immersionbar.ImmersionBar
 import com.hjq.bar.TitleBar
 import com.hjq.base.BaseActivity
 import com.hjq.demo.R
+import com.hjq.demo.action.ImmersionAction
 import com.hjq.demo.action.TitleBarAction
 import com.hjq.demo.http.model.HttpData
+import com.hjq.demo.ktx.isAndroid16
 import com.hjq.demo.ktx.toast
 import com.hjq.demo.ui.dialog.common.WaitDialog
 import com.hjq.http.config.IRequestApi
@@ -21,7 +24,7 @@ import com.hjq.umeng.UmengClient.onActivityResult
  *    time   : 2018/10/18
  *    desc   : Activity 业务基类
  */
-abstract class AppActivity : BaseActivity(), TitleBarAction, OnHttpListener<Any> {
+abstract class AppActivity : BaseActivity(), TitleBarAction, ImmersionAction, OnHttpListener<Any> {
 
     /** 标题栏对象 */
     private var titleBar: TitleBar? = null
@@ -100,9 +103,39 @@ abstract class AppActivity : BaseActivity(), TitleBarAction, OnHttpListener<Any>
             getStatusBarConfig().init()
         }
 
-        val immersionView = getImmersionView()
-        if (immersionView != null) {
-            ImmersionBar.setTitleBar(this, immersionView)
+        // 适配 Android 15 EdgeToEdge 特性，这里你可能好奇为什么判断的是 Android 16？
+        // 因为我在主题样式中注册了一个 windowOptOutEdgeToEdgeEnforcement 属性，
+        // 代表跳过在 Android 15 的 EdgeToEdge 特性适配，但到了 Android 16 上面就失效了。
+        if (isAndroid16()) {
+            window.decorView.setOnApplyWindowInsetsListener(object : View.OnApplyWindowInsetsListener {
+                override fun onApplyWindowInsets(v: View, insets: WindowInsets): WindowInsets {
+                    val systemBars = insets.getInsets(WindowInsets.Type.systemBars())
+                    val immersionTopView = getImmersionTopView()
+                    val immersionBottomView = getImmersionBottomView()
+                    if (immersionTopView != null && immersionTopView === immersionBottomView) {
+                        immersionTopView.setPadding(immersionTopView.getPaddingLeft(), systemBars.top,
+                            immersionTopView.getPaddingRight(), systemBars.bottom
+                        )
+                        return insets
+                    }
+                    immersionTopView?.setPadding(immersionTopView.getPaddingLeft(), systemBars.top,
+                        immersionTopView.getPaddingRight(),
+                        immersionTopView.paddingBottom
+                    )
+                    immersionBottomView?.setPadding(
+                        immersionBottomView.getPaddingLeft(),
+                        immersionBottomView.paddingTop,
+                        immersionBottomView.getPaddingRight(),
+                        systemBars.bottom
+                    )
+                    return insets
+                }
+            })
+        } else {
+            val immersionTopView = getImmersionTopView()
+            if (immersionTopView != null) {
+                ImmersionBar.setTitleBar(this, immersionTopView)
+            }
         }
     }
 
@@ -165,7 +198,7 @@ abstract class AppActivity : BaseActivity(), TitleBarAction, OnHttpListener<Any>
         return titleBar
     }
 
-    open fun getImmersionView(): View? {
+    override fun getImmersionTopView(): View? {
         return getTitleBar()
     }
 

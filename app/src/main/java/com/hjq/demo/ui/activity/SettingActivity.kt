@@ -66,6 +66,10 @@ class SettingActivity : AppActivity(), SwitchButton.OnCheckedChangeListener {
         passwordView?.setRightText("密码强度较低")
     }
 
+    override fun getImmersionBottomView(): View? {
+        return findViewById(R.id.ll_setting_content)
+    }
+
     @SingleClick
     override fun onClick(view: View) {
         when (view.id) {

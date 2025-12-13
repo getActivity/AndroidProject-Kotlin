@@ -63,6 +63,10 @@ class DialogActivity : AppActivity() {
 
     override fun initData() {}
 
+    override fun getImmersionBottomView(): View? {
+        return findViewById(R.id.ll_dialog_content)
+    }
+
     @SingleClick
     override fun onClick(view: View) {
         when (view.id) {
