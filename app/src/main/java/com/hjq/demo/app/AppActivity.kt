@@ -94,8 +94,7 @@ abstract class AppActivity : BaseActivity(), TitleBarAction, ImmersionAction, On
     override fun initLayout() {
         super.initLayout()
 
-        val titleBar = getTitleBar()
-        titleBar?.setOnTitleBarListener(this)
+        acquireTitleBar()?.setOnTitleBarListener(this)
 
         // 初始化沉浸式状态栏
         if (isStatusBarEnabled()) {
@@ -187,18 +186,18 @@ abstract class AppActivity : BaseActivity(), TitleBarAction, ImmersionAction, On
      */
     override fun setTitle(title: CharSequence?) {
         super<BaseActivity>.setTitle(title)
-        getTitleBar()?.title = title
+        acquireTitleBar()?.title = title
     }
 
-    override fun getTitleBar(): TitleBar? {
+    override fun acquireTitleBar(): TitleBar? {
         if (titleBar == null) {
-            titleBar = obtainTitleBar(getContentView())
+            titleBar = findTitleBar(getContentView())
         }
         return titleBar
     }
 
     override fun getImmersionTopView(): View? {
-        return getTitleBar()
+        return acquireTitleBar()
     }
 
     override fun onLeftClick(titleBar: TitleBar) {

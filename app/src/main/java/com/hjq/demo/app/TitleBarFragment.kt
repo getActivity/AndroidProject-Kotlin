@@ -28,15 +28,13 @@ abstract class TitleBarFragment<A : AppActivity> : AppFragment<A>(), TitleBarAct
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val titleBar = getTitleBar()
         // 设置标题栏点击监听
-        titleBar?.setOnTitleBarListener(this)
+        acquireTitleBar()?.setOnTitleBarListener(this)
 
         if (isStatusBarEnabled()) {
             // 初始化沉浸式状态栏
             getStatusBarConfig().init()
         }
-
 
         // 适配 Android 15 EdgeToEdge 特性，这里你可能好奇为什么判断的是 Android 16？
         // 因为我在主题样式中注册了一个 windowOptOutEdgeToEdgeEnforcement 属性，
@@ -114,14 +112,14 @@ abstract class TitleBarFragment<A : AppActivity> : AppFragment<A>(), TitleBarAct
         return getAttachActivity()!!.isStatusBarDarkFont()
     }
 
-    override fun getTitleBar(): TitleBar? {
+    override fun acquireTitleBar(): TitleBar? {
         if (titleBar == null || !isLoading()) {
-            titleBar = obtainTitleBar(view as ViewGroup)
+            titleBar = findTitleBar(view as ViewGroup)
         }
         return titleBar
     }
 
     override fun getImmersionTopView(): View? {
-        return getTitleBar()
+        return acquireTitleBar()
     }
 }

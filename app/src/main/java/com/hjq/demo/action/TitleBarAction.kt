@@ -17,13 +17,13 @@ interface TitleBarAction : OnTitleBarListener {
     /**
      * 获取标题栏对象
      */
-    fun getTitleBar(): TitleBar?
+    fun acquireTitleBar(): TitleBar?
 
     /**
      * 设置标题栏的标题
      */
     fun setTitle(@StringRes id: Int) {
-        val titleBar = getTitleBar() ?: return
+        val titleBar = this@TitleBarAction.acquireTitleBar() ?: return
         titleBar.setTitle(id)
     }
 
@@ -31,7 +31,7 @@ interface TitleBarAction : OnTitleBarListener {
      * 设置标题栏的标题
      */
     fun setTitle(title: CharSequence?) {
-        val titleBar = getTitleBar() ?: return
+        val titleBar = this@TitleBarAction.acquireTitleBar() ?: return
         titleBar.title = title
     }
 
@@ -39,17 +39,17 @@ interface TitleBarAction : OnTitleBarListener {
      * 设置标题栏的左标题
      */
     fun setLeftTitle(id: Int) {
-        val titleBar = getTitleBar() ?: return
+        val titleBar = this@TitleBarAction.acquireTitleBar() ?: return
         titleBar.setLeftTitle(id)
     }
 
     fun setLeftTitle(text: CharSequence?) {
-        val titleBar = getTitleBar() ?: return
+        val titleBar = this@TitleBarAction.acquireTitleBar() ?: return
         titleBar.leftTitle = text
     }
 
     fun getLeftTitle(): CharSequence? {
-        val titleBar = getTitleBar() ?: return ""
+        val titleBar = this@TitleBarAction.acquireTitleBar() ?: return ""
         return titleBar.leftTitle
     }
 
@@ -57,17 +57,17 @@ interface TitleBarAction : OnTitleBarListener {
      * 设置标题栏的右标题
      */
     fun setRightTitle(id: Int) {
-        val titleBar = getTitleBar() ?: return
+        val titleBar = this@TitleBarAction.acquireTitleBar() ?: return
         titleBar.setRightTitle(id)
     }
 
     fun setRightTitle(text: CharSequence?) {
-        val titleBar = getTitleBar() ?: return
+        val titleBar = this@TitleBarAction.acquireTitleBar() ?: return
         titleBar.rightTitle = text
     }
 
     fun getRightTitle(): CharSequence? {
-        val titleBar = getTitleBar() ?: return ""
+        val titleBar = this@TitleBarAction.acquireTitleBar() ?: return ""
         return titleBar.rightTitle
     }
 
@@ -75,17 +75,17 @@ interface TitleBarAction : OnTitleBarListener {
      * 设置标题栏的左图标
      */
     fun setLeftIcon(id: Int) {
-        val titleBar = getTitleBar() ?: return
+        val titleBar = this@TitleBarAction.acquireTitleBar() ?: return
         titleBar.setLeftIcon(id)
     }
 
     fun setLeftIcon(drawable: Drawable?) {
-        val titleBar = getTitleBar() ?: return
+        val titleBar = this@TitleBarAction.acquireTitleBar() ?: return
         titleBar.leftIcon = drawable
     }
 
     fun getLeftIcon(): Drawable? {
-        val titleBar = getTitleBar() ?: return null
+        val titleBar = this@TitleBarAction.acquireTitleBar() ?: return null
         return titleBar.leftIcon
     }
 
@@ -93,24 +93,24 @@ interface TitleBarAction : OnTitleBarListener {
      * 设置标题栏的右图标
      */
     fun setRightIcon(id: Int) {
-        val titleBar = getTitleBar() ?: return
+        val titleBar = this@TitleBarAction.acquireTitleBar() ?: return
         titleBar.setRightIcon(id)
     }
 
     fun setRightIcon(drawable: Drawable?) {
-        val titleBar = getTitleBar() ?: return
+        val titleBar = this@TitleBarAction.acquireTitleBar() ?: return
         titleBar.rightIcon = drawable
     }
 
     fun getRightIcon(): Drawable? {
-        val titleBar = getTitleBar() ?: return null
+        val titleBar = this@TitleBarAction.acquireTitleBar() ?: return null
         return titleBar.rightIcon
     }
 
     /**
      * 递归获取 ViewGroup 中的 TitleBar 对象
      */
-    fun obtainTitleBar(group: ViewGroup?): TitleBar? {
+    fun findTitleBar(group: ViewGroup?): TitleBar? {
         if (group == null) {
             return null
         }
@@ -120,7 +120,7 @@ interface TitleBarAction : OnTitleBarListener {
                 return view
             }
             if (view is ViewGroup) {
-                val titleBar = obtainTitleBar(view)
+                val titleBar = findTitleBar(view)
                 if (titleBar != null) {
                     return titleBar
                 }
