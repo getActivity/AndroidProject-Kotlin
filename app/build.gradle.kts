@@ -196,7 +196,7 @@ dependencies {
 
     implementation(libs.photoView)
 
-    implementation(libs.buglyPro)
+    implementation(libs.bugly)
 
     implementation(libs.lottie)
 
