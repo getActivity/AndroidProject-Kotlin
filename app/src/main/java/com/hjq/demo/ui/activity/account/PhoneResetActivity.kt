@@ -93,8 +93,8 @@ class PhoneResetActivity : AppActivity(), OnEditorActionListener {
                 .api(GetCodeApi().apply {
                     setPhone(phoneView?.text.toString())
                 })
-                .request(object : HttpCallbackProxy<HttpData<Void?>>(this) {
-                    override fun onHttpSuccess(data: HttpData<Void?>) {
+                .request(object : HttpCallbackProxy<HttpData<Any>>(this) {
+                    override fun onHttpSuccess(data: HttpData<Any>) {
                         toast(R.string.common_code_send_hint)
                         countdownView?.start()
                     }
@@ -131,9 +131,9 @@ class PhoneResetActivity : AppActivity(), OnEditorActionListener {
                     setPhone(phoneView?.text.toString())
                     setCode(codeView?.text.toString())
                 })
-                .request(object : HttpCallbackProxy<HttpData<Void?>>(this) {
+                .request(object : HttpCallbackProxy<HttpData<Any>>(this) {
 
-                    override fun onHttpSuccess(data: HttpData<Void?>) {
+                    override fun onHttpSuccess(data: HttpData<Any>) {
                         TipsDialog.Builder(this@PhoneResetActivity)
                             .setIcon(TipsDialog.ICON_FINISH)
                             .setMessage(R.string.phone_reset_commit_succeed)

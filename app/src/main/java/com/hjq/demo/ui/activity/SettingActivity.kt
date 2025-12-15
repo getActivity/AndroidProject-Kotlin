@@ -168,9 +168,9 @@ class SettingActivity : AppActivity(), SwitchButton.OnCheckedChangeListener {
                 // 退出登录
                 EasyHttp.post(this)
                     .api(LogoutApi())
-                    .request(object : HttpCallbackProxy<HttpData<Void?>>(this) {
+                    .request(object : HttpCallbackProxy<HttpData<Any>>(this) {
 
-                        override fun onHttpSuccess(data: HttpData<Void?>) {
+                        override fun onHttpSuccess(data: HttpData<Any>) {
                             startActivity(LoginActivity::class.java)
                             // 进行内存优化，销毁除登录页之外的所有界面
                             ActivityManager.finishAllActivities(LoginActivity::class.java)

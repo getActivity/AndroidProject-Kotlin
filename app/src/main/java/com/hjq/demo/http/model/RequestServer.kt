@@ -1,7 +1,7 @@
 package com.hjq.demo.http.model
 
 import com.hjq.demo.other.AppConfig
-import com.hjq.http.config.IRequestBodyStrategy
+import com.hjq.http.config.IHttpPostBodyStrategy
 import com.hjq.http.config.IRequestServer
 import com.hjq.http.model.RequestBodyType
 
@@ -17,7 +17,7 @@ class RequestServer : IRequestServer {
         return AppConfig.getHostUrl() + "api/"
     }
 
-    override fun getBodyType(): IRequestBodyStrategy {
+    override fun getBodyType(): IHttpPostBodyStrategy {
         // 以表单的形式提交参数
         return RequestBodyType.FORM
     }

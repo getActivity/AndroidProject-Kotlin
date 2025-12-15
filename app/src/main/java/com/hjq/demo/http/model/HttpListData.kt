@@ -30,6 +30,7 @@ class HttpListData<T> : HttpData<ListBean<T?>?>() {
          */
         @Suppress("DIVISION_BY_ZERO")
         fun isLastPage(): Boolean {
+            // 避免出现除零异常
             if (pageSize == 0) {
                 return true
             }

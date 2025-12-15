@@ -127,9 +127,9 @@ class RegisterActivity : AppActivity(), OnEditorActionListener {
                 .api(GetCodeApi().apply {
                     setPhone(phoneView?.text.toString())
                 })
-                .request(object : HttpCallbackProxy<HttpData<Void?>>(this) {
+                .request(object : HttpCallbackProxy<HttpData<Any>>(this) {
 
-                    override fun onHttpSuccess(data: HttpData<Void?>) {
+                    override fun onHttpSuccess(data: HttpData<Any>) {
                         toast(R.string.common_code_send_hint)
                         countdownView?.start()
                     }

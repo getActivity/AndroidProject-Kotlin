@@ -6,18 +6,24 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.ConnectivityManager
 import android.net.NetworkInfo
-import com.google.gson.JsonSyntaxException
 import com.hjq.base.ktx.createIntent
 import com.hjq.demo.R
 import com.hjq.demo.http.exception.ResultException
 import com.hjq.demo.http.exception.TokenException
-import com.hjq.demo.http.model.HttpCacheManager.generateCacheKey
 import com.hjq.demo.manager.ActivityManager
 import com.hjq.demo.ui.activity.account.LoginActivity
 import com.hjq.gson.factory.GsonFactory
 import com.hjq.http.EasyLog
 import com.hjq.http.config.IRequestHandler
-import com.hjq.http.exception.*
+import com.hjq.http.exception.CancelException
+import com.hjq.http.exception.DataException
+import com.hjq.http.exception.FileMd5Exception
+import com.hjq.http.exception.HttpException
+import com.hjq.http.exception.NetworkException
+import com.hjq.http.exception.NullBodyException
+import com.hjq.http.exception.ResponseException
+import com.hjq.http.exception.ServerException
+import com.hjq.http.exception.TimeoutException
 import com.hjq.http.request.HttpRequest
 import okhttp3.Headers
 import okhttp3.Response
@@ -37,24 +43,26 @@ class RequestHandler constructor(private val application: Application) : IReques
 
     @Throws(Throwable::class)
     override fun requestSuccess(httpRequest: HttpRequest<*>, response: Response, type: Type): Any {
-
-        if ((Response::class.java == type)) {
+        if (Response::class.java == type) {
             return response
         }
 
         if (!response.isSuccessful) {
             throw ResponseException(String.format(application.getString(R.string.http_response_error),
-                    response.code(), response.message()), response)
+                                    response.code, response.message), response)
         }
 
-        if ((Headers::class.java == type)) {
-            return response.headers()
+        if (Any::class.java == type || Object::class.java == type) {
+            return ""
         }
 
-        val body = response.body()
-            ?: throw NullBodyException(application.getString(R.string.http_response_null_body))
+        if (Headers::class.java == type) {
+            return response.headers
+        }
 
-        if ((InputStream::class.java == type)) {
+        val body = response.body ?: throw NullBodyException(application.getString(R.string.http_response_null_body))
+
+        if (InputStream::class.java == type) {
             return body.byteStream()
         }
 
@@ -79,15 +87,15 @@ class RequestHandler constructor(private val application: Application) : IReques
         val result: Any
         try {
             result = GsonFactory.getSingletonGson().fromJson(text, type)
-        } catch (e: JsonSyntaxException) {
+        } catch (e: Exception) {
             // 返回结果读取异常
             throw DataException(application.getString(R.string.http_data_explain_error), e)
         }
 
         if (result is HttpData<*>) {
             val model: HttpData<*> = result
-            val headers = response.headers()
-            val headersSize = headers.size()
+            val headers = response.headers
+            val headersSize = headers.size
             val headersMap: MutableMap<String, String> = HashMap(headersSize)
             for (i in 0 until headersSize) {
                 headersMap[headers.name(i)] = headers.value(i)
@@ -149,12 +157,7 @@ class RequestHandler constructor(private val application: Application) : IReques
         when (throwable) {
             is ResponseException -> {
                 val response = throwable.response
-                throwable.setMessage(
-                    String.format(
-                        application.getString(R.string.http_response_error),
-                        response.code(), response.message()
-                    )
-                )
+                throwable.setMessage(String.format(application.getString(R.string.http_response_error), response.code, response.message))
                 return throwable
             }
             is NullBodyException -> {
@@ -167,45 +170,5 @@ class RequestHandler constructor(private val application: Application) : IReques
             }
             else -> return requestFail(httpRequest, throwable)
         }
-    }
-
-    override fun readCache(httpRequest: HttpRequest<*>, type: Type, cacheTime: Long): Any? {
-        val cacheKey = generateCacheKey(httpRequest)
-        val cacheValue = HttpCacheManager.readHttpCache(cacheKey)
-        if (cacheValue == null || "" == cacheValue || "{}" == cacheValue) {
-            return null
-        }
-        EasyLog.printLog(httpRequest, "----- read cache key -----")
-        EasyLog.printJson(httpRequest, cacheKey)
-        EasyLog.printLog(httpRequest, "----- read cache value -----")
-        EasyLog.printJson(httpRequest, cacheValue)
-        EasyLog.printLog(httpRequest, "cacheTime = $cacheTime")
-        val cacheInvalidate = HttpCacheManager.isCacheInvalidate(cacheKey, cacheTime)
-        EasyLog.printLog(httpRequest, "cacheInvalidate = $cacheInvalidate")
-        return if (cacheInvalidate) {
-            // 表示缓存已经过期了，直接返回 null 给外层，表示缓存不可用
-            null
-        } else GsonFactory.getSingletonGson().fromJson<Any>(cacheValue, type)
-    }
-
-    override fun writeCache(httpRequest: HttpRequest<*>, response: Response, result: Any): Boolean {
-        val cacheKey = generateCacheKey(httpRequest)
-        val cacheValue = GsonFactory.getSingletonGson().toJson(result)
-        if (cacheValue == null || "" == cacheValue || "{}" == cacheValue) {
-            return false
-        }
-        EasyLog.printLog(httpRequest, "----- write cache key -----")
-        EasyLog.printJson(httpRequest, cacheKey)
-        EasyLog.printLog(httpRequest, "----- write cache value -----")
-        EasyLog.printJson(httpRequest, cacheValue)
-        val writeHttpCacheResult = HttpCacheManager.writeHttpCache(cacheKey, cacheValue)
-        EasyLog.printLog(httpRequest, "writeHttpCacheResult = $writeHttpCacheResult")
-        val refreshHttpCacheTimeResult = HttpCacheManager.setHttpCacheTime(cacheKey, System.currentTimeMillis())
-        EasyLog.printLog(httpRequest, "refreshHttpCacheTimeResult = $refreshHttpCacheTimeResult")
-        return writeHttpCacheResult && refreshHttpCacheTimeResult
-    }
-
-    override fun clearCache() {
-        HttpCacheManager.clearCache()
     }
 }

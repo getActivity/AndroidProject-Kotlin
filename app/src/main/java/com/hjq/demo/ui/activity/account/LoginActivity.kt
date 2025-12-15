@@ -193,9 +193,9 @@ class LoginActivity : AppActivity(), UmengLogin.OnLoginListener,
                     override fun onHttpEnd(api: IRequestApi) {}
 
                     override fun onHttpSuccess(data: HttpData<LoginApi.Bean?>) {
+                        val bean = data.getData() ?: return
                         // 更新 Token
-                        EasyConfig.getInstance()
-                            .addHeader("token", data.getData()?.getToken())
+                        EasyConfig.getInstance().addHeader("token", bean.getToken())
                         postDelayed({
                             commitView?.showSucceed()
                             postDelayed({

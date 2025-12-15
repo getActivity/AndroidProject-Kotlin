@@ -67,7 +67,7 @@ class GlideConfig : AppGlideModule() {
     override fun registerComponents(context: Context, glide: Glide, registry: Registry) {
         // Glide 默认使用的是 HttpURLConnection 来做网络请求，这里切换成更高效的 OkHttp
         registry.replace(GlideUrl::class.java, InputStream::class.java,
-            OkHttpLoader.Factory(EasyConfig.getInstance().client))
+                            OkHttpLoader.Factory(EasyConfig.getInstance().client))
     }
 
     override fun isManifestParsingEnabled(): Boolean {

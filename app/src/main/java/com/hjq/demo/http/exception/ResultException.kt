@@ -13,11 +13,11 @@ class ResultException : HttpException {
 
     val httpData: HttpData<*>
 
-    constructor(message: String?, data: HttpData<*>) : super(message) {
+    constructor(message: String, data: HttpData<*>) : super(message) {
         httpData = data
     }
 
-    constructor(message: String?, cause: Throwable?, data: HttpData<*>) : super(message, cause) {
+    constructor(message: String, cause: Throwable, data: HttpData<*>) : super(message, cause) {
         httpData = data
     }
 }

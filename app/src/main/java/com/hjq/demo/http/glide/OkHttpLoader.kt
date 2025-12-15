@@ -15,8 +15,7 @@ import java.io.InputStream
  *    time   : 2019/12/15
  *    desc   : OkHttp 加载模型
  */
-class OkHttpLoader private constructor(private val factory: Call.Factory) :
-    ModelLoader<GlideUrl, InputStream> {
+class OkHttpLoader private constructor(private val factory: Call.Factory) : ModelLoader<GlideUrl, InputStream> {
 
     override fun handles(url: GlideUrl): Boolean {
         return true
@@ -26,7 +25,7 @@ class OkHttpLoader private constructor(private val factory: Call.Factory) :
         return LoadData(model, OkHttpFetcher(factory, model))
     }
 
-    class Factory constructor(private val factory: Call.Factory) : ModelLoaderFactory<GlideUrl, InputStream> {
+    class Factory(private val factory: Call.Factory) : ModelLoaderFactory<GlideUrl, InputStream> {
 
         override fun build(multiFactory: MultiModelLoaderFactory): ModelLoader<GlideUrl, InputStream> {
             return OkHttpLoader(factory)

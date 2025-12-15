@@ -106,9 +106,9 @@ class PasswordResetActivity : AppActivity(), OnEditorActionListener {
                     setCode(verifyCode)
                     setPassword(firstPassword?.text.toString())
                 })
-                .request(object : HttpCallbackProxy<HttpData<Void?>>(this) {
+                .request(object : HttpCallbackProxy<HttpData<Any>>(this) {
 
-                    override fun onHttpSuccess(data: HttpData<Void?>) {
+                    override fun onHttpSuccess(data: HttpData<Any>) {
                         TipsDialog.Builder(this@PasswordResetActivity)
                             .setIcon(TipsDialog.ICON_FINISH)
                             .setMessage(R.string.password_reset_success)

@@ -71,9 +71,9 @@ class SafeDialog {
                         .api(GetCodeApi().apply {
                             setPhone(phoneNumber)
                         })
-                        .request(object : OnHttpListener<HttpData<Void?>> {
+                        .request(object : OnHttpListener<HttpData<Any>> {
 
-                            override fun onHttpSuccess(data: HttpData<Void?>) {
+                            override fun onHttpSuccess(data: HttpData<Any>) {
                                 toast(R.string.common_code_send_hint)
                                 countdownView?.start()
                                 setCancelable(false)
@@ -101,9 +101,9 @@ class SafeDialog {
                             setPhone(phoneNumber)
                             setCode(codeView?.text.toString())
                         })
-                        .request(object : OnHttpListener<HttpData<Void?>> {
+                        .request(object : OnHttpListener<HttpData<Any>> {
 
-                            override fun onHttpSuccess(data: HttpData<Void?>) {
+                            override fun onHttpSuccess(data: HttpData<Any>) {
                                 performClickDismiss()
                                 listener?.onConfirm(getDialog(), phoneNumber, codeView?.text.toString())
                             }

@@ -12,14 +12,12 @@ import com.google.gson.reflect.TypeToken
 import com.google.gson.stream.JsonToken
 import com.hjq.bar.TitleBar
 import com.hjq.demo.R
+import com.hjq.demo.http.model.HttpCacheStrategy
 import com.hjq.demo.http.model.RequestHandler
 import com.hjq.demo.http.model.RequestServer
 import com.hjq.demo.ktx.isAndroid7
 import com.hjq.demo.ktx.toast
 import com.hjq.demo.other.AppConfig
-import com.hjq.demo.other.AppConfig.getBuglyId
-import com.hjq.demo.other.AppConfig.getBuglyKey
-import com.hjq.demo.other.AppConfig.isDebug
 import com.hjq.demo.other.CrashHandler
 import com.hjq.demo.other.DebugLoggerTree
 import com.hjq.demo.other.MaterialHeader
@@ -88,15 +86,15 @@ object InitManager {
         TitleBar.setGlobalStyle(TitleBarStyle())
 
         // 设置全局的 Header 构建器
-        SmartRefreshLayout.setDefaultRefreshHeaderCreator{ context: Context, layout: RefreshLayout ->
+        SmartRefreshLayout.setDefaultRefreshHeaderCreator{ context: Context, _: RefreshLayout ->
             MaterialHeader(context).setColorSchemeColors(ContextCompat.getColor(context, R.color.common_accent_color))
         }
         // 设置全局的 Footer 构建器
-        SmartRefreshLayout.setDefaultRefreshFooterCreator{ context: Context, layout: RefreshLayout ->
+        SmartRefreshLayout.setDefaultRefreshFooterCreator{ context: Context, _: RefreshLayout ->
             SmartBallPulseFooter(context)
         }
         // 设置全局初始化器
-        SmartRefreshLayout.setDefaultRefreshInitializer { context: Context, layout: RefreshLayout ->
+        SmartRefreshLayout.setDefaultRefreshInitializer { _: Context, layout: RefreshLayout ->
             // 刷新头部是否跟随内容偏移
             layout.setEnableHeaderTranslationContent(true)
                 // 刷新尾部是否跟随内容偏移
@@ -128,8 +126,8 @@ object InitManager {
 
         // Bugly 异常捕捉
         // Bugly 异常捕捉
-        val builder = BuglyBuilder(getBuglyId(), getBuglyKey())
-        builder.debugMode = isDebug()
+        val builder = BuglyBuilder(AppConfig.getBuglyId(), AppConfig.getBuglyKey())
+        builder.debugMode = AppConfig.isDebug()
         Bugly.init(application, builder)
 
         // Activity 栈管理初始化
@@ -142,10 +140,16 @@ object InitManager {
         val okHttpClient: OkHttpClient = OkHttpClient.Builder()
             .build()
 
-        EasyConfig.with(okHttpClient) // 是否打印日志
-            .setLogEnabled(AppConfig.isLogEnable()) // 设置服务器配置
-            .setServer(RequestServer()) // 设置请求处理策略
-            .setHandler(RequestHandler(application)) // 设置请求重试次数
+        EasyConfig.with(okHttpClient)
+            // 是否打印日志
+            .setLogEnabled(AppConfig.isLogEnable())
+            // 设置服务器配置
+            .setServer(RequestServer())
+            // 设置请求处理策略
+            .setHandler(RequestHandler(application))
+            // 设置请求缓存实现策略（非必须）
+            .setCacheStrategy(HttpCacheStrategy())
+            // 设置请求重试次数
             .setRetryCount(1)
             .setInterceptor(object : IRequestInterceptor {
                 override fun interceptArguments(
@@ -180,7 +184,7 @@ object InitManager {
 
             private fun handlerGsonParseException(message: String) {
                 val e = IllegalArgumentException(message)
-                if (isDebug()) {
+                if (AppConfig.isDebug()) {
                     throw e
                 } else {
                     // 上报到 Bugly 错误列表中

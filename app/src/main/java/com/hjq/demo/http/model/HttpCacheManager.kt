@@ -12,20 +12,16 @@ import com.tencent.mmkv.MMKV
  */
 object HttpCacheManager {
 
-    private val HTTP_CACHE_CONTENT = MMKV.mmkvWithID("http_cache_content");
+    private val HTTP_CACHE_CONTENT: MMKV = MMKV.mmkvWithID("http_cache_content");
 
-    private val HTTP_CACHE_TIME = MMKV.mmkvWithID("http_cache_time")
+    private val HTTP_CACHE_TIME: MMKV = MMKV.mmkvWithID("http_cache_time")
 
     /**
      * 生成缓存的 key
      */
     fun generateCacheKey(httpRequest: HttpRequest<*>): String {
         val requestApi = httpRequest.requestApi
-        return """
-            请替换成当前的用户 id
-            ${requestApi.api}
-            ${GsonFactory.getSingletonGson().toJson(requestApi)}
-            """.trimIndent()
+        return "请替换成当前的用户 id" + "\n" + requestApi.getApi() + "\n" + GsonFactory.getSingletonGson().toJson(requestApi)
     }
 
     /**
@@ -33,16 +29,24 @@ object HttpCacheManager {
      */
     fun readHttpCache(cacheKey: String): String? {
         val cacheValue = HTTP_CACHE_CONTENT.getString(cacheKey, null)
-        return if ("" == cacheValue || "{}" == cacheValue) {
-            null
-        } else cacheValue
+        if (cacheValue == null || cacheValue.isEmpty() || "{}" == cacheValue) {
+            return null
+        }
+        return cacheValue
     }
 
     /**
      * 写入缓存
      */
-    fun writeHttpCache(cacheKey: String?, cacheValue: String?): Boolean {
+    fun writeHttpCache(cacheKey: String, cacheValue: String): Boolean {
         return HTTP_CACHE_CONTENT.putString(cacheKey, cacheValue).commit()
+    }
+
+    /**
+     * 删除缓存
+     */
+    fun deleteHttpCache(cacheKey: String): Boolean {
+        return HTTP_CACHE_CONTENT.remove(cacheKey).commit()
     }
 
     /**
@@ -51,6 +55,7 @@ object HttpCacheManager {
     fun clearCache() {
         HTTP_CACHE_CONTENT.clearMemoryCache()
         HTTP_CACHE_CONTENT.clearAll()
+
         HTTP_CACHE_TIME.clearMemoryCache()
         HTTP_CACHE_TIME.clearAll()
     }
@@ -58,29 +63,30 @@ object HttpCacheManager {
     /**
      * 获取 Http 写入缓存的时间
      */
-    fun getHttpCacheTime(cacheKey: String?): Long {
+    fun getHttpCacheTime(cacheKey: String): Long {
         return HTTP_CACHE_TIME.getLong(cacheKey, 0)
     }
 
     /**
      * 设置 Http 写入缓存的时间
      */
-    fun setHttpCacheTime(cacheKey: String?, cacheTime: Long): Boolean {
+    fun setHttpCacheTime(cacheKey: String, cacheTime: Long): Boolean {
         return HTTP_CACHE_TIME.putLong(cacheKey, cacheTime).commit()
     }
 
     /**
      * 判断缓存是否过期
      */
-    fun isCacheInvalidate(cacheKey: String?, maxCacheTime: Long): Boolean {
+    fun isCacheInvalidate(cacheKey: String, maxCacheTime: Long): Boolean {
         if (maxCacheTime == Long.MAX_VALUE) {
             // 表示缓存长期有效，永远不会过期
             return false
         }
         val httpCacheTime = getHttpCacheTime(cacheKey)
-        return if (httpCacheTime == 0L) {
+        if (httpCacheTime == 0L) {
             // 表示不知道缓存的时间，这里默认当做已经过期了
-            true
-        } else httpCacheTime + maxCacheTime < System.currentTimeMillis()
+            return true
+        }
+        return httpCacheTime + maxCacheTime < System.currentTimeMillis()
     }
 }

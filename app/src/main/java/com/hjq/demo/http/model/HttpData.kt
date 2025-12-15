@@ -32,8 +32,8 @@ open class HttpData<T> {
         return code
     }
 
-    fun getMessage(): String? {
-        return msg
+    fun getMessage(): String {
+        return msg ?: ""
     }
 
     fun getData(): T? {
