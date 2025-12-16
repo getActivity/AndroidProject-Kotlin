@@ -60,7 +60,9 @@ class HomeMineFragment : TitleBarFragment<HomeActivity>() {
             R.id.btn_home_mine_video_select, R.id.btn_home_mine_video_play, R.id.btn_home_mine_crash, R.id.btn_home_mine_donate)
     }
 
-    override fun initData() {}
+    override fun initData() {
+        // default implementation ignored
+    }
 
     @SingleClick
     override fun onClick(view: View) {
@@ -100,60 +102,70 @@ class HomeMineFragment : TitleBarFragment<HomeActivity>() {
             }
             R.id.btn_home_mine_browser -> {
 
-                InputDialog.Builder(getAttachActivity()!!)
-                    .setTitle("跳转到网页")
-                    .setContent("https://juejin.cn/user/712139265815144/posts")
-                    .setHint("请输入网页地址")
-                    .setConfirm(getString(R.string.common_confirm))
-                    .setCancel(getString(R.string.common_cancel))
-                    .setListener(object : InputDialog.OnListener {
+                getAttachActivity()?.let {
+                    InputDialog.Builder(it)
+                        .setTitle("跳转到网页")
+                        .setContent("https://juejin.cn/user/712139265815144/posts")
+                        .setHint("请输入网页地址")
+                        .setConfirm(getString(R.string.common_confirm))
+                        .setCancel(getString(R.string.common_cancel))
+                        .setListener(object : InputDialog.OnListener {
 
-                        override fun onConfirm(dialog: BaseDialog?, content: String) {
-                            BrowserActivity.start(getAttachActivity()!!, content)
-                        }
-                    })
-                    .show()
+                            override fun onConfirm(dialog: BaseDialog, content: String) {
+                                BrowserActivity.start(it, content)
+                            }
+                        })
+                        .show()
+                }
             }
             R.id.btn_home_mine_image_select -> {
 
-                ImageSelectActivity.start(getAttachActivity()!!, object : OnImageSelectListener {
+                getAttachActivity()?.let {
+                    ImageSelectActivity.start(it, object : OnImageSelectListener {
 
-                    override fun onSelected(data: MutableList<String>) {
-                        toast("选择了$data")
-                    }
+                        override fun onSelected(data: MutableList<String>) {
+                            toast("选择了$data")
+                        }
 
-                    override fun onCancel() {
-                        toast("取消了")
-                    }
-                })
+                        override fun onCancel() {
+                            toast("取消了")
+                        }
+                    })
+                }
             }
             R.id.btn_home_mine_image_preview -> {
 
-                val images: MutableList<String?> = ArrayList()
-                images.add("https://www.baidu.com/img/bd_logo.png")
-                images.add("https://avatars1.githubusercontent.com/u/28616817")
-                ImagePreviewActivity.start(getAttachActivity()!!, images, images.size - 1)
+                getAttachActivity()?.let {
+                    val images: MutableList<String> = mutableListOf()
+                    images.add("https://www.baidu.com/img/bd_logo.png")
+                    images.add("https://avatars1.githubusercontent.com/u/28616817")
+                    ImagePreviewActivity.start(it, images, images.size - 1)
+                }
             }
             R.id.btn_home_mine_video_select -> {
 
-                VideoSelectActivity.start(getAttachActivity()!!, object : OnVideoSelectListener {
+                getAttachActivity()?.let {
+                    VideoSelectActivity.start(it, object : OnVideoSelectListener {
 
-                    override fun onSelected(data: MutableList<String>) {
-                        toast("选择了$data")
-                    }
+                        override fun onSelected(data: MutableList<String>) {
+                            toast("选择了$data")
+                        }
 
-                    override fun onCancel() {
-                        toast("取消了")
-                    }
-                })
+                        override fun onCancel() {
+                            toast("取消了")
+                        }
+                    })
+                }
             }
             R.id.btn_home_mine_video_play -> {
 
-                VideoPlayActivity.Builder()
-                    .setVideoTitle("速度与激情特别行动")
-                    .setVideoSource("http://vfx.mtime.cn/Video/2019/06/29/mp4/190629004821240734.mp4")
-                    .setActivityOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE)
-                    .start(getAttachActivity()!!)
+                getAttachActivity()?.let {
+                    VideoPlayActivity.Builder()
+                        .setVideoTitle("速度与激情特别行动")
+                        .setVideoSource("http://vfx.mtime.cn/Video/2019/06/29/mp4/190629004821240734.mp4")
+                        .setActivityOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE)
+                        .start(it)
+                }
             }
             R.id.btn_home_mine_crash -> {
 
@@ -166,30 +178,32 @@ class HomeMineFragment : TitleBarFragment<HomeActivity>() {
             }
             R.id.btn_home_mine_donate -> {
 
-                MessageDialog.Builder(getAttachActivity()!!)
-                    .setTitle("捐赠")
-                    .setMessage("如果你觉得这个开源项目很棒，希望它能更好地坚持开发下去，可否愿意花一点点钱（推荐 10.24 元）作为对于开发者的激励")
-                    .setConfirm("支付宝")
-                    .setCancel(null)
-                    //.setAutoDismiss(false)
-                    .setListener(object : MessageDialog.OnListener {
+                getAttachActivity()?.let {
+                    MessageDialog.Builder(it)
+                        .setTitle("捐赠")
+                        .setMessage("如果你觉得这个开源项目很棒，希望它能更好地坚持开发下去，可否愿意花一点点钱（推荐 10.24 元）作为对于开发者的激励")
+                        .setConfirm("支付宝")
+                        .setCancel(null)
+                        //.setAutoDismiss(false)
+                        .setListener(object : MessageDialog.OnListener {
 
-                        override fun onConfirm(dialog: BaseDialog?) {
-                            BrowserActivity.start(getAttachActivity()!!, "https://github.com/getActivity/Donate")
-                            toast("AndroidProject 因为有你的支持而能够不断更新、完善，非常感谢支持！")
-                            postDelayed({
-                                try {
-                                    startActivity(Intent.ACTION_VIEW) {
-                                        data = Uri.parse("alipays://platformapi/startapp?saId=10000007&clientVersion=3.7.0.0718&qrcode=https%3A%2F%2Fqr.alipay.com%2FFKX04202G4K6AVCF5GIY66%3F_s%3Dweb-other")
-                                        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                            override fun onConfirm(dialog: BaseDialog) {
+                                BrowserActivity.start(it, "https://github.com/getActivity/Donate")
+                                toast("AndroidProject 因为有你的支持而能够不断更新、完善，非常感谢支持！")
+                                postDelayed({
+                                    try {
+                                        startActivity(Intent.ACTION_VIEW) {
+                                            data = Uri.parse("alipays://platformapi/startapp?saId=10000007&clientVersion=3.7.0.0718&qrcode=https%3A%2F%2Fqr.alipay.com%2FFKX04202G4K6AVCF5GIY66%3F_s%3Dweb-other")
+                                            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                                        }
+                                    } catch (e: ActivityNotFoundException) {
+                                        toast("打开支付宝失败，你可能还没有安装支付宝客户端")
                                     }
-                                } catch (e: ActivityNotFoundException) {
-                                    toast("打开支付宝失败，你可能还没有安装支付宝客户端")
-                                }
-                            }, 2000)
-                        }
-                    })
-                    .show()
+                                }, 2000)
+                            }
+                        })
+                        .show()
+                }
             }
         }
     }

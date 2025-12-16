@@ -2,7 +2,6 @@ package com.hjq.demo.app
 
 import android.os.Bundle
 import android.view.View
-import android.view.ViewGroup
 import android.view.WindowInsets
 import com.gyf.immersionbar.ImmersionBar
 import com.hjq.bar.TitleBar
@@ -78,11 +77,11 @@ abstract class TitleBarFragment<A : AppActivity> : AppFragment<A>(), TitleBarAct
     /**
      * 获取状态栏沉浸的配置对象
      */
-    protected fun getStatusBarConfig(): ImmersionBar {
-        if (immersionBar == null) {
-            immersionBar = createStatusBarConfig()
+    open fun getStatusBarConfig(): ImmersionBar {
+        createStatusBarConfig().let {
+            immersionBar = it
+            return it
         }
-        return immersionBar!!
     }
 
     /**
@@ -103,12 +102,12 @@ abstract class TitleBarFragment<A : AppActivity> : AppFragment<A>(), TitleBarAct
      */
     protected open fun isStatusBarDarkFont(): Boolean {
         // 返回真表示黑色字体
-        return getAttachActivity()!!.isStatusBarDarkFont()
+        return getAttachActivity()?.isStatusBarDarkFont() == true
     }
 
     override fun acquireTitleBar(): TitleBar? {
         if (titleBar == null || !isLoading()) {
-            titleBar = findTitleBar(view as ViewGroup)
+            titleBar = findTitleBar(view)
         }
         return titleBar
     }

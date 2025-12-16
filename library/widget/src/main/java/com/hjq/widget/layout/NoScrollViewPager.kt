@@ -17,13 +17,13 @@ class NoScrollViewPager @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null) :
     ViewPager(context, attrs) {
 
-    override fun onInterceptTouchEvent(ev: MotionEvent?): Boolean {
+    override fun onInterceptTouchEvent(ev: MotionEvent): Boolean {
         // 不拦截这个事件
         return false
     }
 
     @Suppress("ClickableViewAccessibility")
-    override fun onTouchEvent(ev: MotionEvent?): Boolean {
+    override fun onTouchEvent(ev: MotionEvent): Boolean {
         // 不处理这个事件
         return false
     }

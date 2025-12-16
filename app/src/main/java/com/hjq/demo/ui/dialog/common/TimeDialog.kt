@@ -45,19 +45,19 @@ class TimeDialog {
             secondAdapter = PickerAdapter(context)
 
             // 生产小时
-            val hourData = ArrayList<String?>(24)
+            val hourData: MutableList<String> = mutableListOf()
             for (i in 0..23) {
                 hourData.add((if (i < 10) "0" else "") + i + " " + getString(R.string.common_hour))
             }
 
             // 生产分钟
-            val minuteData = ArrayList<String?>(60)
+            val minuteData: MutableList<String> = mutableListOf()
             for (i in 0..59) {
                 minuteData.add((if (i < 10) "0" else "") + i + " " + getString(R.string.common_minute))
             }
 
             // 生产秒钟
-            val secondData = ArrayList<String?>(60)
+            val secondData: MutableList<String> = mutableListOf()
             for (i in 0..59) {
                 secondData.add((if (i < 10) "0" else "") + i + " " + getString(R.string.common_second))
             }
@@ -101,12 +101,12 @@ class TimeDialog {
             }
             // 102030
             if (time.matches(Regex("\\d{6}"))) {
-                setHour(time.substring(0, 2))
+                setHour(time.take(2))
                 setMinute(time.substring(2, 4))
                 setSecond(time.substring(4, 6))
                 // 10:20:30
             } else if (time.matches(Regex("\\d{2}:\\d{2}:\\d{2}"))) {
-                setHour(time.substring(0, 2))
+                setHour(time.take(2))
                 setMinute(time.substring(3, 5))
                 setSecond(time.substring(6, 8))
             }
@@ -168,18 +168,18 @@ class TimeDialog {
             when (view.id) {
                 R.id.tv_ui_confirm -> {
                     performClickDismiss()
-                    listener?.onSelected(getDialog(), hourManager.getPickedPosition(),
+                    listener?.onSelected(requireNotNull(getDialog()), hourManager.getPickedPosition(),
                         minuteManager.getPickedPosition(), secondManager.getPickedPosition())
                 }
                 R.id.tv_ui_cancel -> {
                     performClickDismiss()
-                    listener?.onCancel(getDialog())
+                    listener?.onCancel(requireNotNull(getDialog()))
                 }
             }
         }
     }
 
-    private class PickerAdapter(context: Context) : AppAdapter<String?>(context) {
+    private class PickerAdapter(context: Context) : AppAdapter<String>(context) {
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AppViewHolder {
             return ViewHolder()
@@ -204,11 +204,13 @@ class TimeDialog {
          * @param minute            分钟
          * @param second            秒钟
          */
-        fun onSelected(dialog: BaseDialog?, hour: Int, minute: Int, second: Int)
+        fun onSelected(dialog: BaseDialog, hour: Int, minute: Int, second: Int)
 
         /**
          * 点击取消时回调
          */
-        fun onCancel(dialog: BaseDialog?) {}
+        fun onCancel(dialog: BaseDialog) {
+            // default implementation ignored
+        }
     }
 }

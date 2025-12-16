@@ -21,9 +21,8 @@ import com.hjq.demo.widget.PlayerView
  *    time   : 2020/03/01
  *    desc   : 视频选择适配器
  */
-class VideoSelectAdapter constructor(
-    context: Context, images: MutableList<VideoSelectActivity.VideoBean>) :
-    AppAdapter<VideoSelectActivity.VideoBean>(context) {
+class VideoSelectAdapter(context: Context, images: MutableList<VideoSelectActivity.VideoBean>) :
+                         AppAdapter<VideoSelectActivity.VideoBean>(context) {
 
     private val selectVideo: MutableList<VideoSelectActivity.VideoBean> = images
 

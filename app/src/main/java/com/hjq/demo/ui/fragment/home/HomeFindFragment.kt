@@ -49,9 +49,9 @@ class HomeFindFragment : TitleBarFragment<HomeActivity>(),
         switchButton?.setOnCheckedChangeListener(this)
 
         val simpleRatingBar1 = findViewById<SimpleRatingBar>(R.id.srb_home_find_rating_bar_1)
-        simpleRatingBar1!!.setOnRatingBarChangeListener(this)
+        simpleRatingBar1?.setOnRatingBarChangeListener(this)
         val simpleRatingBar2 = findViewById<SimpleRatingBar>(R.id.srb_home_find_rating_bar_2)
-        simpleRatingBar2!!.setOnRatingBarChangeListener(this)
+        simpleRatingBar2?.setOnRatingBarChangeListener(this)
     }
 
     override fun initData() {

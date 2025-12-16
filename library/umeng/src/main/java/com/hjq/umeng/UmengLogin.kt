@@ -96,11 +96,11 @@ class UmengLogin {
          *
          * @param platform      平台名称
          * @param action        行为序号，开发者用不上
-         * @param t             错误原因
+         * @param throwable             错误原因
          */
-        override fun onError(platform: SHARE_MEDIA?, action: Int, t: Throwable) {
-            t.printStackTrace()
-            listener?.onLoginFail(this.platform, t)
+        override fun onError(platform: SHARE_MEDIA?, action: Int, throwable: Throwable) {
+            throwable.printStackTrace()
+            listener?.onLoginFail(this.platform, throwable)
             listener = null
         }
 
@@ -123,7 +123,9 @@ class UmengLogin {
          *
          * @param platform      平台对象
          */
-        fun onLoginStart(platform: Platform?) {}
+        fun onLoginStart(platform: Platform) {
+            // default implementation ignored
+        }
 
         /**
          * 授权成功的回调
@@ -131,21 +133,25 @@ class UmengLogin {
          * @param platform      平台对象
          * @param data          用户资料返回
          */
-        fun onLoginSuccess(platform: Platform?, data: LoginData?)
+        fun onLoginSuccess(platform: Platform, data: LoginData)
 
         /**
          * 授权失败的回调
          *
          * @param platform      平台对象
-         * @param t             错误原因
+         * @param throwable     错误原因
          */
-        fun onLoginFail(platform: Platform?, t: Throwable) {}
+        fun onLoginFail(platform: Platform, throwable: Throwable) {
+            // default implementation ignored
+        }
 
         /**
          * 授权取消的回调
          *
          * @param platform      平台对象
          */
-        fun onLoginCancel(platform: Platform?) {}
+        fun onLoginCancel(platform: Platform) {
+            // default implementation ignored
+        }
     }
 }

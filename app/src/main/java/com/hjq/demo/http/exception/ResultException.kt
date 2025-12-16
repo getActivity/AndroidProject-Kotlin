@@ -5,7 +5,7 @@ import com.hjq.http.exception.HttpException
 
 /**
  *    author : Android 轮子哥
- *    github : https://github.com/getActivity/AndroidProject
+ *    github : https://github.com/getActivity/AndroidProject-Kotlin
  *    time   : 2021/12/19
  *    desc   : 返回结果异常
  */

@@ -33,7 +33,7 @@ class StatusActivity : AppActivity(), StatusAction {
             .setList("加载中", "请求错误", "空数据提示", "自定义提示")
             .setListener(object : MenuDialog.OnListener<String> {
 
-                override fun onSelected(dialog: BaseDialog?, position: Int, data: String) {
+                override fun onSelected(dialog: BaseDialog, position: Int, data: String) {
                     when (position) {
                         0 -> {
                             showLoading()

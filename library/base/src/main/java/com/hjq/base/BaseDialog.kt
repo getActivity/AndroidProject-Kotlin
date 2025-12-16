@@ -46,7 +46,7 @@ import java.lang.ref.SoftReference
  *    desc   : Dialog 技术基类
  */
 @Suppress("LeakingThis")
-open class BaseDialog constructor(context: Context, @StyleRes themeResId: Int = R.style.BaseDialogTheme) :
+open class BaseDialog(context: Context, @StyleRes themeResId: Int = R.style.BaseDialogTheme) :
     AppCompatDialog(context, themeResId), LifecycleOwner, ContextAction, ResourcesAction,
     HandlerAction, ClickAction, AnimAction, DialogInterface.OnShowListener,
     DialogInterface.OnCancelListener, DialogInterface.OnDismissListener {
@@ -88,7 +88,8 @@ open class BaseDialog constructor(context: Context, @StyleRes themeResId: Int = 
         lifecycle.handleLifecycleEvent(Lifecycle.Event.ON_RESUME)
         // 这里解释一下为什么要创建一个新的 ArrayList，这是因为执行监听方法可能会删除 List 集合中的元素
         // 例如 Builder 类中的 postDelayed 方法，就会移除监听对象，所以这里遍历可能出现 ConcurrentModificationException
-        val listeners = ArrayList<OnShowListener>(showListeners)
+        val listeners: MutableList<OnShowListener> = mutableListOf()
+        showListeners.toCollection(listeners)
         for (listener in listeners) {
             listener.onShow(this)
         }
@@ -98,7 +99,10 @@ open class BaseDialog constructor(context: Context, @StyleRes themeResId: Int = 
      * [DialogInterface.OnCancelListener]
      */
     override fun onCancel(dialog: DialogInterface?) {
-        val listeners = ArrayList<OnCancelListener>(cancelListeners)
+        // 这里解释一下为什么要创建一个新的 ArrayList，这是因为执行监听方法可能会删除 List 集合中的元素
+        // 例如 Builder 类中的 postDelayed 方法，就会移除监听对象，所以这里遍历可能出现 ConcurrentModificationException
+        val listeners: MutableList<OnCancelListener> = mutableListOf()
+        cancelListeners.toCollection(listeners)
         for (listener in listeners) {
             listener.onCancel(this)
         }
@@ -109,7 +113,10 @@ open class BaseDialog constructor(context: Context, @StyleRes themeResId: Int = 
      */
     override fun onDismiss(dialog: DialogInterface?) {
         lifecycle.handleLifecycleEvent(Lifecycle.Event.ON_DESTROY)
-        val listeners = ArrayList<OnDismissListener>(dismissListeners)
+        // 这里解释一下为什么要创建一个新的 ArrayList，这是因为执行监听方法可能会删除 List 集合中的元素
+        // 例如 Builder 类中的 postDelayed 方法，就会移除监听对象，所以这里遍历可能出现 ConcurrentModificationException
+        val listeners: MutableList<OnDismissListener> = mutableListOf()
+        dismissListeners.toCollection(listeners)
         for (listener in listeners) {
             listener.onDismiss(this)
         }
@@ -365,8 +372,7 @@ open class BaseDialog constructor(context: Context, @StyleRes themeResId: Int = 
     }
 
     @Suppress("UNCHECKED_CAST")
-    open class Builder<B : Builder<B>> constructor(private val context: Context) :
-        ContextAction, ResourcesAction, ClickAction {
+    open class Builder<B : Builder<B>>(private val context: Context) : ContextAction, ResourcesAction, ClickAction {
 
         /** Dialog 对象 */
         private var dialog: BaseDialog? = null
@@ -409,13 +415,13 @@ open class BaseDialog constructor(context: Context, @StyleRes themeResId: Int = 
         private var createListener: OnCreateListener? = null
 
         /** Dialog 显示监听 */
-        private val showListeners: MutableList<OnShowListener> by lazy { ArrayList() }
+        private val showListeners: MutableList<OnShowListener> by lazy { mutableListOf() }
 
         /** Dialog 取消监听 */
-        private val cancelListeners: MutableList<OnCancelListener> by lazy { ArrayList() }
+        private val cancelListeners: MutableList<OnCancelListener> by lazy { mutableListOf() }
 
         /** Dialog 销毁监听 */
-        private val dismissListeners: MutableList<OnDismissListener> by lazy { ArrayList() }
+        private val dismissListeners: MutableList<OnDismissListener> by lazy { mutableListOf() }
 
         /** Dialog 按键监听 */
         private var keyListener: OnKeyListener? = null
@@ -433,11 +439,7 @@ open class BaseDialog constructor(context: Context, @StyleRes themeResId: Int = 
             )
         }
 
-        open fun setContentView(view: View?): B {
-            // 请不要传入空的布局
-            if (view == null) {
-                throw IllegalArgumentException("are you ok?")
-            }
+        open fun setContentView(view: View): B {
             contentView = view
             if (isCreated()) {
                 dialog?.setContentView(view)
@@ -476,10 +478,7 @@ open class BaseDialog constructor(context: Context, @StyleRes themeResId: Int = 
          */
         open fun setThemeStyle(@StyleRes id: Int): B {
             themeId = id
-            if (isCreated()) {
-                // Dialog 创建之后不能再设置主题 id
-                throw IllegalStateException("are you ok?")
-            }
+            // 注意：Dialog 创建之后不能再设置主题 id
             return this as B
         }
 
@@ -680,7 +679,7 @@ open class BaseDialog constructor(context: Context, @StyleRes themeResId: Int = 
             if (listener == null) {
                 return this as B
             }
-            cancelListeners.add(listener)
+            cancelListeners.remove(listener)
             if (isCreated()) {
                 dialog?.removeOnCancelListener(listener)
             }
@@ -711,7 +710,7 @@ open class BaseDialog constructor(context: Context, @StyleRes themeResId: Int = 
             if (listener == null) {
                 return this as B
             }
-            dismissListeners.add(listener)
+            dismissListeners.remove(listener)
             if (isCreated()) {
                 dialog?.removeOnDismissListener(listener)
             }
@@ -732,39 +731,27 @@ open class BaseDialog constructor(context: Context, @StyleRes themeResId: Int = 
         /**
          * 设置文本
          */
-        open fun setText(@IdRes viewId: Int, @StringRes stringId: Int): B {
-            return setText(viewId, getString(stringId))
+        open fun setTextByTextView(@IdRes viewId: Int, @StringRes stringId: Int): B {
+            return setTextByTextView(viewId, getString(stringId))
         }
 
-        open fun setText(@IdRes id: Int, text: CharSequence?): B {
-            (findViewById<View?>(id) as TextView?)?.text = text
+        open fun setTextByTextView(@IdRes id: Int, text: CharSequence?): B {
+            findViewById<TextView?>(id)?.text = text
             return this as B
         }
 
         /**
          * 设置文本颜色
          */
-        open fun setTextColor(@IdRes id: Int, @ColorInt color: Int): B {
-            (findViewById<View?>(id) as TextView?)?.setTextColor(color)
-            return this as B
-        }
-
-        /**
-         * 设置提示
-         */
-        open fun setHint(@IdRes viewId: Int, @StringRes stringId: Int): B {
-            return setHint(viewId, getString(stringId))
-        }
-
-        open fun setHint(@IdRes id: Int, text: CharSequence?): B {
-            (findViewById<View?>(id) as TextView?)?.hint = text
+        open fun setTextColorByTextView(@IdRes id: Int, @ColorInt color: Int): B {
+            findViewById<TextView?>(id)?.setTextColor(color)
             return this as B
         }
 
         /**
          * 设置可见状态
          */
-        open fun setVisibility(@IdRes id: Int, visibility: Int): B {
+        open fun setVisibilityByView(@IdRes id: Int, visibility: Int): B {
             findViewById<View?>(id)?.visibility = visibility
             return this as B
         }
@@ -772,11 +759,11 @@ open class BaseDialog constructor(context: Context, @StyleRes themeResId: Int = 
         /**
          * 设置背景
          */
-        open fun setBackground(@IdRes viewId: Int, @DrawableRes drawableId: Int): B {
-            return setBackground(viewId, getDrawable(drawableId))
+        open fun setBackgroundByView(@IdRes viewId: Int, @DrawableRes drawableId: Int): B {
+            return setBackgroundByView(viewId, getDrawable(drawableId))
         }
 
-        open fun setBackground(@IdRes id: Int, drawable: Drawable?): B {
+        open fun setBackgroundByView(@IdRes id: Int, drawable: Drawable?): B {
             findViewById<View?>(id)?.background = drawable
             return this as B
         }
@@ -784,25 +771,30 @@ open class BaseDialog constructor(context: Context, @StyleRes themeResId: Int = 
         /**
          * 设置图片
          */
-        open fun setImageDrawable(@IdRes viewId: Int, @DrawableRes drawableId: Int): B {
-            return setBackground(viewId, getDrawable(drawableId))
+        open fun setDrawableByImageView(@IdRes viewId: Int, @DrawableRes drawableId: Int): B {
+            return setBackgroundByView(viewId, getDrawable(drawableId))
         }
 
-        open fun setImageDrawable(@IdRes id: Int, drawable: Drawable?): B {
-            (findViewById<View?>(id) as ImageView?)?.setImageDrawable(drawable)
+        open fun setDrawableByImageView(@IdRes id: Int, drawable: Drawable?): B {
+            findViewById<ImageView?>(id)?.setImageDrawable(drawable)
             return this as B
         }
 
         /**
          * 设置点击事件
          */
-        open fun setOnClickListener(@IdRes id: Int, listener: OnClickListener<out View>): B {
+        open fun setOnClickListenerByView(@IdRes id: Int, listener: OnClickListener<out View>): B {
             if (clickArray == null) {
                 clickArray = SparseArray()
             }
-            clickArray!!.put(id, listener as OnClickListener<View>)
+            clickArray?.put(id, listener as OnClickListener<View>)
             if (isCreated()) {
-                dialog?.findViewById<View?>(id)?.setOnClickListener(ViewClickWrapper(dialog, listener))
+                dialog?.let {
+                    val view = it.findViewById<View?>(id)
+                    view?.setOnClickListener(
+                        ViewClickWrapper(it, listener as OnClickListener<View>?)
+                    )
+                }
             }
             return this as B
         }
@@ -814,7 +806,7 @@ open class BaseDialog constructor(context: Context, @StyleRes themeResId: Int = 
         open fun create(): BaseDialog {
             // 判断布局是否为空
             if (contentView == null) {
-                throw IllegalArgumentException("are you ok?")
+                throw IllegalArgumentException("Content view must not be null")
             }
 
             // 如果当前正在显示
@@ -840,30 +832,32 @@ open class BaseDialog constructor(context: Context, @StyleRes themeResId: Int = 
 
             // 创建新的 Dialog 对象
             dialog = createDialog(context, themeId)
-            dialog?.let { dialog ->
-                dialog.setContentView(contentView!!)
-                dialog.setCancelable(cancelable)
+            dialog?.let {
+                contentView?.apply {
+                    it.setContentView(this)
+                }
+                it.setCancelable(cancelable)
                 if (cancelable) {
-                    dialog.setCanceledOnTouchOutside(canceledOnTouchOutside)
+                    it.setCanceledOnTouchOutside(canceledOnTouchOutside)
                 }
 
                 for (listener in showListeners) {
-                    dialog.addOnShowListener(listener)
+                    it.addOnShowListener(listener)
                 }
 
                 for (listener in cancelListeners) {
-                    dialog.addOnCancelListener(listener)
+                    it.addOnCancelListener(listener)
                 }
 
                 for (listener in dismissListeners) {
-                    dialog.addOnDismissListener(listener)
+                    it.addOnDismissListener(listener)
                 }
 
                 if (keyListener != null) {
-                    dialog.setOnKeyListener(keyListener)
+                    it.setOnKeyListener(keyListener)
                 }
 
-                val window: Window? = dialog.window
+                val window: Window? = it.window
                 if (window != null) {
                     val params: WindowManager.LayoutParams = window.attributes
                     params.width = width
@@ -885,19 +879,19 @@ open class BaseDialog constructor(context: Context, @StyleRes themeResId: Int = 
                 clickArray?.let { array ->
                     var i = 0
                     while (i < array.size()) {
-                        contentView!!.findViewById<View?>(array.keyAt(i))?.
-                        setOnClickListener(ViewClickWrapper(dialog, array.valueAt(i)))
+                        val view = contentView?.findViewById<View?>(array.keyAt(i))
+                        view?.setOnClickListener(ViewClickWrapper(it, array.valueAt(i)))
                         i++
                     }
                 }
 
                 getContext().getActivity()?.let { activity ->
                     // 将 Dialog 的生命周期和 Activity 绑定在一起
-                    DialogLifecycle.with(activity, dialog)
+                    DialogLifecycle.with(activity, it)
                 }
-                createListener?.onCreate(dialog)
+                createListener?.onCreate(it)
             }
-            return dialog!!
+            return requireNotNull(dialog)
         }
 
         /**
@@ -943,7 +937,7 @@ open class BaseDialog constructor(context: Context, @StyleRes themeResId: Int = 
          * 当前 Dialog 是否显示了
          */
         open fun isShowing(): Boolean {
-            return isCreated() && dialog!!.isShowing
+            return isCreated() && dialog?.isShowing == true
         }
 
         /**
@@ -964,9 +958,9 @@ open class BaseDialog constructor(context: Context, @StyleRes themeResId: Int = 
 
             addOnShowListener(object : OnShowListener {
 
-                override fun onShow(dialog: BaseDialog?) {
+                override fun onShow(dialog: BaseDialog) {
                     removeOnShowListener(this)
-                    dialog?.post(runnable)
+                    dialog.post(runnable)
                 }
             })
         }
@@ -982,9 +976,9 @@ open class BaseDialog constructor(context: Context, @StyleRes themeResId: Int = 
 
             addOnShowListener(object : OnShowListener {
 
-                override fun onShow(dialog: BaseDialog?) {
+                override fun onShow(dialog: BaseDialog) {
                     removeOnShowListener(this)
-                    dialog?.postDelayed(runnable, delayMillis)
+                    dialog.postDelayed(runnable, delayMillis)
                 }
             })
         }
@@ -1002,9 +996,9 @@ open class BaseDialog constructor(context: Context, @StyleRes themeResId: Int = 
         override fun <V : View?> findViewById(@IdRes id: Int): V? {
             if (contentView == null) {
                 // 没有 setContentView 就想 findViewById ?
-                throw IllegalStateException("are you ok?")
+                throw IllegalStateException("You must set content view before finding view")
             }
-            return contentView!!.findViewById(id)
+            return contentView?.findViewById(id)
         }
 
         /**
@@ -1023,7 +1017,7 @@ open class BaseDialog constructor(context: Context, @StyleRes themeResId: Int = 
 
         companion object {
 
-            fun with(activity: Activity, dialog: BaseDialog?) {
+            fun with(activity: Activity, dialog: BaseDialog) {
                 DialogLifecycle(activity, dialog)
             }
         }
@@ -1036,12 +1030,16 @@ open class BaseDialog constructor(context: Context, @StyleRes themeResId: Int = 
         /** Dialog 动画样式（避免 Dialog 从后台返回到前台后再次触发动画效果） */
         private var dialogAnim: Int = 0
 
-        override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {}
+        override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
+            // default implementation ignored
+        }
 
-        override fun onActivityStarted(activity: Activity) {}
+        override fun onActivityStarted(activity: Activity) {
+            // default implementation ignored
+        }
 
         override fun onActivityResumed(activity: Activity) {
-            if (activity !== activity) {
+            if (this.activity !== activity) {
                 return
             }
 
@@ -1077,9 +1075,13 @@ open class BaseDialog constructor(context: Context, @StyleRes themeResId: Int = 
             }
         }
 
-        override fun onActivityStopped(activity: Activity) {}
+        override fun onActivityStopped(activity: Activity) {
+            // default implementation ignored
+        }
 
-        override fun onActivitySaveInstanceState(activity: Activity, outState: Bundle) {}
+        override fun onActivitySaveInstanceState(activity: Activity, outState: Bundle) {
+            // default implementation ignored
+        }
 
         override fun onActivityDestroyed(activity: Activity) {
             if (this.activity !== activity) {
@@ -1097,12 +1099,12 @@ open class BaseDialog constructor(context: Context, @StyleRes themeResId: Int = 
             this.dialog = null
         }
 
-        override fun onShow(dialog: BaseDialog?) {
+        override fun onShow(dialog: BaseDialog) {
             this.dialog = dialog
             registerActivityLifecycleCallbacks()
         }
 
-        override fun onDismiss(dialog: BaseDialog?) {
+        override fun onDismiss(dialog: BaseDialog) {
             this.dialog = null
             unregisterActivityLifecycleCallbacks()
         }
@@ -1137,8 +1139,8 @@ open class BaseDialog constructor(context: Context, @StyleRes themeResId: Int = 
     /**
      * Dialog 监听包装类（修复原生 Dialog 监听器对象导致的内存泄漏）
      */
-    private class ListenersWrapper<T>(referent: T?) :
-        SoftReference<T?>(referent), DialogInterface.OnShowListener,
+    private class ListenersWrapper<T>(listener: T?) :
+        SoftReference<T?>(listener), DialogInterface.OnShowListener,
         DialogInterface.OnCancelListener,
         DialogInterface.OnDismissListener
             where T : DialogInterface.OnShowListener,
@@ -1161,8 +1163,8 @@ open class BaseDialog constructor(context: Context, @StyleRes themeResId: Int = 
     /**
      * 点击事件包装类
      */
-    private class ViewClickWrapper constructor(
-        private val dialog: BaseDialog?,
+    private class ViewClickWrapper(
+        private val dialog: BaseDialog,
         private val listener: OnClickListener<View>?) : View.OnClickListener {
 
         override fun onClick(view: View) {
@@ -1173,10 +1175,10 @@ open class BaseDialog constructor(context: Context, @StyleRes themeResId: Int = 
     /**
      * 显示监听包装类
      */
-    private class ShowListenerWrapper constructor(referent: DialogInterface.OnShowListener?) :
-        SoftReference<DialogInterface.OnShowListener?>(referent), OnShowListener {
+    private class ShowListenerWrapper(listener: DialogInterface.OnShowListener?) :
+        SoftReference<DialogInterface.OnShowListener?>(listener), OnShowListener {
 
-        override fun onShow(dialog: BaseDialog?) {
+        override fun onShow(dialog: BaseDialog) {
             // 在横竖屏切换后监听对象会为空
             get()?.onShow(dialog)
         }
@@ -1185,10 +1187,10 @@ open class BaseDialog constructor(context: Context, @StyleRes themeResId: Int = 
     /**
      * 取消监听包装类
      */
-    private class CancelListenerWrapper constructor(referent: DialogInterface.OnCancelListener?) :
-        SoftReference<DialogInterface.OnCancelListener?>(referent), OnCancelListener {
+    private class CancelListenerWrapper(listener: DialogInterface.OnCancelListener?) :
+        SoftReference<DialogInterface.OnCancelListener?>(listener), OnCancelListener {
 
-        override fun onCancel(dialog: BaseDialog?) {
+        override fun onCancel(dialog: BaseDialog) {
             // 在横竖屏切换后监听对象会为空
             get()?.onCancel(dialog)
         }
@@ -1197,10 +1199,10 @@ open class BaseDialog constructor(context: Context, @StyleRes themeResId: Int = 
     /**
      * 销毁监听包装类
      */
-    private class DismissListenerWrapper constructor(referent: DialogInterface.OnDismissListener?) :
-        SoftReference<DialogInterface.OnDismissListener?>(referent), OnDismissListener {
+    private class DismissListenerWrapper(listener: DialogInterface.OnDismissListener?) :
+        SoftReference<DialogInterface.OnDismissListener?>(listener), OnDismissListener {
 
-        override fun onDismiss(dialog: BaseDialog?) {
+        override fun onDismiss(dialog: BaseDialog) {
             // 在横竖屏切换后监听对象会为空
             get()?.onDismiss(dialog)
         }
@@ -1209,57 +1211,14 @@ open class BaseDialog constructor(context: Context, @StyleRes themeResId: Int = 
     /**
      * 按键监听包装类
      */
-    private class KeyListenerWrapper constructor(private val listener: OnKeyListener?) : DialogInterface.OnKeyListener {
+    private class KeyListenerWrapper(private val listener: OnKeyListener?) : DialogInterface.OnKeyListener {
 
-        override fun onKey(dialog: DialogInterface?, keyCode: Int, event: KeyEvent?): Boolean {
+        override fun onKey(dialog: DialogInterface, keyCode: Int, event: KeyEvent): Boolean {
             // 在横竖屏切换后监听对象会为空
             if (listener == null || dialog !is BaseDialog) {
                 return false
             }
             return listener.onKey(dialog, event)
-        }
-    }
-
-    /**
-     * post 任务包装类
-     */
-    private class ShowPostWrapper constructor(private val runnable: Runnable?) : OnShowListener {
-
-        override fun onShow(dialog: BaseDialog?) {
-            if (runnable == null) {
-                return
-            }
-            dialog?.removeOnShowListener(this)
-            dialog?.post(runnable)
-        }
-    }
-
-    /**
-     * postDelayed 任务包装类
-     */
-    private class ShowPostDelayedWrapper constructor(
-        private val runnable: Runnable?,
-        private val delayMillis: Long) : OnShowListener {
-
-        override fun onShow(dialog: BaseDialog?) {
-            if (runnable == null) {
-                return
-            }
-            dialog?.removeOnShowListener(this)
-            dialog?.postDelayed(runnable, delayMillis)
-        }
-    }
-
-    /**
-     * postAtTime 任务包装类
-     */
-    private class ShowPostAtTimeWrapper constructor(
-        private val runnable: Runnable,
-        private val uptimeMillis: Long) : OnShowListener {
-
-        override fun onShow(dialog: BaseDialog?) {
-            dialog?.removeOnShowListener(this)
-            dialog?.postAtTime(runnable, uptimeMillis)
         }
     }
 
@@ -1271,7 +1230,7 @@ open class BaseDialog constructor(context: Context, @StyleRes themeResId: Int = 
         /**
          * 点击事件触发了
          */
-        fun onClick(dialog: BaseDialog?, view: V)
+        fun onClick(dialog: BaseDialog, view: V)
     }
 
     /**
@@ -1282,7 +1241,7 @@ open class BaseDialog constructor(context: Context, @StyleRes themeResId: Int = 
         /**
          * Dialog 创建了
          */
-        fun onCreate(dialog: BaseDialog?)
+        fun onCreate(dialog: BaseDialog)
     }
 
     /**
@@ -1293,7 +1252,7 @@ open class BaseDialog constructor(context: Context, @StyleRes themeResId: Int = 
         /**
          * Dialog 显示了
          */
-        fun onShow(dialog: BaseDialog?)
+        fun onShow(dialog: BaseDialog)
     }
 
     /**
@@ -1304,7 +1263,7 @@ open class BaseDialog constructor(context: Context, @StyleRes themeResId: Int = 
         /**
          * Dialog 取消了
          */
-        fun onCancel(dialog: BaseDialog?)
+        fun onCancel(dialog: BaseDialog)
     }
 
     /**
@@ -1315,7 +1274,7 @@ open class BaseDialog constructor(context: Context, @StyleRes themeResId: Int = 
         /**
          * Dialog 销毁了
          */
-        fun onDismiss(dialog: BaseDialog?)
+        fun onDismiss(dialog: BaseDialog)
     }
 
     /**
@@ -1326,6 +1285,6 @@ open class BaseDialog constructor(context: Context, @StyleRes themeResId: Int = 
         /**
          * 触发了按键
          */
-        fun onKey(dialog: BaseDialog?, event: KeyEvent?): Boolean
+        fun onKey(dialog: BaseDialog, event: KeyEvent): Boolean
     }
 }

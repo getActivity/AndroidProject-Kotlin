@@ -75,12 +75,12 @@ interface BundleAction {
         return (bundle.getSerializable(name)) as S?
     }
 
-    fun getStringArrayList(name: String): ArrayList<String?>? {
+    fun getStringArrayList(name: String): MutableList<String?>? {
         val bundle: Bundle = getBundle() ?: return null
         return bundle.getStringArrayList(name)
     }
 
-    fun getIntegerArrayList(name: String): ArrayList<Int?>? {
+    fun getIntegerArrayList(name: String): MutableList<Int?>? {
         val bundle: Bundle = getBundle() ?: return null
         return bundle.getIntegerArrayList(name)
     }

@@ -47,8 +47,8 @@ class PlayButton @JvmOverloads constructor(
     private var centerX: Int = 0
     private var centerY: Int = 0
     private var circleRadius: Int = 0
-    private var rectF: RectF? = null
-    private var bgRectF: RectF? = null
+    private var rectF: RectF = RectF()
+    private var bgRectF: RectF = RectF()
     private var fraction: Float = 1f
     private val path: Path
     private val dstPath: Path
@@ -85,14 +85,11 @@ class PlayButton @JvmOverloads constructor(
         circleRadius = width / dp2px(4).toInt()
         centerX = width / 2
         centerY = height / 2
-        rectF = RectF(
-            (centerX - circleRadius).toFloat(), centerY + 0.6f * circleRadius,
-            (centerX + circleRadius).toFloat(), centerY + 2.6f * circleRadius
+        rectF.set((centerX - circleRadius).toFloat(), centerY + 0.6f * circleRadius,
+                 (centerX + circleRadius).toFloat(), centerY + 2.6f * circleRadius
         )
-        bgRectF = RectF(
-            centerX - viewWidth / 2f, centerY - viewHeight / 2f,
-            centerX + viewWidth / 2f, centerY + viewHeight / 2f
-        )
+        bgRectF.set(centerX - viewWidth / 2f, centerY - viewHeight / 2f,
+                   centerX + viewWidth / 2f, centerY + viewHeight / 2f)
         path.moveTo((centerX - circleRadius).toFloat(), centerY + 1.8f * circleRadius)
         path.lineTo((centerX - circleRadius).toFloat(), centerY - 1.8f * circleRadius)
         path.lineTo((centerX + circleRadius).toFloat(), centerY.toFloat())
@@ -107,12 +104,16 @@ class PlayButton @JvmOverloads constructor(
         when (MeasureSpec.getMode(finalWidthMeasureSpec)) {
             MeasureSpec.AT_MOST, MeasureSpec.UNSPECIFIED ->
                 finalWidthMeasureSpec = MeasureSpec.makeMeasureSpec(dp2px(60).toInt(), MeasureSpec.EXACTLY)
-            MeasureSpec.EXACTLY -> {}
+            MeasureSpec.EXACTLY -> {
+                // default implementation ignored
+            }
         }
         when (MeasureSpec.getMode(finalHeightMeasureSpec)) {
             MeasureSpec.AT_MOST, MeasureSpec.UNSPECIFIED ->
                 finalHeightMeasureSpec = MeasureSpec.makeMeasureSpec(dp2px(60).toInt(), MeasureSpec.EXACTLY)
-            MeasureSpec.EXACTLY -> {}
+            MeasureSpec.EXACTLY -> {
+                // default implementation ignored
+            }
         }
         setMeasuredDimension(finalWidthMeasureSpec, finalHeightMeasureSpec)
     }
@@ -128,7 +129,7 @@ class PlayButton @JvmOverloads constructor(
                     centerY + (1.6f * circleRadius) + (10 * circleRadius * fraction), paint)
                 canvas.drawLine((centerX - circleRadius).toFloat(), centerY - 1.6f * circleRadius, (
                             centerX - circleRadius).toFloat(), centerY + 1.6f * circleRadius, paint)
-                canvas.drawArc(bgRectF!!, -105f, 360f, false, paint)
+                canvas.drawArc(bgRectF, -105f, 360f, false, paint)
             }
             fraction <= 0.3 -> {
                 // 右侧直线和下方曲线
@@ -138,20 +139,20 @@ class PlayButton @JvmOverloads constructor(
                 canvas.drawLine((centerX - circleRadius).toFloat(), centerY - 1.6f * circleRadius, (
                             centerX - circleRadius).toFloat(), centerY + 1.6f * circleRadius, paint)
                 if (fraction != 0f) {
-                    canvas.drawArc(rectF!!, 0f, 180f / 0.3f * fraction, false, paint)
+                    canvas.drawArc(rectF, 0f, 180f / 0.3f * fraction, false, paint)
                 }
-                canvas.drawArc(bgRectF!!, -105 + 360 * fraction, 360 * (1 - fraction), false, paint)
+                canvas.drawArc(bgRectF, -105 + 360 * fraction, 360 * (1 - fraction), false, paint)
             }
             fraction <= 0.6 -> {
                 // 下方曲线和三角形
-                canvas.drawArc(rectF!!, 180f / 0.3f * (fraction - 0.3f),
+                canvas.drawArc(rectF, 180f / 0.3f * (fraction - 0.3f),
                     180 - 180f / 0.3f * (fraction - 0.3f), false, paint)
                 dstPath.reset()
                 pathMeasure.getSegment(0.02f * pathLength,
                     0.38f * pathLength + 0.42f * pathLength / 0.3f * (fraction - 0.3f),
                     dstPath, true)
                 canvas.drawPath(dstPath, paint)
-                canvas.drawArc(bgRectF!!, -105 + 360 * fraction, 360 * (1 - fraction), false, paint)
+                canvas.drawArc(bgRectF, -105 + 360 * fraction, 360 * (1 - fraction), false, paint)
             }
             fraction <= 0.8 -> {
                 // 三角形
@@ -159,7 +160,7 @@ class PlayButton @JvmOverloads constructor(
                 pathMeasure.getSegment(0.02f * pathLength + 0.2f * pathLength / 0.2f * (fraction - 0.6f),
                     0.8f * pathLength + 0.2f * pathLength / 0.2f * (fraction - 0.6f), dstPath, true)
                 canvas.drawPath(dstPath, paint)
-                canvas.drawArc(bgRectF!!, -105 + 360 * fraction, 360 * (1 - fraction), false, paint)
+                canvas.drawArc(bgRectF, -105 + 360 * fraction, 360 * (1 - fraction), false, paint)
             }
             else -> {
                 // 弹性部分

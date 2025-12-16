@@ -30,14 +30,14 @@ class PasswordEditText @JvmOverloads constructor(
     OnTouchListener, OnFocusChangeListener, TextWatcher {
 
     private var currentDrawable: Drawable
-    private val visibleDrawable: Drawable = DrawableCompat.wrap(ContextCompat.getDrawable(context, R.drawable.password_off_ic)!!)
+    private val visibleDrawable: Drawable = DrawableCompat.wrap(requireNotNull(ContextCompat.getDrawable(context, R.drawable.password_off_ic)))
     private val invisibleDrawable: Drawable
     private var touchListener: OnTouchListener? = null
     private var focusChangeListener: OnFocusChangeListener? = null
 
     init {
         visibleDrawable.setBounds(0, 0, visibleDrawable.intrinsicWidth, visibleDrawable.intrinsicHeight)
-        invisibleDrawable = DrawableCompat.wrap(ContextCompat.getDrawable(context, R.drawable.password_on_ic)!!)
+        invisibleDrawable = DrawableCompat.wrap(requireNotNull(ContextCompat.getDrawable(context, R.drawable.password_on_ic)))
         invisibleDrawable.setBounds(0, 0, invisibleDrawable.intrinsicWidth, invisibleDrawable.intrinsicHeight)
         currentDrawable = visibleDrawable
 
@@ -87,7 +87,7 @@ class PasswordEditText @JvmOverloads constructor(
     /**
      * [OnFocusChangeListener]
      */
-    override fun onFocusChange(view: View?, hasFocus: Boolean) {
+    override fun onFocusChange(view: View, hasFocus: Boolean) {
         setDrawableVisible(hasFocus && !TextUtils.isEmpty(text))
         focusChangeListener?.onFocusChange(view, hasFocus)
     }
@@ -128,19 +128,23 @@ class PasswordEditText @JvmOverloads constructor(
             }
             return true
         }
-        return touchListener != null && touchListener!!.onTouch(view, event)
+        return touchListener?.onTouch(view, event) == true
     }
 
     /**
      * [TextWatcher]
      */
-    override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-        if (isFocused && s != null) {
+    override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
+        if (isFocused) {
             setDrawableVisible(s.isNotEmpty())
         }
     }
 
-    override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+    override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {
+        // default implementation ignored
+    }
 
-    override fun afterTextChanged(s: Editable?) {}
+    override fun afterTextChanged(s: Editable) {
+        // default implementation ignored
+    }
 }

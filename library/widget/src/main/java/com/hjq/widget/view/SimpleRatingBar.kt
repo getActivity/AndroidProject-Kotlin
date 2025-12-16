@@ -65,8 +65,8 @@ class SimpleRatingBar @JvmOverloads constructor(
         )
         setGradeCount(array.getInt(R.styleable.SimpleRatingBar_gradeCount, 5))
         setGradeSpace(array.getDimension(R.styleable.SimpleRatingBar_gradeSpace, gradeWidth / 4f).toInt())
-        setGradeWidth(array.getDimensionPixelSize(R.styleable.SimpleRatingBar_gradeWidth, normalDrawable!!.intrinsicWidth))
-        setGradeHeight(array.getDimensionPixelSize(R.styleable.SimpleRatingBar_gradeHeight, normalDrawable!!.intrinsicHeight))
+        setGradeWidth(array.getDimensionPixelSize(R.styleable.SimpleRatingBar_gradeWidth, requireNotNull(normalDrawable).intrinsicWidth))
+        setGradeHeight(array.getDimensionPixelSize(R.styleable.SimpleRatingBar_gradeHeight, requireNotNull(normalDrawable).intrinsicHeight))
         when (array.getInt(R.styleable.SimpleRatingBar_gradeStep, 0)) {
             0x01 -> setGradeStep(GradleStep.ONE)
             0x00 -> setGradeStep(GradleStep.HALF)
@@ -110,9 +110,7 @@ class SimpleRatingBar @JvmOverloads constructor(
                     currentGrade = grade
                     optimizationGradeValue()
                     invalidate()
-                    if (listener != null) {
-                        listener!!.onRatingChanged(this, currentGrade, true)
-                    }
+                    listener?.onRatingChanged(this, currentGrade, true)
                 }
             }
         }
@@ -129,15 +127,15 @@ class SimpleRatingBar @JvmOverloads constructor(
             if (currentGrade > i) {
                 if (halfDrawable != null && gradeStep == GradleStep.HALF &&
                     currentGrade.toInt() == i && currentGrade - currentGrade.toInt().toFloat() == 0.5f) {
-                    halfDrawable!!.bounds = gradeBounds
-                    halfDrawable!!.draw(canvas)
+                    requireNotNull(halfDrawable).bounds = gradeBounds
+                    requireNotNull(halfDrawable).draw(canvas)
                 } else {
-                    fillDrawable!!.bounds = gradeBounds
-                    fillDrawable!!.draw(canvas)
+                    requireNotNull(fillDrawable).bounds = gradeBounds
+                    requireNotNull(fillDrawable).draw(canvas)
                 }
             } else {
-                normalDrawable!!.bounds = gradeBounds
-                normalDrawable!!.draw(canvas)
+                requireNotNull(normalDrawable).bounds = gradeBounds
+                requireNotNull(normalDrawable).draw(canvas)
             }
         }
     }
@@ -167,10 +165,10 @@ class SimpleRatingBar @JvmOverloads constructor(
         }
 
         if (this.normalDrawable != null) {
-            if (gradeWidth == this.normalDrawable!!.intrinsicWidth) {
+            if (gradeWidth == requireNotNull(this.normalDrawable).intrinsicWidth) {
                 gradeWidth = 0
             }
-            if (gradeHeight == this.normalDrawable!!.intrinsicHeight) {
+            if (gradeHeight == requireNotNull(this.normalDrawable).intrinsicHeight) {
                 gradeHeight = 0
             }
         }
@@ -178,10 +176,10 @@ class SimpleRatingBar @JvmOverloads constructor(
         this.halfDrawable = halfDrawable
         this.fillDrawable = fillDrawable
         if (gradeWidth == 0) {
-            gradeWidth = this.normalDrawable!!.intrinsicWidth
+            gradeWidth = requireNotNull(this.normalDrawable).intrinsicWidth
         }
         if (gradeHeight == 0) {
-            gradeHeight = this.normalDrawable!!.intrinsicHeight
+            gradeHeight = requireNotNull(this.normalDrawable).intrinsicHeight
         }
         requestLayout()
     }
@@ -236,7 +234,7 @@ class SimpleRatingBar @JvmOverloads constructor(
         requestLayout()
     }
 
-    fun setGradeStep(step: GradleStep?) {
+    fun setGradeStep(step: GradleStep) {
         gradeStep = step
         optimizationGradeValue()
         invalidate()

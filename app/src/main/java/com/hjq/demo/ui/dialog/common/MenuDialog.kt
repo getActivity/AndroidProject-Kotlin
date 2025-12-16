@@ -32,8 +32,9 @@ class MenuDialog {
         private val cancelView: TextView? by lazyFindViewById(R.id.tv_menu_cancel)
 
         private val adapter: MenuAdapter
-        private var listener: OnListener<Any>? = null
         private var autoDismiss = true
+
+        private var listener: OnListener<Any>? = null
 
         init {
             setContentView(R.layout.menu_dialog)
@@ -59,9 +60,11 @@ class MenuDialog {
         }
 
         fun setList(vararg ids: Int): Builder = apply {
-            val data: MutableList<Any> = ArrayList(ids.size)
+            val data: MutableList<Any> = mutableListOf()
             for (id in ids) {
-                data.add(getString(id)!!)
+                getString(id)?.let {
+                    data.add(it)
+                }
             }
             setList(data)
         }
@@ -98,18 +101,18 @@ class MenuDialog {
                 dismiss()
             }
             if (view === cancelView) {
-                listener?.onCancel(getDialog())
+                listener?.onCancel(requireNotNull(getDialog()))
             }
         }
 
         /**
          * [BaseAdapter.OnItemClickListener]
          */
-        override fun onItemClick(recyclerView: RecyclerView?, itemView: View?, position: Int) {
+        override fun onItemClick(recyclerView: RecyclerView, itemView: View, position: Int) {
             if (autoDismiss) {
                 dismiss()
             }
-            listener?.onSelected(getDialog(), position, adapter.getItem(position))
+            listener?.onSelected(requireNotNull(getDialog()), position, adapter.getItem(position))
         }
 
         /**
@@ -156,11 +159,13 @@ class MenuDialog {
         /**
          * 选择条目时回调
          */
-        fun onSelected(dialog: BaseDialog?, position: Int, data: T)
+        fun onSelected(dialog: BaseDialog, position: Int, data: T)
 
         /**
          * 点击取消时回调
          */
-        fun onCancel(dialog: BaseDialog?) {}
+        fun onCancel(dialog: BaseDialog) {
+            // default implementation ignored
+        }
     }
 }

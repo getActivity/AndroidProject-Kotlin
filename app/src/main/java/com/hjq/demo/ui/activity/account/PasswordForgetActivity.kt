@@ -51,7 +51,9 @@ class PasswordForgetActivity : AppActivity(), OnEditorActionListener {
         }
     }
 
-    override fun initData() {}
+    override fun initData() {
+        // default implementation ignored
+    }
 
     @SingleClick
     override fun onClick(view: View) {
@@ -101,11 +103,7 @@ class PasswordForgetActivity : AppActivity(), OnEditorActionListener {
                 return
             }
             if (true) {
-                PasswordResetActivity.start(
-                    this,
-                    phoneView?.text.toString(),
-                    codeView?.text.toString()
-                )
+                PasswordResetActivity.start(this, phoneView?.text.toString(), codeView?.text.toString())
                 finish()
                 return
             }
@@ -119,10 +117,7 @@ class PasswordForgetActivity : AppActivity(), OnEditorActionListener {
                 .request(object : HttpCallbackProxy<HttpData<Any>>(this) {
 
                     override fun onHttpSuccess(data: HttpData<Any>) {
-                        PasswordResetActivity.start(
-                            this@PasswordForgetActivity,
-                            phoneView?.text.toString(), codeView?.text.toString()
-                        )
+                        PasswordResetActivity.start(this@PasswordForgetActivity, phoneView?.text.toString(), codeView?.text.toString())
                         finish()
                     }
                 })
@@ -132,7 +127,7 @@ class PasswordForgetActivity : AppActivity(), OnEditorActionListener {
     /**
      * [TextView.OnEditorActionListener]
      */
-    override fun onEditorAction(v: TextView?, actionId: Int, event: KeyEvent?): Boolean {
+    override fun onEditorAction(v: TextView, actionId: Int, event: KeyEvent): Boolean {
         if (actionId == EditorInfo.IME_ACTION_DONE) {
             // 模拟点击下一步按钮
             commitView?.let {

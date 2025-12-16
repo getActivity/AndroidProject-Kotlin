@@ -63,7 +63,7 @@ class BrowserView  @JvmOverloads constructor(
         log(String.format("loadUrl: url = %s", url))
     }
 
-    override fun loadUrl(url: String, additionalHttpHeaders: Map<String?, String?>) {
+    override fun loadUrl(url: String, additionalHttpHeaders: MutableMap<String?, String?>) {
         super.loadUrl(url, additionalHttpHeaders)
         log(String.format("loadUrl: url = %s, additionalHttpHeaders = %s", url, additionalHttpHeaders))
     }
@@ -115,7 +115,9 @@ class BrowserView  @JvmOverloads constructor(
             Lifecycle.Event.ON_RESUME -> onResume()
             Lifecycle.Event.ON_STOP -> onPause()
             Lifecycle.Event.ON_DESTROY -> onDestroy()
-            else -> {}
+            else -> {
+                // default implementation ignored
+            }
         }
     }
 
@@ -170,6 +172,9 @@ class BrowserView  @JvmOverloads constructor(
     }
 
     protected fun log(message: String?) {
+        if (message == null) {
+            return
+        }
         Timber.i(message)
     }
 }

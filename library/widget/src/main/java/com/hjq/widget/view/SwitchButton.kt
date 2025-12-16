@@ -115,7 +115,9 @@ class SwitchButton @JvmOverloads constructor(
                 finalWidthMeasureSpec = MeasureSpec.makeMeasureSpec(
                     (dp2px(56) + paddingLeft + paddingRight).toInt(), MeasureSpec.EXACTLY)
             }
-            MeasureSpec.EXACTLY -> {}
+            MeasureSpec.EXACTLY -> {
+                // default implementation ignored
+            }
         }
         when (MeasureSpec.getMode(finalHeightMeasureSpec)) {
             MeasureSpec.AT_MOST, MeasureSpec.UNSPECIFIED -> {
@@ -123,7 +125,9 @@ class SwitchButton @JvmOverloads constructor(
                         ((MeasureSpec.getSize(finalWidthMeasureSpec) * aspectRatio).toInt() + paddingTop + paddingBottom),
                     MeasureSpec.EXACTLY)
             }
-            MeasureSpec.EXACTLY -> {}
+            MeasureSpec.EXACTLY -> {
+                // default implementation ignored
+            }
         }
         setMeasuredDimension(finalWidthMeasureSpec, finalHeightMeasureSpec)
     }
@@ -345,7 +349,9 @@ class SwitchButton @JvmOverloads constructor(
                         }
                     }
                 }
-                MotionEvent.ACTION_DOWN -> {}
+                MotionEvent.ACTION_DOWN -> {
+                    // default implementation ignored
+                }
             }
         }
         return true

@@ -16,9 +16,13 @@ class AboutActivity : AppActivity() {
         return R.layout.about_activity
     }
 
-    override fun initView() {}
+    override fun initView() {
 
-    override fun initData() {}
+    }
+
+    override fun initData() {
+
+    }
 
     override fun getImmersionBottomView(): View? {
         return findViewById(R.id.tv_about_copyright)

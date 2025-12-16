@@ -139,7 +139,7 @@ class PlayerView @JvmOverloads constructor(
     private var listener: OnPlayListener? = null
 
     /** 音量管理器 */
-    private val audioManager: AudioManager
+    private val audioManager: AudioManager?
 
     /** 最大音量值 */
     private var maxVoice: Int = 0
@@ -236,7 +236,7 @@ class PlayerView @JvmOverloads constructor(
         videoView.setOnCompletionListener(this)
         videoView.setOnInfoListener(this)
         videoView.setOnErrorListener(this)
-        audioManager = ContextCompat.getSystemService(context, AudioManager::class.java)!!
+        audioManager = ContextCompat.getSystemService(context, AudioManager::class.java)
 
         val activity = context.getActivity()
         if (activity != null) {
@@ -259,7 +259,9 @@ class PlayerView @JvmOverloads constructor(
             Lifecycle.Event.ON_RESUME -> onResume()
             Lifecycle.Event.ON_PAUSE -> onPause()
             Lifecycle.Event.ON_DESTROY -> onDestroy()
-            else -> {}
+            else -> {
+                // default implementation ignored
+            }
         }
     }
 
@@ -632,7 +634,7 @@ class PlayerView @JvmOverloads constructor(
      * [MediaPlayer.OnErrorListener]
      */
     override fun onError(player: MediaPlayer?, what: Int, extra: Int): Boolean {
-        if (listener != null && listener!!.onPlayError(this, what, extra)) {
+        if (listener?.onPlayError(this, what, extra) == true) {
             return true
         }
 
@@ -653,7 +655,7 @@ class PlayerView @JvmOverloads constructor(
             .setCancelable(false)
             .setListener(object : MessageDialog.OnListener {
 
-                override fun onConfirm(dialog: BaseDialog?) {
+                override fun onConfirm(dialog: BaseDialog) {
                     onCompletion(player)
                 }
             })
@@ -731,19 +733,19 @@ class PlayerView @JvmOverloads constructor(
         }
         when (event.action) {
             MotionEvent.ACTION_DOWN -> {
-                maxVoice = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC)
-                currentVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC)
-                window.let {
-                    if (it == null) {
-                        return@let
-                    }
+                audioManager?.let {
+                    maxVoice = it.getStreamMaxVolume(AudioManager.STREAM_MUSIC)
+                    currentVolume = it.getStreamVolume(AudioManager.STREAM_MUSIC)
+                }
 
+                window?.let {
                     currentBrightnessPercent = it.attributes.screenBrightness
                     // 如果当前亮度是默认的，那么就获取系统当前的屏幕亮度
                     if (currentBrightnessPercent == WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_NONE) {
                         currentBrightnessPercent = getBrightness().toFloat() / getMaxBrightness().toFloat()
                     }
                 }
+
                 viewDownX = event.x
                 viewDownY = event.y
                 removeCallbacks(hideControllerRunnable)
@@ -822,52 +824,48 @@ class PlayerView @JvmOverloads constructor(
                         return@run
                     }
 
-                    // 更新系统音量
-                    val voice: Int = min(max(currentVolume + delta, 0f), maxVoice.toFloat()).toInt()
-                    audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, voice, 0)
-                    val percent: Int = voice * 100 / maxVoice
-                    @DrawableRes val iconId: Int
-                    iconId = when {
-                        percent > 100 / 3 * 2 -> {
-                            R.drawable.video_volume_high_ic
+                    audioManager?.let {
+                        // 更新系统音量
+                        val voice: Int = min(max(currentVolume + delta, 0f), maxVoice.toFloat()).toInt()
+                        it.setStreamVolume(AudioManager.STREAM_MUSIC, voice, 0)
+                        val percent: Int = voice * 100 / maxVoice
+                        @DrawableRes val iconId: Int
+                        iconId = when {
+                            percent > 100 / 3 * 2 -> {
+                                R.drawable.video_volume_high_ic
+                            }
+                            percent > 100 / 3 -> {
+                                R.drawable.video_volume_medium_ic
+                            }
+                            percent != 0 -> {
+                                R.drawable.video_volume_low_ic
+                            }
+                            else -> {
+                                R.drawable.video_volume_mute_ic
+                            }
                         }
-                        percent > 100 / 3 -> {
-                            R.drawable.video_volume_medium_ic
-                        }
-                        percent != 0 -> {
-                            R.drawable.video_volume_low_ic
-                        }
-                        else -> {
-                            R.drawable.video_volume_mute_ic
-                        }
+                        lottieView.setImageResource(iconId)
+                        messageView.text = String.format("%s %%", percent)
+                        post(showMessageRunnable)
                     }
-                    lottieView.setImageResource(iconId)
-                    messageView.text = String.format("%s %%", percent)
-                    post(showMessageRunnable)
                     return@run
                 }
             }
-            MotionEvent.ACTION_UP -> {
-                if (abs(viewDownX - event.x) <= ViewConfiguration.get(context).scaledTouchSlop &&
-                    abs(viewDownY - event.y) <= ViewConfiguration.get(context).scaledTouchSlop) {
-                    // 如果整个视频播放区域太大，触摸移动会导致触发点击事件，所以这里换成手动派发点击事件
-                    if (isEnabled && isClickable) {
-                        performClick()
+            MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                if (event.action == MotionEvent.ACTION_UP) {
+                    if (abs(viewDownX - event.x) <= ViewConfiguration.get(context).scaledTouchSlop &&
+                        abs(viewDownY - event.y) <= ViewConfiguration.get(context).scaledTouchSlop) {
+                        // 如果整个视频播放区域太大，触摸移动会导致触发点击事件，所以这里换成手动派发点击事件
+                        if (isEnabled && isClickable) {
+                            performClick()
+                        }
                     }
                 }
+
                 touchOrientation = -1
-                currentVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC)
-                if (adjustSecond != 0) {
-                    // 调整播放进度
-                    setProgress(getProgress() + adjustSecond * 1000)
-                    adjustSecond = 0
+                audioManager?.let {
+                    currentVolume = it.getStreamVolume(AudioManager.STREAM_MUSIC)
                 }
-                postDelayed(hideControllerRunnable, CONTROLLER_TIME.toLong())
-                postDelayed(hideMessageRunnable, DIALOG_TIME.toLong())
-            }
-            MotionEvent.ACTION_CANCEL -> {
-                touchOrientation = -1
-                currentVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC)
                 if (adjustSecond != 0) {
                     setProgress(getProgress() + adjustSecond * 1000)
                     adjustSecond = 0
@@ -920,37 +918,49 @@ class PlayerView @JvmOverloads constructor(
         /**
          * 点击了返回按钮（可在此处处理返回事件）
          */
-        fun onClickBack(view: PlayerView) {}
+        fun onClickBack(view: PlayerView) {
+            // default implementation ignored
+        }
 
         /**
          * 点击了锁定按钮
          */
-        fun onClickLock(view: PlayerView) {}
+        fun onClickLock(view: PlayerView) {
+            // default implementation ignored
+        }
 
         /**
          * 点击了播放按钮
          */
-        fun onClickPlay(view: PlayerView) {}
+        fun onClickPlay(view: PlayerView) {
+            // default implementation ignored
+        }
 
         /**
          * 播放开始（可在此处设置播放进度）
          */
-        fun onPlayStart(view: PlayerView) {}
+        fun onPlayStart(view: PlayerView) {
+            // default implementation ignored
+        }
 
         /**
          * 播放进度发生改变
          */
-        fun onPlayProgress(view: PlayerView) {}
+        fun onPlayProgress(view: PlayerView) {
+            // default implementation ignored
+        }
 
         /**
          * 播放结束（可在此处结束播放或者循环播放）
          */
-        fun onPlayEnd(view: PlayerView) {}
+        fun onPlayEnd(view: PlayerView) {
+            // default implementation ignored
+        }
 
         /**
          * 播放出错
          */
-        fun onPlayError(view: PlayerView?, what: Int, extra: Int): Boolean {
+        fun onPlayError(view: PlayerView, what: Int, extra: Int): Boolean {
             return false
         }
     }

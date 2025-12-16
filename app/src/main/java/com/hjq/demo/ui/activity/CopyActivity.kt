@@ -15,7 +15,11 @@ class CopyActivity : AppActivity() {
         return R.layout.copy_activity
     }
 
-    override fun initView() {}
+    override fun initView() {
 
-    override fun initData() {}
+    }
+
+    override fun initData() {
+
+    }
 }

@@ -222,7 +222,7 @@ class SubmitButton @JvmOverloads constructor(
     private fun drawResult(canvas: Canvas, succeed: Boolean) {
         if (succeed) {
             resultPath.moveTo(-viewHeight / 6f, 0f)
-            resultPath.lineTo(0f, (-viewHeight / 6 + (1 + sqrt(5.0)) * viewHeight / 12).toFloat())
+            resultPath.lineTo(0f, (-viewHeight / 6f + (1 + sqrt(5.0)) * viewHeight / 12).toFloat())
             resultPath.lineTo(viewHeight / 6f, -viewHeight / 6f)
         } else {
             resultPath.moveTo(-viewHeight / 6f, viewHeight / 6f)

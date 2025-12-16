@@ -32,6 +32,10 @@ class ArrowDrawable private constructor(private val builder: Builder) : Drawable
     private val paint: Paint = Paint(Paint.ANTI_ALIAS_FLAG)
     private var path: Path = Path()
 
+    init {
+        paint.style = Paint.Style.FILL
+    }
+
     override fun draw(canvas: Canvas) {
         if (builder.shadowSize > 0) {
             paint.maskFilter = BlurMaskFilter(builder.shadowSize.toFloat(), BlurMaskFilter.Blur.OUTER)
@@ -206,7 +210,8 @@ class ArrowDrawable private constructor(private val builder: Builder) : Drawable
                 Gravity.LEFT, Gravity.TOP, Gravity.RIGHT, Gravity.BOTTOM -> {
                     arrowOrientation = finalOrientation
                 }
-                else -> throw IllegalArgumentException("are you ok?")
+                // 箭头只能在左上右下这四个位置
+                else -> throw IllegalArgumentException("The arrow can only be in the four positions: left, top, right, and bottom")
             }
         }
 
@@ -227,14 +232,16 @@ class ArrowDrawable private constructor(private val builder: Builder) : Drawable
             }
             when (finalGravity) {
                 Gravity.LEFT, Gravity.RIGHT -> if (arrowOrientation == Gravity.LEFT || arrowOrientation == Gravity.RIGHT) {
-                    throw IllegalArgumentException("are you ok?")
+                    throw IllegalArgumentException("The arrow direction cannot be the same as the arrow gravity")
                 }
                 Gravity.TOP, Gravity.BOTTOM -> if (arrowOrientation == Gravity.TOP || arrowOrientation == Gravity.BOTTOM) {
-                    throw IllegalArgumentException("are you ok?")
+                    throw IllegalArgumentException("The arrow direction cannot be the same as the arrow gravity")
                 }
-                Gravity.CENTER_VERTICAL, Gravity.CENTER_HORIZONTAL -> {}
+                Gravity.CENTER_VERTICAL, Gravity.CENTER_HORIZONTAL -> {
+                    // default implementation ignored
+                }
                 else -> {
-                    throw IllegalArgumentException("are you ok?")
+                    throw IllegalArgumentException("The arrow direction cannot be the same as the arrow gravity")
                 }
             }
             arrowGravity = finalGravity
@@ -264,10 +271,10 @@ class ArrowDrawable private constructor(private val builder: Builder) : Drawable
         /**
          * 构建 Drawable
          */
-        fun build(): Drawable {
+        fun build(): ArrowDrawable {
             if (arrowOrientation == Gravity.NO_GRAVITY || arrowGravity == Gravity.NO_GRAVITY) {
                 // 必须要先设置箭头的方向及重心
-                throw IllegalArgumentException("are you ok?")
+                throw IllegalArgumentException("You must set the direction and gravity of the arrow")
             }
             return ArrowDrawable(this)
         }

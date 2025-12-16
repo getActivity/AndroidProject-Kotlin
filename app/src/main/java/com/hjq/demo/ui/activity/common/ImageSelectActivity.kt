@@ -77,7 +77,7 @@ class ImageSelectActivity : AppActivity(), StatusAction, Runnable,
                     val multipleVisualMedia = PickMultipleVisualMedia(maxSelect)
                     val intent = multipleVisualMedia.createIntent(activity, visualMediaRequest)
                     activity.startActivityForResult(intent, null, OnActivityCallback { resultCode, data ->
-                        val uris: List<Uri> = multipleVisualMedia.parseResult(resultCode, data)
+                        val uris: MutableList<Uri> = multipleVisualMedia.parseResult(resultCode, data).toMutableList()
                         if (uris.isEmpty()) {
                             return@OnActivityCallback
                         }
@@ -120,9 +120,7 @@ class ImageSelectActivity : AppActivity(), StatusAction, Runnable,
                             listener.onCancel()
                             return@OnActivityCallback
                         }
-                        val list: ArrayList<String>? = data.getStringArrayListExtra(
-                            INTENT_KEY_OUT_IMAGE_LIST
-                        )
+                        val list: MutableList<String>? = data.getStringArrayListExtra(INTENT_KEY_OUT_IMAGE_LIST)
                         if (list.isNullOrEmpty()) {
                             listener.onCancel()
                             return@OnActivityCallback
@@ -151,13 +149,13 @@ class ImageSelectActivity : AppActivity(), StatusAction, Runnable,
     private var maxSelect: Int = 1
 
     /** 选中列表 */
-    private val selectImage = ArrayList<String>()
+    private val selectImage: MutableList<String> = mutableListOf()
 
     /** 全部图片 */
-    private val allImage = ArrayList<String>()
+    private val allImage: MutableList<String> = mutableListOf()
 
     /** 图片专辑 */
-    private val allAlbum = HashMap<String, MutableList<String>>()
+    private val allAlbum: MutableMap<String, MutableList<String>> = mutableMapOf()
 
     /** 列表适配器 */
     private val adapter: ImageSelectAdapter = ImageSelectAdapter(this, selectImage)
@@ -214,7 +212,7 @@ class ImageSelectActivity : AppActivity(), StatusAction, Runnable,
         if (allImage.isEmpty()) {
             return
         }
-        val data: ArrayList<AlbumInfo> = ArrayList(allAlbum.size + 1)
+        val data: MutableList<AlbumInfo> = mutableListOf()
         var count = 0
         val keys: MutableSet<String> = allAlbum.keys
         for (key: String in keys) {
@@ -231,7 +229,7 @@ class ImageSelectActivity : AppActivity(), StatusAction, Runnable,
         if (albumDialog == null) {
             albumDialog = AlbumDialog.Builder(this)
                 .setListener(object : AlbumDialog.OnListener {
-                    override fun onSelected(dialog: BaseDialog?, position: Int, bean: AlbumInfo) {
+                    override fun onSelected(dialog: BaseDialog, position: Int, bean: AlbumInfo) {
                         setRightTitle(bean.getName())
                         // 滚动回第一个位置
                         recyclerView?.scrollToPosition(0)
@@ -307,7 +305,8 @@ class ImageSelectActivity : AppActivity(), StatusAction, Runnable,
                 }
 
                 // 完成选择
-                setResult(RESULT_OK, Intent().putStringArrayListExtra(INTENT_KEY_OUT_IMAGE_LIST, selectImage))
+                setResult(RESULT_OK, Intent().putStringArrayListExtra(
+                    INTENT_KEY_OUT_IMAGE_LIST, selectImage.toCollection(ArrayList())))
                 finish()
             }
         }
@@ -319,7 +318,7 @@ class ImageSelectActivity : AppActivity(), StatusAction, Runnable,
      * @param itemView          被点击的条目对象
      * @param position          被点击的条目位置
      */
-    override fun onItemClick(recyclerView: RecyclerView?, itemView: View?, position: Int) {
+    override fun onItemClick(recyclerView: RecyclerView, itemView: View, position: Int) {
         ImagePreviewActivity.start(
             this@ImageSelectActivity,
             adapter.getData().toMutableList(),
@@ -333,7 +332,7 @@ class ImageSelectActivity : AppActivity(), StatusAction, Runnable,
      * @param itemView          被点击的条目对象
      * @param position          被点击的条目位置
      */
-    override fun onItemLongClick(recyclerView: RecyclerView?, itemView: View?, position: Int): Boolean {
+    override fun onItemLongClick(recyclerView: RecyclerView, itemView: View, position: Int): Boolean {
         if (selectImage.size < maxSelect) {
             // 长按的时候模拟选中
             itemView?.findViewById<View?>(R.id.fl_image_select_check)?.let {
@@ -349,8 +348,8 @@ class ImageSelectActivity : AppActivity(), StatusAction, Runnable,
      * @param childView         被点击的条目子 View Id
      * @param position          被点击的条目位置
      */
-    override fun onChildClick(recyclerView: RecyclerView?, childView: View?, position: Int) {
-        if (childView?.id == R.id.fl_image_select_check) {
+    override fun onChildClick(recyclerView: RecyclerView, childView: View, position: Int) {
+        if (childView.id == R.id.fl_image_select_check) {
             val path = adapter.getItem(position)
             val file = File(path)
             if (!file.isFile) {
@@ -438,7 +437,7 @@ class ImageSelectActivity : AppActivity(), StatusAction, Runnable,
                 val albumName: String = parentFile.name
                 var data: MutableList<String>? = allAlbum[albumName]
                 if (data == null) {
-                    data = ArrayList()
+                    data = mutableListOf()
                     allAlbum[albumName] = data
                 }
                 data.add(path)
@@ -499,6 +498,8 @@ class ImageSelectActivity : AppActivity(), StatusAction, Runnable,
         /**
          * 取消回调
          */
-        fun onCancel() {}
+        fun onCancel() {
+            // default implementation ignored
+        }
     }
 }

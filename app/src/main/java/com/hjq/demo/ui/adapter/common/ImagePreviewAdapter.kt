@@ -13,7 +13,7 @@ import com.hjq.demo.http.glide.GlideApp
  *    time   : 2020/08/28
  *    desc   : 图片预览适配器
  */
-class ImagePreviewAdapter constructor(context: Context) : AppAdapter<String?>(context) {
+class ImagePreviewAdapter(context: Context) : AppAdapter<String?>(context) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AppViewHolder {
         return ViewHolder()

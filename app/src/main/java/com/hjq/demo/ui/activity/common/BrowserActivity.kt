@@ -21,9 +21,9 @@ import com.hjq.demo.app.AppActivity
 import com.hjq.demo.widget.StatusLayout
 import com.hjq.demo.widget.StatusLayout.OnRetryListener
 import com.hjq.demo.widget.webview.BrowserChromeClient
+import com.hjq.demo.widget.webview.BrowserFullScreenController
 import com.hjq.demo.widget.webview.BrowserView
 import com.hjq.demo.widget.webview.BrowserViewClient
-import com.hjq.demo.widget.webview.FullScreenModeController
 import com.scwang.smart.refresh.layout.SmartRefreshLayout
 import com.scwang.smart.refresh.layout.api.RefreshLayout
 import com.scwang.smart.refresh.layout.listener.OnRefreshListener
@@ -52,7 +52,7 @@ class BrowserActivity : AppActivity(), StatusAction, OnRefreshListener {
         }
     }
 
-    private val fullScreenModeController by lazy { FullScreenModeController() }
+    private val fullScreenController by lazy { BrowserFullScreenController() }
 
     private val statusLayout: StatusLayout? by lazyFindViewById(R.id.sl_browser_status)
     private val progressBar: ProgressBar? by lazyFindViewById(R.id.pb_browser_progress)
@@ -78,7 +78,7 @@ class BrowserActivity : AppActivity(), StatusAction, OnRefreshListener {
         browserView?.apply {
             setBrowserViewClient(AppBrowserViewClient())
             setBrowserChromeClient(AppBrowserChromeClient(this))
-            loadUrl(getString(INTENT_KEY_IN_URL)!!)
+            getString(INTENT_KEY_IN_URL)?.let { loadUrl(it) }
         }
     }
 
@@ -94,11 +94,10 @@ class BrowserActivity : AppActivity(), StatusAction, OnRefreshListener {
         finish()
     }
 
-    override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
+    override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
         if (keyCode == KeyEvent.KEYCODE_BACK) {
-
-            if (fullScreenModeController.isFullScreenMode()) {
-                fullScreenModeController.exitFullScreenMode(this)
+            if (fullScreenController.isFullScreen()) {
+                fullScreenController.exitFullScreen(this)
                 return true
             }
 
@@ -141,12 +140,12 @@ class BrowserActivity : AppActivity(), StatusAction, OnRefreshListener {
             }
         }
 
-        override fun onWebPageLoadStarted(view: WebView, url: String?, favicon: Bitmap?) {
+        override fun onWebPageLoadStarted(view: WebView, url: String, favicon: Bitmap?) {
             super.onWebPageLoadStarted(view, url, favicon)
             progressBar?.visibility = View.VISIBLE
         }
 
-        override fun onWebPageLoadFinished(view: WebView, url: String?, success: Boolean) {
+        override fun onWebPageLoadFinished(view: WebView, url: String, success: Boolean) {
             super.onWebPageLoadFinished(view, url, success)
             progressBar?.visibility = View.GONE
             refreshLayout?.finishRefresh()
@@ -162,22 +161,19 @@ class BrowserActivity : AppActivity(), StatusAction, OnRefreshListener {
         }
     }
 
-    private inner class AppBrowserChromeClient constructor(view: BrowserView) : BrowserChromeClient(view) {
+    private inner class AppBrowserChromeClient(view: BrowserView) : BrowserChromeClient(view) {
 
         /**
          * 收到网页标题
          */
-        override fun onReceivedTitle(view: WebView, title: String?) {
-            if (title == null) {
-                return
-            }
+        override fun onReceivedTitle(view: WebView, title: String) {
             setTitle(title)
         }
 
-        override fun onReceivedIcon(view: WebView, icon: Bitmap?) {
-            if (icon == null) {
-                return
-            }
+        /**
+         * 收到网页图标
+         */
+        override fun onReceivedIcon(view: WebView, icon: Bitmap) {
             setRightIcon(BitmapDrawable(resources, icon))
         }
 
@@ -193,14 +189,14 @@ class BrowserActivity : AppActivity(), StatusAction, OnRefreshListener {
          * 播放视频时进入全屏回调
          */
         override fun onShowCustomView(view: View?, callback: CustomViewCallback?) {
-            fullScreenModeController.enterFullScreenMode(this@BrowserActivity, view, callback)
+            fullScreenController.enterFullScreen(this@BrowserActivity, view, callback)
         }
 
         /**
          * 播放视频时退出全屏回调
          */
         override fun onHideCustomView() {
-            fullScreenModeController.exitFullScreenMode(this@BrowserActivity)
+            fullScreenController.exitFullScreen(this@BrowserActivity)
         }
     }
 }

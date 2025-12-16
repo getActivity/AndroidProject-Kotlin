@@ -61,7 +61,9 @@ class DialogActivity : AppActivity() {
         )
     }
 
-    override fun initData() {}
+    override fun initData() {
+        // default implementation ignored
+    }
 
     override fun getImmersionBottomView(): View? {
         return findViewById(R.id.ll_dialog_content)
@@ -86,11 +88,11 @@ class DialogActivity : AppActivity() {
                     //.setAutoDismiss(false)
                     .setListener(object : MessageDialog.OnListener {
 
-                        override fun onConfirm(dialog: BaseDialog?) {
+                        override fun onConfirm(dialog: BaseDialog) {
                             toast("确定了")
                         }
 
-                        override fun onCancel(dialog: BaseDialog?) {
+                        override fun onCancel(dialog: BaseDialog) {
                             toast("取消了")
                         }
                     })
@@ -114,11 +116,11 @@ class DialogActivity : AppActivity() {
                     //.setAutoDismiss(false)
                     .setListener(object : InputDialog.OnListener {
 
-                        override fun onConfirm(dialog: BaseDialog?, content: String) {
+                        override fun onConfirm(dialog: BaseDialog, content: String) {
                             toast("确定了：$content")
                         }
 
-                        override fun onCancel(dialog: BaseDialog?) {
+                        override fun onCancel(dialog: BaseDialog) {
                             toast("取消了")
                         }
                     })
@@ -126,7 +128,7 @@ class DialogActivity : AppActivity() {
             }
             R.id.btn_dialog_bottom_menu -> {
 
-                val data = ArrayList<String>()
+                val data: MutableList<String> = mutableListOf()
                 for (i in 0..19) {
                     data.add("我是数据" + (i + 1))
                 }
@@ -140,11 +142,11 @@ class DialogActivity : AppActivity() {
                     .setList(data)
                     .setListener(object : MenuDialog.OnListener<String> {
 
-                        override fun onSelected(dialog: BaseDialog?, position: Int, data: String) {
+                        override fun onSelected(dialog: BaseDialog, position: Int, data: String) {
                             toast("位置：$position，文本：$data")
                         }
 
-                        override fun onCancel(dialog: BaseDialog?) {
+                        override fun onCancel(dialog: BaseDialog) {
                             toast("取消了")
                         }
                     })
@@ -153,7 +155,7 @@ class DialogActivity : AppActivity() {
             }
             R.id.btn_dialog_center_menu -> {
 
-                val data = ArrayList<String>()
+                val data: MutableList<String> = mutableListOf()
                 for (i in 0..19) {
                     data.add("我是数据" + (i + 1))
                 }
@@ -167,11 +169,11 @@ class DialogActivity : AppActivity() {
                     .setList(data)
                     .setListener(object : MenuDialog.OnListener<String> {
 
-                        override fun onSelected(dialog: BaseDialog?, position: Int, data: String) {
+                        override fun onSelected(dialog: BaseDialog, position: Int, data: String) {
                             toast("位置：$position，文本：$data")
                         }
 
-                        override fun onCancel(dialog: BaseDialog?) {
+                        override fun onCancel(dialog: BaseDialog) {
                             toast("取消了")
                         }
                     })
@@ -187,11 +189,11 @@ class DialogActivity : AppActivity() {
                     .setSingleSelect() // 设置默认选中
                     .setSelect(0)
                     .setSingleListener(object : OnSingleListener<String?> {
-                        override fun onSelected(dialog: BaseDialog?, position: Int, data: String?) {
+                        override fun onSelected(dialog: BaseDialog, position: Int, data: String?) {
                             toast("位置：$position，数据：$data")
                         }
 
-                        override fun onCancel(dialog: BaseDialog?) {
+                        override fun onCancel(dialog: BaseDialog) {
                             toast("取消了")
                         }
                     })
@@ -209,11 +211,11 @@ class DialogActivity : AppActivity() {
                     .setSelect(2, 3, 4)
                     .setMultiListener(object : SelectDialog.OnMultiListener<String> {
 
-                        override fun onSelected(dialog: BaseDialog?, data: HashMap<Int, String>) {
+                        override fun onSelected(dialog: BaseDialog, data: MutableMap<Int, String>) {
                             toast("确定了：$data")
                         }
 
-                        override fun onCancel(dialog: BaseDialog?) {
+                        override fun onCancel(dialog: BaseDialog) {
                             toast("取消了")
                         }
                     })
@@ -273,11 +275,11 @@ class DialogActivity : AppActivity() {
                     //.setAutoDismiss(false)
                     .setListener(object : PayPasswordDialog.OnListener {
 
-                        override fun onCompleted(dialog: BaseDialog?, password: String) {
+                        override fun onCompleted(dialog: BaseDialog, password: String) {
                             toast(password)
                         }
 
-                        override fun onCancel(dialog: BaseDialog?) {
+                        override fun onCancel(dialog: BaseDialog) {
                             toast("取消了")
                         }
                     })
@@ -296,11 +298,11 @@ class DialogActivity : AppActivity() {
                     //.setIgnoreArea()
                     .setListener(object : AddressDialog.OnListener {
 
-                        override fun onSelected(dialog: BaseDialog?, province: String, city: String, area: String) {
+                        override fun onSelected(dialog: BaseDialog, province: String, city: String, area: String) {
                             toast(province + city + area)
                         }
 
-                        override fun onCancel(dialog: BaseDialog?) {
+                        override fun onCancel(dialog: BaseDialog) {
                             toast("取消了")
                         }
                     })
@@ -330,7 +332,7 @@ class DialogActivity : AppActivity() {
                     //.setIgnoreDay()
                     .setListener(object : DateDialog.OnListener {
 
-                        override fun onSelected(dialog: BaseDialog?, year: Int, month: Int, day: Int) {
+                        override fun onSelected(dialog: BaseDialog, year: Int, month: Int, day: Int) {
                             toast(year.toString() + getString(R.string.common_year) + month +
                                     getString(R.string.common_month) + day + getString(R.string.common_day))
 
@@ -344,7 +346,7 @@ class DialogActivity : AppActivity() {
                             //toast(new SimpleDateFormat("yyyy年MM月dd日 kk:mm:ss").format(calendar.getTime()));
                         }
 
-                        override fun onCancel(dialog: BaseDialog?) {
+                        override fun onCancel(dialog: BaseDialog) {
                             toast("取消了")
                         }
                     })
@@ -373,7 +375,7 @@ class DialogActivity : AppActivity() {
                     //.setIgnoreSecond()
                     .setListener(object : TimeDialog.OnListener {
 
-                        override fun onSelected(dialog: BaseDialog?, hour: Int, minute: Int, second: Int) {
+                        override fun onSelected(dialog: BaseDialog, hour: Int, minute: Int, second: Int) {
                             toast(hour.toString() + getString(R.string.common_hour) + minute + getString(
                                 R.string.common_minute
                             ) + second + getString(R.string.common_second))
@@ -387,7 +389,7 @@ class DialogActivity : AppActivity() {
                             //toast(new SimpleDateFormat("yyyy年MM月dd日 kk:mm:ss").format(calendar.getTime()));
                         }
 
-                        override fun onCancel(dialog: BaseDialog?) {
+                        override fun onCancel(dialog: BaseDialog) {
                             toast("取消了")
                         }
                     })
@@ -407,15 +409,15 @@ class DialogActivity : AppActivity() {
                     .setShareLink(content)
                     .setListener(object : OnShareListener {
 
-                        override fun onShareSuccess(platform: Platform?) {
+                        override fun onShareSuccess(platform: Platform) {
                             toast("分享成功")
                         }
 
-                        override fun onShareFail(platform: Platform?, t: Throwable) {
-                            toast(t.message)
+                        override fun onShareFail(platform: Platform, throwable: Throwable) {
+                            toast(throwable.message)
                         }
 
-                        override fun onShareCancel(platform: Platform?) {
+                        override fun onShareCancel(platform: Platform) {
                             toast("分享取消")
                         }
                     })
@@ -444,11 +446,11 @@ class DialogActivity : AppActivity() {
                 // 身份校验对话框
                 SafeDialog.Builder(this)
                     .setListener(object : SafeDialog.OnListener {
-                        override fun onConfirm(dialog: BaseDialog?, phone: String, code: String) {
+                        override fun onConfirm(dialog: BaseDialog, phone: String, code: String) {
                             toast("手机号：$phone\n验证码：$code")
                         }
 
-                        override fun onCancel(dialog: BaseDialog?) {
+                        override fun onCancel(dialog: BaseDialog) {
                             toast("取消了")
                         }
                     })
@@ -460,9 +462,6 @@ class DialogActivity : AppActivity() {
                 BaseDialog.Builder(this)
                     .setContentView(R.layout.custom_dialog)
                     .setAnimStyle(AnimAction.ANIM_SCALE) //.setText(id, "我是预设置的文本")
-                    .setOnClickListener(R.id.btn_dialog_custom_ok) { dialog, _ ->
-                        dialog?.dismiss()
-                    }
                     .setOnCreateListener { toast("Dialog 创建了") }
                     .addOnShowListener { toast("Dialog 显示了") }
                     .addOnCancelListener { toast("Dialog 取消了") }
@@ -470,6 +469,9 @@ class DialogActivity : AppActivity() {
                     .setOnKeyListener { dialog, event ->
                         toast("按键代码：" + event?.keyCode)
                         return@setOnKeyListener false
+                    }
+                    .setOnClickListenerByView(R.id.btn_dialog_custom_ok) { dialog, _ ->
+                        dialog.dismiss()
                     }
                     .show()
             }
@@ -512,7 +514,7 @@ class DialogActivity : AppActivity() {
             .addOnDismissListener { toast("PopupWindow 销毁了") }
             .setListener(object : ListPopup.OnListener<String> {
 
-                override fun onSelected(popupWindow: BasePopupWindow?, position: Int, data: String) {
+                override fun onSelected(popupWindow: BasePopupWindow, position: Int, data: String) {
                     toast("点击了：$data")
                 }
             })

@@ -67,27 +67,37 @@ abstract class BaseFragment<A : BaseActivity> : Fragment(),
     /**
      * Activity 获取焦点回调
      */
-    protected open fun onActivityStart(attachActivity: A) {}
+    protected open fun onActivityStart(attachActivity: A) {
+        // default implementation ignored
+    }
 
     /**
      * Activity 可见回调
      */
-    protected open fun onActivityResume(attachActivity: A) {}
+    protected open fun onActivityResume(attachActivity: A) {
+        // default implementation ignored
+    }
 
     /**
      * Activity 不可见回调
      */
-    protected open fun onActivityPause(attachActivity: A) {}
+    protected open fun onActivityPause(attachActivity: A) {
+        // default implementation ignored
+    }
 
     /**
      * Activity 失去焦点回调
      */
-    protected open fun onActivityStop(attachActivity: A) {}
+    protected open fun onActivityStop(attachActivity: A) {
+        // default implementation ignored
+    }
 
     /**
      * Activity 销毁时回调
      */
-    protected open fun onActivityDestroy(attachActivity: A) {}
+    protected open fun onActivityDestroy(attachActivity: A) {
+        // default implementation ignored
+    }
 
     override fun onDestroyView() {
         super.onDestroyView()
@@ -196,7 +206,7 @@ abstract class BaseFragment<A : BaseActivity> : Fragment(),
     /**
      * 按键按下事件回调
      */
-    open fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
+    open fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
         // 默认不拦截按键事件
         return false
     }
@@ -204,12 +214,14 @@ abstract class BaseFragment<A : BaseActivity> : Fragment(),
     /**
      * 按键抬起事件回调
      */
-    open fun onKeyUp(keyCode: Int, event: KeyEvent?): Boolean {
+    open fun onKeyUp(keyCode: Int, event: KeyEvent): Boolean {
         // 默认不拦截按键事件
         return false
     }
 
-    override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {}
+    override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
+        // default implementation ignored
+    }
 
     override fun onActivityStarted(activity: Activity) {
         if (activity !== this.activity) {
@@ -239,7 +251,9 @@ abstract class BaseFragment<A : BaseActivity> : Fragment(),
         onActivityStop(activity)
     }
 
-    override fun onActivitySaveInstanceState(activity: Activity, outState: Bundle) {}
+    override fun onActivitySaveInstanceState(activity: Activity, outState: Bundle) {
+        // default implementation ignored
+    }
 
     override fun onActivityDestroyed(activity: Activity) {
         if (activity !== this.activity) {

@@ -28,6 +28,7 @@ import com.hjq.base.ktx.startActivity
 import com.hjq.demo.R
 import com.hjq.demo.aop.SingleClick
 import com.hjq.demo.app.AppActivity
+import com.hjq.demo.ktx.getSdkVersion
 import com.hjq.demo.other.AppConfig
 import com.tencent.bugly.library.Bugly
 import kotlinx.coroutines.Dispatchers
@@ -62,11 +63,7 @@ class CrashActivity : AppActivity() {
         /** 报错代码行数正则表达式 */
         private val CODE_REGEX: Pattern = Pattern.compile("\\(\\w+\\.\\w+:\\d+\\)")
 
-        fun start(application: Application, throwable: Throwable?) {
-            if (throwable == null) {
-                return
-            }
-
+        fun start(application: Application, throwable: Throwable) {
             application.startActivity(CrashActivity::class.java) {
                 putExtra(INTENT_KEY_IN_THROWABLE, throwable)
             }
@@ -103,42 +100,44 @@ class CrashActivity : AppActivity() {
         throwable.printStackTrace(printWriter)
         throwable.cause?.printStackTrace(printWriter)
         stackTrace = stringWriter.toString()
-        val matcher: Matcher = CODE_REGEX.matcher(stackTrace!!)
-        val spannable = SpannableStringBuilder(stackTrace)
-        if (spannable.isNotEmpty()) {
-            while (matcher.find()) {
-                // 不包含左括号（
-                val start: Int = matcher.start() + "(".length
-                // 不包含右括号 ）
-                val end: Int = matcher.end() - ")".length
+        stackTrace?.let {
+            val matcher: Matcher = CODE_REGEX.matcher(it)
+            val spannable = SpannableStringBuilder(it)
+            if (spannable.isNotEmpty()) {
+                while (matcher.find()) {
+                    // 不包含左括号（
+                    val start: Int = matcher.start() + "(".length
+                    // 不包含右括号 ）
+                    val end: Int = matcher.end() - ")".length
 
-                // 代码信息颜色
-                var codeColor: Int = Color.parseColor("#999999")
-                val lineIndex: Int = stackTrace!!.lastIndexOf("at ", start)
-                if (lineIndex != -1) {
-                    val lineData: String = spannable.subSequence(lineIndex, start).toString()
-                    if (TextUtils.isEmpty(lineData)) {
-                        continue
-                    }
-                    // 是否高亮代码行数
-                    var highlight = true
-                    for (packagePrefix: String? in SYSTEM_PACKAGE_PREFIX_LIST) {
-                        if (lineData.startsWith("at $packagePrefix")) {
-                            highlight = false
-                            break
+                    // 代码信息颜色
+                    var codeColor: Int = Color.parseColor("#999999")
+                    val lineIndex: Int = it.lastIndexOf("at ", start)
+                    if (lineIndex != -1) {
+                        val lineData: String = spannable.subSequence(lineIndex, start).toString()
+                        if (TextUtils.isEmpty(lineData)) {
+                            continue
+                        }
+                        // 是否高亮代码行数
+                        var highlight = true
+                        for (packagePrefix: String? in SYSTEM_PACKAGE_PREFIX_LIST) {
+                            if (lineData.startsWith("at $packagePrefix")) {
+                                highlight = false
+                                break
+                            }
+                        }
+                        if (highlight) {
+                            codeColor = Color.parseColor("#287BDE")
                         }
                     }
-                    if (highlight) {
-                        codeColor = Color.parseColor("#287BDE")
-                    }
-                }
 
-                // 设置前景
-                spannable.setSpan(ForegroundColorSpan(codeColor), start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
-                // 设置下划线
-                spannable.setSpan(UnderlineSpan(), start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                    // 设置前景
+                    spannable.setSpan(ForegroundColorSpan(codeColor), start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                    // 设置下划线
+                    spannable.setSpan(UnderlineSpan(), start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                }
+                messageView?.text = spannable
             }
-            messageView?.text = spannable
         }
         val displayMetrics: DisplayMetrics = resources.displayMetrics
         val screenWidth: Int = displayMetrics.widthPixels
@@ -177,7 +176,7 @@ class CrashActivity : AppActivity() {
             .append("\n最小宽度：\t").append(smallestWidth.toInt())
 
         builder.append("\n安卓版本：\t").append(Build.VERSION.RELEASE)
-            .append("\nAPI 版本：\t").append(Build.VERSION.SDK_INT)
+            .append("\nAPI 版本：\t").append(getSdkVersion())
             .append("\nCPU 架构：\t").append(Build.SUPPORTED_ABIS[0])
 
         builder.append("\n应用版本：\t").append(AppConfig.getVersionName())
@@ -190,8 +189,8 @@ class CrashActivity : AppActivity() {
                 .append(dateFormat.format(Date(packageInfo.firstInstallTime)))
                 .append("\n最近安装：\t").append(dateFormat.format(Date(packageInfo.lastUpdateTime)))
                 .append("\n崩溃时间：\t").append(dateFormat.format(Date()))
-            val permissions: MutableList<String> = packageInfo.requestedPermissions?.toMutableList() ?: mutableListOf()
-            if (permissions.contains(Manifest.permission.INTERNET)) {
+            val permissionsManifest: MutableList<String> = packageInfo.requestedPermissions?.toMutableList() ?: mutableListOf()
+            if (permissionsManifest.contains(Manifest.permission.INTERNET)) {
                 builder.append("\n当前网络访问：\t")
 
                 lifecycleScope.launch(Dispatchers.IO) {

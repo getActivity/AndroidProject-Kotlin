@@ -13,7 +13,7 @@ import com.hjq.demo.app.AppAdapter
  *    time   : 2019/09/22
  *    desc   : 状态数据列表
  */
-class StatusAdapter constructor(context: Context) : AppAdapter<String?>(context) {
+class StatusAdapter(context: Context) : AppAdapter<String?>(context) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AppViewHolder {
         return ViewHolder()

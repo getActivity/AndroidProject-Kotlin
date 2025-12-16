@@ -10,9 +10,9 @@ import com.umeng.socialize.bean.SHARE_MEDIA
  */
 enum class Platform(
     /** 第三方平台 */
-    private val thirdParty: SHARE_MEDIA?,
+    private val thirdParty: SHARE_MEDIA,
     /** 第三方包名 */
-    private val packageName: String?
+    private val packageName: String
 ) {
     /** 微信 */
     WECHAT(SHARE_MEDIA.WEIXIN, "com.tencent.mm"),
@@ -26,11 +26,11 @@ enum class Platform(
     /** QQ 空间 */
     QZONE(SHARE_MEDIA.QZONE, "com.tencent.mobileqq");
 
-    fun getThirdParty(): SHARE_MEDIA? {
+    fun getThirdParty(): SHARE_MEDIA {
         return thirdParty
     }
 
-    fun getPackageName(): String? {
+    fun getPackageName(): String {
         return packageName
     }
 }

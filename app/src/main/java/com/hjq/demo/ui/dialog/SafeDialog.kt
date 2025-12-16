@@ -91,7 +91,7 @@ class SafeDialog {
                     }
                     if (true) {
                         performClickDismiss()
-                        listener?.onConfirm(getDialog(), phoneNumber, codeView?.text.toString())
+                        listener?.onConfirm(requireNotNull(getDialog()), phoneNumber, codeView?.text.toString())
                         return
                     }
 
@@ -105,7 +105,7 @@ class SafeDialog {
 
                             override fun onHttpSuccess(data: HttpData<Any>) {
                                 performClickDismiss()
-                                listener?.onConfirm(getDialog(), phoneNumber, codeView?.text.toString())
+                                listener?.onConfirm(requireNotNull(getDialog()), phoneNumber, codeView?.text.toString())
                             }
 
                             override fun onHttpFail(throwable: Throwable) {
@@ -115,7 +115,7 @@ class SafeDialog {
                 }
                 R.id.tv_ui_cancel -> {
                     performClickDismiss()
-                    listener?.onCancel(getDialog())
+                    listener?.onCancel(requireNotNull(getDialog()))
                 }
             }
         }
@@ -126,11 +126,13 @@ class SafeDialog {
         /**
          * 点击确定时回调
          */
-        fun onConfirm(dialog: BaseDialog?, phone: String, code: String)
+        fun onConfirm(dialog: BaseDialog, phone: String, code: String)
 
         /**
          * 点击取消时回调
          */
-        fun onCancel(dialog: BaseDialog?) {}
+        fun onCancel(dialog: BaseDialog) {
+            // default implementation ignored
+        }
     }
 }

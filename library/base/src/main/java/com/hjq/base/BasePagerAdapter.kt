@@ -14,14 +14,14 @@ import androidx.viewpager.widget.ViewPager
  *    desc   : FragmentPagerAdapter 封装
  */
 @Suppress("deprecation")
-open class BasePagerAdapter<F : Fragment> constructor(manager: FragmentManager) :
+open class BasePagerAdapter<F : Fragment>(manager: FragmentManager) :
     FragmentPagerAdapter(manager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
 
     /** Fragment 集合 */
-    private val fragmentSet: MutableList<F> = ArrayList()
+    private val fragmentSet: MutableList<F> = mutableListOf()
 
     /** Fragment 标题 */
-    private val fragmentTitle: MutableList<CharSequence?> = ArrayList()
+    private val fragmentTitle: MutableList<CharSequence?> = mutableListOf()
 
     /** 当前显示的Fragment */
     private var showFragment: F? = null

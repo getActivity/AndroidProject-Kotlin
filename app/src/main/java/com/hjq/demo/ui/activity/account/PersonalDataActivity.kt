@@ -101,7 +101,7 @@ class PersonalDataActivity : AppActivity() {
                 //.setAutoDismiss(false)
                 .setListener(object : InputDialog.OnListener {
 
-                    override fun onConfirm(dialog: BaseDialog?, content: String) {
+                    override fun onConfirm(dialog: BaseDialog, content: String) {
                         nameView?.let {
                             if (it.getRightText() != content) {
                                 it.setRightText(content)
@@ -118,7 +118,7 @@ class PersonalDataActivity : AppActivity() {
                 //.setIgnoreArea()
                 .setListener(object : AddressDialog.OnListener {
 
-                    override fun onSelected(dialog: BaseDialog?, province: String, city: String, area: String) {
+                    override fun onSelected(dialog: BaseDialog, province: String, city: String, area: String) {
                         addressView?.let {
                             val address: String = province + city + area
                             if (it.getRightText() != address) {

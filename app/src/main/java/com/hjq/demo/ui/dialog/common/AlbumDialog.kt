@@ -25,9 +25,10 @@ class AlbumDialog {
     
     class Builder(context: Context) : BaseDialog.Builder<Builder>(context), BaseAdapter.OnItemClickListener {
 
-        private var listener: OnListener? = null
         private val recyclerView: RecyclerView? by lazyFindViewById(R.id.rv_album_list)
         private val adapter: AlbumAdapter
+
+        private var listener: OnListener? = null
 
         init {
             setContentView(R.layout.album_dialog)
@@ -51,7 +52,7 @@ class AlbumDialog {
             this.listener = listener
         }
 
-        override fun onItemClick(recyclerView: RecyclerView?, itemView: View?, position: Int) {
+        override fun onItemClick(recyclerView: RecyclerView, itemView: View, position: Int) {
             val data = adapter.getData()
             for (info in data) {
                 if (info.isSelect()) {
@@ -64,7 +65,7 @@ class AlbumDialog {
 
             // 延迟消失
             postDelayed({
-                listener?.onSelected(getDialog(), position, adapter.getItem(position))
+                listener?.onSelected(requireNotNull(getDialog()), position, adapter.getItem(position))
                 dismiss()
             }, 300)
         }
@@ -76,7 +77,7 @@ class AlbumDialog {
         }
     }
 
-    class AlbumAdapter constructor(context: Context) : AppAdapter<AlbumInfo>(context) {
+    class AlbumAdapter(context: Context) : AppAdapter<AlbumInfo>(context) {
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AppViewHolder {
             return ViewHolder()
@@ -114,19 +115,11 @@ class AlbumDialog {
         /** 封面 */
         private val icon: String,
         /** 名称 */
-        private var name: String,
+        private val name: String,
         /** 备注 */
         private val remark: String,
         /** 选中 */
         private var select: Boolean) {
-
-        fun setName(name: String) {
-            this.name = name
-        }
-
-        fun setSelect(select: Boolean) {
-            this.select = select
-        }
 
         fun getIcon(): String {
             return icon
@@ -143,6 +136,10 @@ class AlbumDialog {
         fun isSelect(): Boolean {
             return select
         }
+
+        fun setSelect(select: Boolean) {
+            this.select = select
+        }
     }
 
     interface OnListener {
@@ -150,6 +147,6 @@ class AlbumDialog {
         /**
          * 选择条目时回调
          */
-        fun onSelected(dialog: BaseDialog?, position: Int, bean: AlbumInfo)
+        fun onSelected(dialog: BaseDialog, position: Int, bean: AlbumInfo)
     }
 }

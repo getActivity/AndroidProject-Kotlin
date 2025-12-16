@@ -27,9 +27,10 @@ class ListPopup {
     class Builder(context: Context) : BasePopupWindow.Builder<Builder>(context),
         BaseAdapter.OnItemClickListener {
 
-        private var listener: OnListener<Any>? = null
         private var autoDismiss = true
         private val adapter: MenuAdapter
+
+        private var listener: OnListener<Any>? = null
 
         init {
             val recyclerView = RecyclerView(context)
@@ -61,9 +62,11 @@ class ListPopup {
         }
 
         fun setList(vararg ids: Int): Builder = apply {
-            val data: MutableList<Any> = ArrayList(ids.size)
+            val data: MutableList<Any> = mutableListOf()
             for (id in ids) {
-                data.add(getString(id)!!)
+                getString(id)?.let {
+                    data.add(it)
+                }
             }
             setList(data)
         }
@@ -88,11 +91,11 @@ class ListPopup {
         /**
          * [BaseAdapter.OnItemClickListener]
          */
-        override fun onItemClick(recyclerView: RecyclerView?, itemView: View?, position: Int) {
+        override fun onItemClick(recyclerView: RecyclerView, itemView: View, position: Int) {
             if (autoDismiss) {
                 dismiss()
             }
-            listener?.onSelected(getPopupWindow(), position, adapter.getItem(position))
+            listener?.onSelected(requireNotNull(getPopupWindow()), position, adapter.getItem(position))
         }
     }
 
@@ -127,6 +130,6 @@ class ListPopup {
         /**
          * 选择条目时回调
          */
-        fun onSelected(popupWindow: BasePopupWindow?, position: Int, data: T)
+        fun onSelected(popupWindow: BasePopupWindow, position: Int, data: T)
     }
 }

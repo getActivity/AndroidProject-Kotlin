@@ -158,7 +158,7 @@ open class BottomSheetDialog @JvmOverloads constructor(context: Context, themeRe
      * [OnTouchListener]
      */
     @Suppress("ClickableViewAccessibility")
-    override fun onTouch(view: View?, event: MotionEvent?): Boolean {
+    override fun onTouch(view: View, event: MotionEvent): Boolean {
         return true
     }
 
@@ -170,7 +170,9 @@ open class BottomSheetDialog @JvmOverloads constructor(context: Context, themeRe
             }
         }
 
-        override fun onSlide(bottomSheet: View, slideOffset: Float) {}
+        override fun onSlide(bottomSheet: View, slideOffset: Float) {
+            // default implementation ignored
+        }
     }
 
     private inner class BehaviorAccessibilityDelegate : AccessibilityDelegateCompat() {

@@ -49,11 +49,11 @@ class UmengShare {
          * 分享失败的回调
          *
          * @param platform      平台名称
-         * @param t             错误原因
+         * @param throwable             错误原因
          */
-        override fun onError(platform: SHARE_MEDIA, t: Throwable) {
-            t.printStackTrace()
-            listener?.onShareFail(this.platform, t)
+        override fun onError(platform: SHARE_MEDIA, throwable: Throwable) {
+            throwable.printStackTrace()
+            listener?.onShareFail(this.platform, throwable)
             listener = null
         }
 
@@ -75,28 +75,34 @@ class UmengShare {
          *
          * @param platform      平台对象
          */
-        fun onShareStart(platform: Platform?) {}
+        fun onShareStart(platform: Platform) {
+            // default implementation ignored
+        }
 
         /**
          * 分享成功的回调
          *
          * @param platform      平台对象
          */
-        fun onShareSuccess(platform: Platform?)
+        fun onShareSuccess(platform: Platform)
 
         /**
          * 分享失败的回调
          *
          * @param platform      平台对象
-         * @param t             错误原因
+         * @param throwable     错误原因
          */
-        fun onShareFail(platform: Platform?, t: Throwable) {}
+        fun onShareFail(platform: Platform, throwable: Throwable) {
+            // default implementation ignored
+        }
 
         /**
          * 分享取消的回调
          *
          * @param platform      平台对象
          */
-        fun onShareCancel(platform: Platform?) {}
+        fun onShareCancel(platform: Platform) {
+            // default implementation ignored
+        }
     }
 }

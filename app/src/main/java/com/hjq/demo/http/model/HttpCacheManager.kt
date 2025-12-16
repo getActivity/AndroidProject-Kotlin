@@ -6,7 +6,7 @@ import com.tencent.mmkv.MMKV
 
 /**
  *    author : Android 轮子哥
- *    github : https://github.com/getActivity/AndroidProject
+ *    github : https://github.com/getActivity/AndroidProject-Kotlin
  *    time   : 2022/03/22
  *    desc   : Http 缓存管理器
  */
@@ -21,7 +21,7 @@ object HttpCacheManager {
      */
     fun generateCacheKey(httpRequest: HttpRequest<*>): String {
         val requestApi = httpRequest.requestApi
-        return "请替换成当前的用户 id" + "\n" + requestApi.getApi() + "\n" + GsonFactory.getSingletonGson().toJson(requestApi)
+        return "请替换成当前的用户 id" + "\n" + requestApi.api + "\n" + GsonFactory.getSingletonGson().toJson(requestApi)
     }
 
     /**

@@ -40,7 +40,7 @@ interface ResourcesAction {
         return ContextCompat.getColor(getContext(), id)
     }
 
-    fun <S> getSystemService(serviceClass: Class<S>): S {
-        return ContextCompat.getSystemService(getContext(), serviceClass)!!
+    fun <S> getSystemService(serviceClass: Class<S>): S? {
+        return ContextCompat.getSystemService(getContext(), serviceClass)
     }
 }

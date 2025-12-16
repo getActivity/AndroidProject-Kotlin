@@ -51,15 +51,14 @@ class RegisterActivity : AppActivity(), OnEditorActionListener {
                 intent.putExtra(INTENT_KEY_PHONE, phone)
                 intent.putExtra(INTENT_KEY_PASSWORD, password)
             }, OnActivityCallback { resultCode, data ->
-                if (listener == null || data == null) {
+                if (data == null) {
                     return@OnActivityCallback
                 }
                 if (resultCode == RESULT_OK) {
-                    listener.onRegisterSuccess(data.getStringExtra(INTENT_KEY_PHONE), data.getStringExtra(
-                        INTENT_KEY_PASSWORD
-                    ))
+                    listener?.onRegisterSuccess(data.getStringExtra(INTENT_KEY_PHONE) ?: "",
+                                            data.getStringExtra(INTENT_KEY_PASSWORD) ?: "")
                 } else {
-                    listener.onRegisterCancel()
+                    listener?.onRegisterCancel()
                 }
             })
         }
@@ -193,7 +192,9 @@ class RegisterActivity : AppActivity(), OnEditorActionListener {
                         commitView?.showProgress()
                     }
 
-                    override fun onHttpEnd(api: IRequestApi) {}
+                    override fun onHttpEnd(api: IRequestApi) {
+                        // default implementation ignored
+                    }
 
                     override fun onHttpSuccess(data: HttpData<RegisterApi.Bean?>) {
                         postDelayed({
@@ -224,7 +225,7 @@ class RegisterActivity : AppActivity(), OnEditorActionListener {
     /**
      * [TextView.OnEditorActionListener]
      */
-    override fun onEditorAction(v: TextView?, actionId: Int, event: KeyEvent?): Boolean {
+    override fun onEditorAction(v: TextView, actionId: Int, event: KeyEvent): Boolean {
         if (actionId == EditorInfo.IME_ACTION_DONE) {
             // 模拟点击注册按钮
             commitView?.let {
@@ -248,11 +249,13 @@ class RegisterActivity : AppActivity(), OnEditorActionListener {
          * @param phone             手机号
          * @param password          密码
          */
-        fun onRegisterSuccess(phone: String?, password: String?)
+        fun onRegisterSuccess(phone: String, password: String)
 
         /**
          * 取消注册
          */
-        fun onRegisterCancel() {}
+        fun onRegisterCancel() {
+            // default implementation ignored
+        }
     }
 }

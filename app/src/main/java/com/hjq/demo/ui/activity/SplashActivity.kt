@@ -54,12 +54,12 @@ class SplashActivity : AppActivity() {
                 PrivacyAgreementDialog.Builder(this@SplashActivity)
                     .setListener(object : MessageDialog.OnListener {
 
-                        override fun onConfirm(dialog: BaseDialog?) {
+                        override fun onConfirm(dialog: BaseDialog) {
                             InitManager.setAgreePrivacy(this@SplashActivity, true)
                             agreePrivacyAfter()
                         }
 
-                        override fun onCancel(dialog: BaseDialog?) {
+                        override fun onCancel(dialog: BaseDialog) {
                             ActivityManager.finishAllActivities()
                         }
                     })

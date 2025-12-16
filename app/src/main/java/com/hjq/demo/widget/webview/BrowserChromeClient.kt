@@ -27,11 +27,10 @@ import com.hjq.permissions.XXPermissions
 import com.hjq.permissions.permission.PermissionLists
 import com.hjq.permissions.permission.base.IPermission
 import timber.log.Timber
-import java.util.Arrays
 
 /**
  *    author : Android 轮子哥
- *    github : https://github.com/getActivity/AndroidProject
+ *    github : https://github.com/getActivity/AndroidProject-Kotlin
  *    time   : 2019/09/24
  *    desc   : 基于原生 WebChromeClient 封装
  */
@@ -45,23 +44,23 @@ open class BrowserChromeClient(private val browserView: BrowserView) : WebChrome
     /**
      * 网页在控制台打印日志时回调
      */
-    override fun onConsoleMessage(consoleMessage: ConsoleMessage?): Boolean {
-        if (consoleMessage != null) {
-            var priority = -1
-            when (consoleMessage.messageLevel()) {
-                ConsoleMessage.MessageLevel.TIP, ConsoleMessage.MessageLevel.LOG -> priority = Log.INFO
-                ConsoleMessage.MessageLevel.WARNING -> priority = Log.WARN
-                ConsoleMessage.MessageLevel.ERROR -> priority = Log.ERROR
-                ConsoleMessage.MessageLevel.DEBUG -> priority = Log.DEBUG
-                else -> {}
+    override fun onConsoleMessage(consoleMessage: ConsoleMessage): Boolean {
+        var priority = -1
+        when (consoleMessage.messageLevel()) {
+            ConsoleMessage.MessageLevel.TIP, ConsoleMessage.MessageLevel.LOG -> priority = Log.INFO
+            ConsoleMessage.MessageLevel.WARNING -> priority = Log.WARN
+            ConsoleMessage.MessageLevel.ERROR -> priority = Log.ERROR
+            ConsoleMessage.MessageLevel.DEBUG -> priority = Log.DEBUG
+            else -> {
+                // default implementation ignored
             }
-            if (priority > 0) {
-                // 打印一份网页的日志到 Logcat 上面
-                Timber.log(
-                    priority, "WebView onConsoleMessage：lineNumber = %s, sourceId = %s, message = %s",
-                    consoleMessage.lineNumber().toString(), consoleMessage.sourceId(), consoleMessage.message()
-                )
-            }
+        }
+        if (priority > 0) {
+            // 打印一份网页的日志到 Logcat 上面
+            Timber.log(
+                priority, "WebView onConsoleMessage：lineNumber = %s, sourceId = %s, message = %s",
+                consoleMessage.lineNumber().toString(), consoleMessage.sourceId(), consoleMessage.message()
+            )
         }
         return super.onConsoleMessage(consoleMessage)
     }
@@ -71,7 +70,7 @@ open class BrowserChromeClient(private val browserView: BrowserView) : WebChrome
      */
     override fun onPermissionRequest(request: PermissionRequest) {
         log(String.format("onPermissionRequest: requestOrigin = %s, requestResources = %s",
-                        request.origin, Arrays.toString(request.resources)))
+                          request.origin, request.resources.contentToString()))
         val permissions: MutableList<IPermission> = mutableListOf()
         val requestResources = request.resources
         if (requestResources == null) {
@@ -131,7 +130,7 @@ open class BrowserChromeClient(private val browserView: BrowserView) : WebChrome
     /**
      * 网页弹出警告框
      */
-    override fun onJsAlert(view: WebView, url: String, message: String, result: JsResult): Boolean {
+    override fun onJsAlert(view: WebView, url: String, message: String, result: JsResult?): Boolean {
         log(String.format("onJsAlert: url = %s, message = %s", url, message))
         val activity: Activity = browserView.context.getActivity() ?: return false
         TipsDialog.Builder(activity)
@@ -140,7 +139,7 @@ open class BrowserChromeClient(private val browserView: BrowserView) : WebChrome
             .setCancelable(false)
             .addOnDismissListener {
                 log("onJsAlert: call result.confirm()")
-                result.confirm()
+                result?.confirm()
             }
             .show()
         return true
@@ -149,7 +148,7 @@ open class BrowserChromeClient(private val browserView: BrowserView) : WebChrome
     /**
      * 网页弹出确定取消框
      */
-    override fun onJsConfirm(view: WebView, url: String, message: String, result: JsResult): Boolean {
+    override fun onJsConfirm(view: WebView, url: String, message: String, result: JsResult?): Boolean {
         log(String.format("onJsConfirm: url = %s, message = %s", url, message))
         val activity: Activity = browserView.context.getActivity() ?: return false
         MessageDialog.Builder(activity)
@@ -157,14 +156,14 @@ open class BrowserChromeClient(private val browserView: BrowserView) : WebChrome
             .setCancelable(false)
             .setListener(object : MessageDialog.OnListener {
 
-                override fun onConfirm(dialog: BaseDialog?) {
+                override fun onConfirm(dialog: BaseDialog) {
                     log("onJsConfirm: call result.confirm()")
-                    result.confirm()
+                    result?.confirm()
                 }
 
-                override fun onCancel(dialog: BaseDialog?) {
+                override fun onCancel(dialog: BaseDialog) {
                     log("onJsConfirm: call result.cancel()")
-                    result.cancel()
+                    result?.cancel()
                 }
             })
             .show()
@@ -174,7 +173,7 @@ open class BrowserChromeClient(private val browserView: BrowserView) : WebChrome
     /**
      * 网页弹出输入框
      */
-    override fun onJsPrompt(view: WebView, url: String, message: String, defaultValue: String, result: JsPromptResult): Boolean {
+    override fun onJsPrompt(view: WebView, url: String, message: String, defaultValue: String, result: JsPromptResult?): Boolean {
         log(String.format("onJsPrompt: url = %s, message = %s, defaultValue = %s", url, message, defaultValue))
         val activity: Activity = browserView.context.getActivity() ?: return false
         InputDialog.Builder(activity)
@@ -183,14 +182,14 @@ open class BrowserChromeClient(private val browserView: BrowserView) : WebChrome
             .setCancelable(false)
             .setListener(object : InputDialog.OnListener {
 
-                override fun onConfirm(dialog: BaseDialog?, content: String) {
+                override fun onConfirm(dialog: BaseDialog, content: String) {
                     log(String.format("onJsPrompt: call result.confirm(%s)", content))
-                    result.confirm(content)
+                    result?.confirm(content)
                 }
 
-                override fun onCancel(dialog: BaseDialog?) {
+                override fun onCancel(dialog: BaseDialog) {
                     log("onJsPrompt: call result.cancel()")
-                    result.cancel()
+                    result?.cancel()
                 }
             })
             .show()
@@ -201,7 +200,7 @@ open class BrowserChromeClient(private val browserView: BrowserView) : WebChrome
      * 网页请求定位功能
      * 测试地址：https://map.baidu.com/
      */
-    override fun onGeolocationPermissionsShowPrompt(origin: String, callback: GeolocationPermissions.Callback) {
+    override fun onGeolocationPermissionsShowPrompt(origin: String, callback: GeolocationPermissions.Callback?) {
         val activity: Activity = browserView.context.getActivity() ?: return
         MessageDialog.Builder(activity)
             .setMessage(R.string.common_web_location_permission_title)
@@ -210,7 +209,7 @@ open class BrowserChromeClient(private val browserView: BrowserView) : WebChrome
             .setCancelable(false)
             .setListener(object : MessageDialog.OnListener {
 
-                override fun onConfirm(dialog: BaseDialog?) {
+                override fun onConfirm(dialog: BaseDialog) {
                     XXPermissions.with(activity)
                         .permission(PermissionLists.getAccessFineLocationPermission())
                         .permission(PermissionLists.getAccessCoarseLocationPermission())
@@ -222,13 +221,13 @@ open class BrowserChromeClient(private val browserView: BrowserView) : WebChrome
                                 return@request
                             }
                             log(String.format("onGeolocationPermissionsShowPrompt: callback.invoke(%s, true, true)", origin))
-                            callback.invoke(origin, true, true)
+                            callback?.invoke(origin, true, true)
                         }
                 }
 
-                override fun onCancel(dialog: BaseDialog?) {
+                override fun onCancel(dialog: BaseDialog) {
                     log(String.format("onGeolocationPermissionsShowPrompt: callback.invoke(%s, false, true)", origin))
-                    callback.invoke(origin, false, true)
+                    callback?.invoke(origin, false, true)
                 }
             })
             .show()
@@ -241,39 +240,27 @@ open class BrowserChromeClient(private val browserView: BrowserView) : WebChrome
      * @param callback              文件选择回调
      * @param params                文件选择参数
      */
-    override fun onShowFileChooser(webView: WebView, callback: ValueCallback<Array<Uri>>, params: FileChooserParams): Boolean {
+    override fun onShowFileChooser(webView: WebView, callback: ValueCallback<Array<Uri>>?, params: FileChooserParams): Boolean {
         log(String.format("onShowFileChooser: paramsTitle = %s, paramsMode = %s, paramsFilenameHint = %s, paramsAcceptTypes = %s",
-                            params.title, params.mode, params.filenameHint, Arrays.toString(params.acceptTypes)))
+                           params.title, params.mode, params.filenameHint, params.acceptTypes.contentToString()))
         val activity: Activity? = webView.context.getActivity()
         if (activity !is BaseActivity) {
             return false
         }
 
-        XXPermissions.with(activity)
-            .permission(PermissionLists.getReadExternalStoragePermission())
-            .interceptor(PermissionInterceptor())
-            .description(PermissionDescription())
-            .request { _, deniedList ->
-                val allGranted = deniedList.isEmpty()
-                if (!allGranted) {
-                    log("onShowFileChooser: callback.onReceiveValue(null)")
-                    callback.onReceiveValue(null)
-                    return@request
-                }
-                openSystemFileChooser((activity as BaseActivity?)!!, params, callback)
-            }
+        openSystemFileChooser(activity, params, callback)
         return true
     }
 
     /**
      * 打开系统文件选择器
      */
-    private fun openSystemFileChooser(activity: BaseActivity, params: FileChooserParams, callback: ValueCallback<Array<Uri>>) {
+    private fun openSystemFileChooser(activity: BaseActivity, params: FileChooserParams, callback: ValueCallback<Array<Uri>>?) {
         val intent: Intent = params.createIntent()
         // 是否是多选模式
         intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, params.mode == FileChooserParams.MODE_OPEN_MULTIPLE)
         activity.startActivityForResult(activity.createChooserIntent(intent, params.title), null, { resultCode, data ->
-            val uris: MutableList<Uri> = ArrayList()
+            val uris: MutableList<Uri> = mutableListOf()
             if (resultCode == Activity.RESULT_OK && data != null) {
                 val uri = data.data
                 if (uri != null) {
@@ -292,7 +279,7 @@ open class BrowserChromeClient(private val browserView: BrowserView) : WebChrome
             // 不管用户最后有没有选择文件，最后必须要调用 onReceiveValue，如果没有调用就会导致网页再次点击上传无响应
             val result = uris.toTypedArray()
             log(String.format("onShowFileChooser: callback.onReceiveValue(%s)", result.contentToString()))
-            callback.onReceiveValue(result)
+            callback?.onReceiveValue(result)
         })
     }
 

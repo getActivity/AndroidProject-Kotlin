@@ -313,9 +313,9 @@ class SlantedTextView @JvmOverloads constructor(
     /**
      * 设置文本样式
      */
-    fun setTextStyle(tf: Typeface?) {
-        if (getTextStyle() !== tf) {
-            textPaint.typeface = tf
+    fun setTextStyle(typeface: Typeface?) {
+        if (getTextStyle() !== typeface) {
+            textPaint.typeface = typeface
             invalidate()
         }
     }

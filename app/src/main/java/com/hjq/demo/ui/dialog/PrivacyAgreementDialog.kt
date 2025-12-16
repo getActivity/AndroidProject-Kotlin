@@ -25,21 +25,23 @@ class PrivacyAgreementDialog {
             setConfirm(getString(R.string.privacy_agreement_agree))
             setCancel(getString(R.string.privacy_agreement_disagree))
 
-            val privacyAgreementContent: String = getString(R.string.privacy_agreement_content)!!
+            val privacyAgreementContent: String = getString(R.string.privacy_agreement_content) ?: ""
             val spannable = SpannableStringBuilder(privacyAgreementContent)
 
-            val userAgreement: String = getString(R.string.privacy_agreement_user_agreement_text)!!
+            val userAgreement: String = getString(R.string.privacy_agreement_user_agreement_text) ?: ""
             val userAgreementTextStart = privacyAgreementContent.indexOf(userAgreement)
             val userAgreementTextEnd = userAgreementTextStart + userAgreement.length
             if (userAgreementTextStart != -1 && userAgreementTextEnd < privacyAgreementContent.length) {
-                spannable.setSpan(LinkClickableSpan(getString(R.string.privacy_agreement_user_agreement_link)), userAgreementTextStart, userAgreementTextEnd, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                spannable.setSpan(LinkClickableSpan(getString(R.string.privacy_agreement_user_agreement_link) ?: ""),
+                    userAgreementTextStart, userAgreementTextEnd, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
             }
 
-            val privacyPolicy: String = getString(R.string.privacy_agreement_privacy_policy_text)!!
+            val privacyPolicy: String = getString(R.string.privacy_agreement_privacy_policy_text) ?: ""
             val privacyPolicyTextStart = privacyAgreementContent.indexOf(privacyPolicy)
             val privacyPolicyTextEnd = privacyPolicyTextStart + privacyPolicy.length
             if (privacyPolicyTextStart != -1 && privacyPolicyTextEnd < privacyAgreementContent.length) {
-                spannable.setSpan(LinkClickableSpan(getString(R.string.privacy_agreement_privacy_policy_link)), privacyPolicyTextStart, privacyPolicyTextEnd, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                spannable.setSpan(LinkClickableSpan(getString(R.string.privacy_agreement_privacy_policy_link) ?: ""),
+                    privacyPolicyTextStart, privacyPolicyTextEnd, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
             }
 
             val messageView: TextView? = messageView

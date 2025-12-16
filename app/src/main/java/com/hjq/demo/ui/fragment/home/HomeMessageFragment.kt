@@ -45,7 +45,9 @@ class HomeMessageFragment : TitleBarFragment<HomeActivity>() {
         )
     }
 
-    override fun initData() {}
+    override fun initData() {
+        // default implementation ignored
+    }
 
     override fun isStatusBarEnabled(): Boolean {
         // 使用沉浸式状态栏
@@ -111,7 +113,7 @@ class HomeMessageFragment : TitleBarFragment<HomeActivity>() {
             }
             R.id.btn_home_message_tab -> {
 
-                HomeActivity.start(getAttachActivity()!!, HomeMainFragment::class.java)
+                HomeActivity.start(view.context, HomeMainFragment::class.java)
             }
         }
     }

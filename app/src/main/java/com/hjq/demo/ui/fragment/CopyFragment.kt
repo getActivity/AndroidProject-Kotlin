@@ -23,7 +23,11 @@ class CopyFragment : AppFragment<CopyActivity>() {
         return R.layout.copy_fragment
     }
 
-    override fun initView() {}
+    override fun initView() {
 
-    override fun initData() {}
+    }
+
+    override fun initData() {
+
+    }
 }

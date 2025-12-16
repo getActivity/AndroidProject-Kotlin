@@ -58,8 +58,10 @@ class HomeMainFragment : TitleBarFragment<HomeActivity>(), OnTabListener,
         }
         viewPager?.adapter = pagerAdapter
         viewPager?.addOnPageChangeListener(this)
-        tabAdapter = TabAdapter(getAttachActivity()!!)
-        tabView?.adapter = tabAdapter
+        tabView?.let {
+            tabAdapter = TabAdapter(it.context)
+            it.adapter = tabAdapter
+        }
 
         ImmersionBar.setTitleBarMarginTop(getAttachActivity(), findViewById(R.id.tb_home_main_title))
 
@@ -88,7 +90,7 @@ class HomeMainFragment : TitleBarFragment<HomeActivity>(), OnTabListener,
     /**
      * [TabAdapter.OnTabListener]
      */
-    override fun onTabSelected(recyclerView: RecyclerView?, position: Int): Boolean {
+    override fun onTabSelected(recyclerView: RecyclerView, position: Int): Boolean {
         viewPager?.currentItem = position
         return true
     }
@@ -96,13 +98,17 @@ class HomeMainFragment : TitleBarFragment<HomeActivity>(), OnTabListener,
     /**
      * [ViewPager.OnPageChangeListener]
      */
-    override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {}
+    override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {
+        // default implementation ignored
+    }
 
     override fun onPageSelected(position: Int) {
         tabAdapter?.setSelectedPosition(position)
     }
 
-    override fun onPageScrollStateChanged(state: Int) {}
+    override fun onPageScrollStateChanged(state: Int) {
+        // default implementation ignored
+    }
 
     /**
      * CollapsingToolbarLayout 渐变回调
@@ -110,12 +116,13 @@ class HomeMainFragment : TitleBarFragment<HomeActivity>(), OnTabListener,
      * [XCollapsingToolbarLayout.OnScrimsListener]
      */
     @Suppress("RestrictedApi")
-    override fun onScrimsStateChange(layout: XCollapsingToolbarLayout?, shown: Boolean) {
+    override fun onScrimsStateChange(layout: XCollapsingToolbarLayout, shown: Boolean) {
         getStatusBarConfig().statusBarDarkFont(shown).init()
-        addressView?.setTextColor(ContextCompat.getColor(getAttachActivity()!!, if (shown) R.color.black else R.color.white))
+        val activity = getAttachActivity() ?: return
+        addressView?.setTextColor(ContextCompat.getColor(activity, if (shown) R.color.black else R.color.white))
         hintView?.setBackgroundResource(if (shown) R.drawable.home_search_bar_gray_bg else R.drawable.home_search_bar_transparent_bg)
-        hintView?.setTextColor(ContextCompat.getColor(getAttachActivity()!!, if (shown) R.color.black60 else R.color.white60))
-        searchView?.supportImageTintList = ColorStateList.valueOf(ContextCompat.getColor(getAttachActivity()!!,
+        hintView?.setTextColor(ContextCompat.getColor(activity, if (shown) R.color.black60 else R.color.white60))
+        searchView?.supportImageTintList = ColorStateList.valueOf(ContextCompat.getColor(activity,
             if (shown) R.color.common_icon_color else R.color.white))
     }
 

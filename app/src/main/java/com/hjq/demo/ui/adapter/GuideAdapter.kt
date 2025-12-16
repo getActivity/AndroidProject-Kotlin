@@ -12,7 +12,7 @@ import com.hjq.demo.app.AppAdapter
  *    time   : 2020/08/28
  *    desc   : 引导页适配器
  */
-class GuideAdapter constructor(context: Context) : AppAdapter<Int>(context) {
+class GuideAdapter(context: Context) : AppAdapter<Int>(context) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AppViewHolder {
         return ViewHolder()

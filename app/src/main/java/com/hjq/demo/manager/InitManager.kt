@@ -218,7 +218,7 @@ object InitManager {
     /**
      * 初始化第三方 SDK
      */
-    fun initSdk(application: Application?) {
+    fun initSdk(application: Application) {
         // 友盟统计、登录、分享 SDK
         UmengClient.init(application, AppConfig.isLogEnable())
     }

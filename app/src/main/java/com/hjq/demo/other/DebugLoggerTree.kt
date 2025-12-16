@@ -24,6 +24,6 @@ class DebugLoggerTree : DebugTree() {
         return if (tag.length <= MAX_TAG_LENGTH || isAndroid8()) {
             tag
         } else
-            tag.substring(0, MAX_TAG_LENGTH)
+            tag.take(MAX_TAG_LENGTH)
     }
 }

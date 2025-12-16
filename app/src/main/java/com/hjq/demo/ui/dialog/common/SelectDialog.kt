@@ -41,9 +41,11 @@ class SelectDialog {
         }
 
         fun setList(vararg ids: Int): Builder = apply {
-            val data: MutableList<Any> = ArrayList(ids.size)
+            val data: MutableList<Any> = mutableListOf()
             for (id in ids) {
-                data.add(getString(id)!!)
+                getString(id)?.let {
+                    data.add(it)
+                }
             }
             setList(data)
         }
@@ -107,14 +109,14 @@ class SelectDialog {
                     val data = adapter.getSelectSet()
                     if (data.size >= adapter.getMinSelect()) {
                         performClickDismiss()
-                        listener?.onSelfSelected(getDialog(), data)
+                        listener?.onSelfSelected(requireNotNull(getDialog()), data)
                     } else {
-                        toast(String.format(getString(R.string.select_min_hint)!!, adapter.getMinSelect()))
+                        toast(String.format(getString(R.string.select_min_hint) ?: "", adapter.getMinSelect()))
                     }
                 }
                 R.id.tv_ui_cancel -> {
                     performClickDismiss()
-                    listener?.onCancel(getDialog())
+                    listener?.onCancel(requireNotNull(getDialog()))
                 }
             }
         }
@@ -138,7 +140,7 @@ class SelectDialog {
         private var maxSelect = Int.MAX_VALUE
 
         /** 选择对象集合 */
-        private val selectSet: HashMap<Int, Any> = HashMap()
+        private val selectSet: MutableMap<Int, Any> = mutableMapOf()
 
         init {
             setOnItemClickListener(this)
@@ -176,14 +178,14 @@ class SelectDialog {
             return maxSelect == 1 && minSelect == 1
         }
 
-        fun getSelectSet(): HashMap<Int, Any> {
+        fun getSelectSet(): MutableMap<Int, Any> {
             return selectSet
         }
 
         /**
          * [BaseAdapter.OnItemClickListener]
          */
-        override fun onItemClick(recyclerView: RecyclerView?, itemView: View?, position: Int) {
+        override fun onItemClick(recyclerView: RecyclerView, itemView: View, position: Int) {
             if (selectSet.containsKey(position)) {
                 // 当前必须不是单选模式才能取消选中
                 if (!isSingleSelect()) {
@@ -199,7 +201,7 @@ class SelectDialog {
                     selectSet[position] = getItem(position)
                     notifyItemChanged(position)
                 } else {
-                    toast(String.format(getString(R.string.select_max_hint)!!, maxSelect))
+                    toast(String.format(getString(R.string.select_max_hint) ?: "", maxSelect))
                 }
             }
         }
@@ -229,8 +231,8 @@ class SelectDialog {
          * @param data              选择的位置和数据
          */
         @Suppress("UNCHECKED_CAST")
-        fun onSelfSelected(dialog: BaseDialog?, data: HashMap<Int, out Any>) {
-            onSelected(dialog, data as HashMap<Int, T>)
+        fun onSelfSelected(dialog: BaseDialog, data: MutableMap<Int, out Any>) {
+            onSelected(dialog, data as MutableMap<Int, T>)
         }
 
         /**
@@ -238,17 +240,19 @@ class SelectDialog {
          *
          * @param data              选择的位置和数据
          */
-        fun onSelected(dialog: BaseDialog?, data: HashMap<Int, T>)
+        fun onSelected(dialog: BaseDialog, data: MutableMap<Int, T>)
 
         /**
          * 取消回调
          */
-        fun onCancel(dialog: BaseDialog?) {}
+        fun onCancel(dialog: BaseDialog) {
+            // default implementation ignored
+        }
     }
 
     interface OnSingleListener<T> : OnMultiListener<T> {
 
-        override fun onSelected(dialog: BaseDialog?, data: HashMap<Int, T>) {
+        override fun onSelected(dialog: BaseDialog, data: MutableMap<Int, T>) {
             val keys: Set<Int> = data.keys
             val iterator = keys.iterator()
             if (!iterator.hasNext()) {
@@ -264,6 +268,6 @@ class SelectDialog {
          * @param position          选择的位置
          * @param data              选择的数据
          */
-        fun onSelected(dialog: BaseDialog?, position: Int, data: T?)
+        fun onSelected(dialog: BaseDialog, position: Int, data: T?)
     }
 }

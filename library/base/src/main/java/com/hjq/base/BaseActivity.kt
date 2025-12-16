@@ -16,6 +16,8 @@ import com.hjq.base.action.ContextAction
 import com.hjq.base.action.FixOrientationAction
 import com.hjq.base.action.HandlerAction
 import com.hjq.base.ktx.hideKeyboard
+import java.util.Random
+import kotlin.math.pow
 
 /**
  *    author : Android 轮子哥
@@ -144,17 +146,23 @@ abstract class BaseActivity : AppCompatActivity(), ContextAction,
     }
 
     @Suppress("deprecation")
+    open fun startActivityForResult(intent: Intent, callback: OnActivityCallback?, options: Bundle?) {
+        // 请求码必须在 2 的 16 次方以内
+        var requestCode: Int
+        do {
+            requestCode = Random().nextInt(2.0.pow(16.0).toInt())
+        } while (activityCallbacks.indexOfKey(requestCode) != -1)
+        activityCallbacks.put(requestCode, callback)
+
+        startActivityForResult(intent, requestCode, options)
+    }
+
+    @Suppress("deprecation")
     override fun startActivityForResult(intent: Intent, requestCode: Int, options: Bundle?) {
         // 隐藏软键，避免内存泄漏
         hideKeyboard(currentFocus)
         // 查看源码得知 startActivity 最终也会调用 startActivityForResult
         super.startActivityForResult(intent, requestCode, options)
-    }
-
-    @Suppress("deprecation")
-    open fun startActivityForResult(intent: Intent, requestCode: Int, callback: OnActivityCallback?, options: Bundle?) {
-        activityCallbacks.put(requestCode, callback)
-        startActivityForResult(intent, requestCode, options)
     }
 
     @Suppress("deprecation")

@@ -39,7 +39,7 @@ import java.net.UnknownHostException
  *    time   : 2019/12/07
  *    desc   : 请求处理类
  */
-class RequestHandler constructor(private val application: Application) : IRequestHandler {
+class RequestHandler(private val application: Application) : IRequestHandler {
 
     @Throws(Throwable::class)
     override fun requestSuccess(httpRequest: HttpRequest<*>, response: Response, type: Type): Any {
@@ -96,7 +96,7 @@ class RequestHandler constructor(private val application: Application) : IReques
             val model: HttpData<*> = result
             val headers = response.headers
             val headersSize = headers.size
-            val headersMap: MutableMap<String, String> = HashMap(headersSize)
+            val headersMap: MutableMap<String, String> = mutableMapOf()
             for (i in 0 until headersSize) {
                 headersMap[headers.name(i)] = headers.value(i)
             }

@@ -13,8 +13,7 @@ import com.hjq.demo.ui.activity.common.RestartActivity
  *    time   : 2020/02/03
  *    desc   : Crash 处理类
  */
-class CrashHandler private constructor(private val application: Application) :
-    Thread.UncaughtExceptionHandler {
+class CrashHandler private constructor(private val application: Application) : Thread.UncaughtExceptionHandler {
 
     companion object {
 
@@ -37,7 +36,7 @@ class CrashHandler private constructor(private val application: Application) :
     init {
         if (nextHandler != null && javaClass.name == nextHandler.javaClass.name) {
             // 请不要重复注册 Crash 监听
-            throw IllegalStateException("are you ok?")
+            throw IllegalStateException("CrashHandler has already been registered")
         }
     }
 

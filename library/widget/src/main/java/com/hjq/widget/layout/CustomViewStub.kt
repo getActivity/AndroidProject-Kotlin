@@ -37,17 +37,16 @@ class CustomViewStub @JvmOverloads constructor(
         super.setVisibility(visibility)
         if (inflateView == null && visibility != GONE) {
             inflateView = LayoutInflater.from(context).inflate(layoutResource, this, false)
-            val layoutParams: LayoutParams? = inflateView!!.layoutParams as LayoutParams?
-            if (layoutParams != null) {
-                layoutParams.width = getLayoutParams().width
-                layoutParams.height = getLayoutParams().height
-                if (layoutParams.gravity == LayoutParams.UNSPECIFIED_GRAVITY) {
-                    layoutParams.gravity = Gravity.CENTER
+            (inflateView?.layoutParams as? LayoutParams)?.let {
+                it.width = layoutParams.width
+                it.height = layoutParams.height
+                if (it.gravity == LayoutParams.UNSPECIFIED_GRAVITY) {
+                    it.gravity = Gravity.CENTER
                 }
-                inflateView!!.layoutParams = layoutParams
+                inflateView?.layoutParams = it
             }
             addView(inflateView)
-            listener?.onInflate(this, inflateView!!)
+            listener?.onInflate(this, requireNotNull(inflateView))
         }
         listener?.onVisibility(this, visibility)
     }

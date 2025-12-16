@@ -44,7 +44,7 @@ class WrapRecyclerView @JvmOverloads constructor(
     /**
      * 添加头部View
      */
-    fun addHeaderView(view: View) {
+    fun addHeaderView(view: View?) {
         wrapAdapter.addHeaderView(view)
     }
 
@@ -58,19 +58,19 @@ class WrapRecyclerView @JvmOverloads constructor(
     /**
      * 移除头部View
      */
-    fun removeHeaderView(view: View) {
+    fun removeHeaderView(view: View?) {
         wrapAdapter.removeHeaderView(view)
     }
 
     /**
      * 添加底部View
      */
-    fun addFooterView(view: View) {
+    fun addFooterView(view: View?) {
         wrapAdapter.addFooterView(view)
     }
 
     @Suppress("UNCHECKED_CAST")
-    fun <V : View?> addFooterView(@LayoutRes id: Int): V {
+    fun <V : View?> addFooterView(@LayoutRes id: Int): V? {
         val footerView: View = LayoutInflater.from(context).inflate(id, this, false)
         addFooterView(footerView)
         return footerView as V
@@ -79,7 +79,7 @@ class WrapRecyclerView @JvmOverloads constructor(
     /**
      * 移除底部View
      */
-    fun removeFooterView(view: View) {
+    fun removeFooterView(view: View?) {
         wrapAdapter.removeFooterView(view)
     }
 
@@ -131,7 +131,7 @@ class WrapRecyclerView @JvmOverloads constructor(
 
             override fun getSpanSize(position: Int): Int {
                 return if (((position < wrapAdapter.getHeaderViewsCount()
-                            || position >= wrapAdapter.getHeaderViewsCount() + (if (realAdapter == null) 0 else realAdapter!!.itemCount)))
+                            || position >= wrapAdapter.getHeaderViewsCount() + (realAdapter?.itemCount ?: 0)))
                 ) layoutManager.spanCount else 1
             }
         }
@@ -155,10 +155,10 @@ class WrapRecyclerView @JvmOverloads constructor(
         private var realAdapter: Adapter<ViewHolder>? = null
 
         /** 头部View集合 */
-        private val headerViews: MutableList<View?> = ArrayList()
+        private val headerViews: MutableList<View?> = mutableListOf()
 
         /** 底部View集合 */
-        private val footerViews: MutableList<View?> = ArrayList()
+        private val footerViews: MutableList<View?> = mutableListOf()
 
         /** 当前调用的位置 */
         private var currentPosition: Int = 0
@@ -174,12 +174,8 @@ class WrapRecyclerView @JvmOverloads constructor(
             if (realAdapter === adapter) {
                 return
             }
-            if (realAdapter != null) {
-                if (observer != null) {
-                    // 为原有的RecyclerAdapter移除数据监听对象
-                    realAdapter!!.unregisterAdapterDataObserver(observer!!)
-                }
-            }
+            // 为原有的 RecyclerAdapter 移除数据监听对象
+            observer?.let { realAdapter?.unregisterAdapterDataObserver(it) }
             realAdapter = adapter as Adapter<ViewHolder>?
             if (realAdapter == null) {
                 return
@@ -187,19 +183,16 @@ class WrapRecyclerView @JvmOverloads constructor(
             if (observer == null) {
                 observer = WrapAdapterDataObserver(this)
             }
-            // 为原有的RecyclerAdapter添加数据监听对象
-            realAdapter?.registerAdapterDataObserver(observer!!)
-            // 适配器不是第一次被绑定到RecyclerView上需要发送通知，因为第一次绑定会自动通知
+            // 为原有的 RecyclerAdapter 添加数据监听对象
+            observer?.let { realAdapter?.registerAdapterDataObserver(it) }
+            // 适配器不是第一次被绑定到 RecyclerView 上需要发送通知，因为第一次绑定会自动通知
             if (recyclerView != null) {
                 notifyDataSetChanged()
             }
         }
 
         override fun getItemCount(): Int {
-            var itemCount = 0
-            if (realAdapter != null) {
-                itemCount = realAdapter!!.itemCount
-            }
+            val itemCount = realAdapter?.itemCount ?: 0
             return getHeaderViewsCount() + itemCount + getFooterViewsCount()
         }
 
@@ -208,13 +201,13 @@ class WrapRecyclerView @JvmOverloads constructor(
             // 获取头部布局的总数
             val headerCount: Int = getHeaderViewsCount()
             // 获取原有适配器的总数
-            val adapterCount: Int = if (realAdapter != null) realAdapter!!.itemCount else 0
+            val adapterCount: Int = realAdapter?.itemCount ?: 0
             // 获取在原有适配器上的位置
             val adjPosition: Int = position - headerCount
             if (position < headerCount) {
                 return HEADER_VIEW_TYPE
             } else if (adjPosition < adapterCount) {
-                return realAdapter!!.getItemViewType(adjPosition)
+                return requireNotNull(realAdapter).getItemViewType(adjPosition)
             }
             return FOOTER_VIEW_TYPE
         }
@@ -225,14 +218,15 @@ class WrapRecyclerView @JvmOverloads constructor(
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
             return when (viewType) {
-                HEADER_VIEW_TYPE -> newWrapViewHolder(headerViews[getPosition()]!!)
-                FOOTER_VIEW_TYPE -> newWrapViewHolder(footerViews[getPosition() - getHeaderViewsCount() - (if (realAdapter != null) realAdapter!!.itemCount else 0)]!!)
+                HEADER_VIEW_TYPE -> newWrapViewHolder(requireNotNull(headerViews[getPosition()]))
+                FOOTER_VIEW_TYPE -> newWrapViewHolder(requireNotNull(footerViews[getPosition() - getHeaderViewsCount() - (realAdapter?.itemCount ?: 0)]))
                 else -> {
-                    val itemViewType: Int = realAdapter!!.getItemViewType(getPosition() - getHeaderViewsCount())
+                    val adapter = requireNotNull(realAdapter)
+                    val itemViewType: Int = adapter.getItemViewType(getPosition() - getHeaderViewsCount())
                     if (itemViewType == HEADER_VIEW_TYPE || itemViewType == FOOTER_VIEW_TYPE) {
                         throw IllegalStateException("Please do not use this type as itemType")
                     }
-                    realAdapter!!.onCreateViewHolder(parent, itemViewType)
+                    return adapter.onCreateViewHolder(parent, itemViewType)
                 }
             }
         }
@@ -242,8 +236,10 @@ class WrapRecyclerView @JvmOverloads constructor(
                 return
             }
             when (getItemViewType(position)) {
-                HEADER_VIEW_TYPE, FOOTER_VIEW_TYPE -> {}
-                else -> realAdapter!!.onBindViewHolder(holder, getPosition() - getHeaderViewsCount())
+                HEADER_VIEW_TYPE, FOOTER_VIEW_TYPE -> {
+                    // default implementation ignored
+                }
+                else -> requireNotNull(realAdapter).onBindViewHolder(holder, getPosition() - getHeaderViewsCount())
             }
         }
 
@@ -258,8 +254,8 @@ class WrapRecyclerView @JvmOverloads constructor(
         }
 
         override fun getItemId(position: Int): Long {
-            if ((realAdapter != null) && (position > getHeaderViewsCount() - 1) && (position < getHeaderViewsCount() + realAdapter!!.itemCount)) {
-                return realAdapter!!.getItemId(position - getHeaderViewsCount())
+            if ((realAdapter != null) && (position > getHeaderViewsCount() - 1) && (position < getHeaderViewsCount() + (realAdapter?.itemCount ?: 0))) {
+                return requireNotNull(realAdapter).getItemId(position - getHeaderViewsCount())
             }
             return super.getItemId(position)
         }
@@ -313,8 +309,11 @@ class WrapRecyclerView @JvmOverloads constructor(
         /**
          * 添加头部View
          */
-        fun addHeaderView(view: View) {
-            // 不能添加同一个View对象，否则会导致RecyclerView复用异常
+        fun addHeaderView(view: View?) {
+            if (view == null) {
+                return
+            }
+            // 不能添加同一个 View 对象，否则会导致 RecyclerView 复用异常
             if (!headerViews.contains(view) && !footerViews.contains(view)) {
                 headerViews.add(view)
                 notifyDataSetChanged()
@@ -324,7 +323,10 @@ class WrapRecyclerView @JvmOverloads constructor(
         /**
          * 移除头部View
          */
-        fun removeHeaderView(view: View) {
+        fun removeHeaderView(view: View?) {
+            if (view == null) {
+                return
+            }
             if (headerViews.remove(view)) {
                 notifyDataSetChanged()
             }
@@ -333,8 +335,11 @@ class WrapRecyclerView @JvmOverloads constructor(
         /**
          * 添加底部View
          */
-        fun addFooterView(view: View) {
-            // 不能添加同一个View对象，否则会导致RecyclerView复用异常
+        fun addFooterView(view: View?) {
+            if (view == null) {
+                return
+            }
+            // 不能添加同一个 View 对象，否则会导致 RecyclerView 复用异常
             if (!footerViews.contains(view) && !headerViews.contains(view)) {
                 footerViews.add(view)
                 notifyDataSetChanged()
@@ -344,7 +349,10 @@ class WrapRecyclerView @JvmOverloads constructor(
         /**
          * 移除底部View
          */
-        fun removeFooterView(view: View) {
+        fun removeFooterView(view: View?) {
+            if (view == null) {
+                return
+            }
             if (footerViews.remove(view)) {
                 notifyDataSetChanged()
             }
@@ -382,12 +390,12 @@ class WrapRecyclerView @JvmOverloads constructor(
     /**
      * 头部和底部通用的ViewHolder对象
      */
-    private class WrapViewHolder constructor(itemView: View) : ViewHolder(itemView)
+    private class WrapViewHolder(itemView: View) : ViewHolder(itemView)
 
     /**
      * 数据改变监听器
      */
-    private class WrapAdapterDataObserver constructor(private val wrapAdapter: WrapRecyclerAdapter) : AdapterDataObserver() {
+    private class WrapAdapterDataObserver(private val wrapAdapter: WrapRecyclerAdapter) : AdapterDataObserver() {
 
         override fun onChanged() {
             wrapAdapter.notifyDataSetChanged()

@@ -5,7 +5,7 @@ import kotlin.math.ceil
 
 /**
  *    author : Android 轮子哥
- *    github : https://github.com/getActivity/AndroidProject
+ *    github : https://github.com/getActivity/AndroidProject-Kotlin
  *    time   : 2020/10/07
  *    desc   : 统一接口列表数据结构
  */

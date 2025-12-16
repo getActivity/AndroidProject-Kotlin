@@ -27,7 +27,7 @@ object ActivityManager : ActivityLifecycleCallbacks {
     private val activityList: MutableList<Activity> = mutableListOf()
 
     /** 应用生命周期回调 */
-    private val lifecycleCallbacks: ArrayList<ApplicationLifecycleCallback> = ArrayList()
+    private val lifecycleCallbacks: MutableList<ApplicationLifecycleCallback> = mutableListOf()
 
     /** 当前应用上下文对象 */
     private lateinit var application: Application
@@ -67,7 +67,7 @@ object ActivityManager : ActivityLifecycleCallbacks {
     /**
      * 获取 Activity 集合
      */
-    fun getActivityList(): List<Activity> {
+    fun getActivityList(): MutableList<Activity> {
         return activityList
     }
 

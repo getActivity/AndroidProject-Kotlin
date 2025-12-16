@@ -28,7 +28,7 @@ class LogCut : BasePointCut<Log> {
 
     @SuppressLint("UnclosedTrace")
     private fun enterMethod(joinPoint: ProceedJoinPoint, log: Log) {
-        val className = if (joinPoint.target != null) joinPoint.target!!.javaClass.getName() else ""
+        val className = joinPoint.target?.javaClass?.name ?: ""
         val methodName = joinPoint.targetMethod.name
         val parameterNames: Array<String?>? = null
         val parameterValues = joinPoint.args
@@ -65,7 +65,7 @@ class LogCut : BasePointCut<Log> {
 
     private fun exitMethod(joinPoint: ProceedJoinPoint, log: Log, result: Any?, lengthMillis: Long) {
         Trace.endSection()
-        val className = if (joinPoint.target != null) joinPoint.target!!.javaClass.getName() else ""
+        val className = joinPoint.target?.javaClass?.name ?: ""
         val methodName = joinPoint.targetMethod.name
         val builder = StringBuilder("\u21E0 ")
             .append(className)

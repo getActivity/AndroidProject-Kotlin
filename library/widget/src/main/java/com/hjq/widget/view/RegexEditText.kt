@@ -95,10 +95,12 @@ open class RegexEditText @JvmOverloads constructor(
      * 设置输入正则
      */
     fun setInputRegex(regex: String?) {
-        if (TextUtils.isEmpty(regex)) {
-            return
+        regex?.let {
+            if (TextUtils.isEmpty(it)) {
+                return
+            }
+            pattern = Pattern.compile(it)
         }
-        pattern = Pattern.compile(regex!!)
         addFilters(this)
     }
 
@@ -109,7 +111,7 @@ open class RegexEditText @JvmOverloads constructor(
         if (pattern == null) {
             return null
         }
-        return pattern!!.pattern()
+        return pattern?.pattern()
     }
 
     /**
@@ -151,34 +153,30 @@ open class RegexEditText @JvmOverloads constructor(
      * @param destEnd       在原内容上的终点坐标
      * @return              返回字符串将会加入到内容中
      */
-    override fun filter(source: CharSequence?, start: Int, end: Int,
-        dest: Spanned?, destStart: Int, destEnd: Int): CharSequence? {
+    override fun filter(source: CharSequence, start: Int, end: Int, dest: Spanned, destStart: Int, destEnd: Int): CharSequence {
+        pattern?.let {
+            // 拼接出最终的字符串
+            val begin: String = dest.toString().substring(0, destStart)
+            val over: String = dest.toString().substring(
+                destStart + (destEnd - destStart),
+                destStart + (dest.toString().length - begin.length)
+            )
+            val result: String = begin + source + over
 
-        if (pattern == null) {
-            return source
-        }
-
-        // 拼接出最终的字符串
-        val begin: String = dest.toString().substring(0, destStart)
-        val over: String = dest.toString().substring(
-            destStart + (destEnd - destStart),
-            destStart + (dest.toString().length - begin.length)
-        )
-        val result: String = begin + source + over
-
-        // 判断是插入还是删除
-        if (destStart > destEnd - 1) {
-            // 如果是插入字符
-            if (!pattern!!.matcher(result).matches()) {
-                // 如果不匹配就不让这个字符输入
-                return ""
-            }
-        } else {
-            // 如果是删除字符
-            if (!pattern!!.matcher(result).matches()) {
-                // 如果不匹配则不让删除（删空操作除外）
-                if ("" != result) {
-                    return dest.toString().substring(destStart, destEnd)
+            // 判断是插入还是删除
+            if (destStart > destEnd - 1) {
+                // 如果是插入字符
+                if (!it.matcher(result).matches()) {
+                    // 如果不匹配就不让这个字符输入
+                    return ""
+                }
+            } else {
+                // 如果是删除字符
+                if (!it.matcher(result).matches()) {
+                    // 如果不匹配则不让删除（删空操作除外）
+                    if ("" != result) {
+                        return dest.toString().substring(destStart, destEnd)
+                    }
                 }
             }
         }

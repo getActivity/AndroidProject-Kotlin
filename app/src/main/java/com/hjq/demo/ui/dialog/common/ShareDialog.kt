@@ -46,16 +46,17 @@ class ShareDialog {
         private val adapter: ShareAdapter
         private val shareAction: ShareAction
         private val copyLink: ShareBean
+
         private var listener: OnShareListener? = null
 
         init {
             setContentView(R.layout.share_dialog)
-            val data: MutableList<ShareBean> = ArrayList()
-            data.add(ShareBean(getDrawable(R.drawable.share_wechat_ic)!!, getString(R.string.share_platform_wechat)!!, Platform.WECHAT))
-            data.add(ShareBean(getDrawable(R.drawable.share_moment_ic)!!, getString(R.string.share_platform_moment)!!, Platform.CIRCLE))
-            data.add(ShareBean(getDrawable(R.drawable.share_qq_ic)!!, getString(R.string.share_platform_qq)!!, Platform.QQ))
-            data.add(ShareBean(getDrawable(R.drawable.share_qzone_ic)!!, getString(R.string.share_platform_qzone)!!, Platform.QZONE))
-            copyLink = ShareBean(getDrawable(R.drawable.share_link_ic)!!, getString(R.string.share_platform_link)!!, null)
+            val data: MutableList<ShareBean> = mutableListOf()
+            data.add(ShareBean(Platform.WECHAT, getString(R.string.share_platform_wechat) ?: "",requireNotNull(getDrawable(R.drawable.share_wechat_ic))))
+            data.add(ShareBean(Platform.CIRCLE, getString(R.string.share_platform_moment) ?: "", requireNotNull(getDrawable(R.drawable.share_moment_ic))))
+            data.add(ShareBean(Platform.QQ, getString(R.string.share_platform_qq) ?: "", requireNotNull(getDrawable(R.drawable.share_qq_ic))))
+            data.add(ShareBean(Platform.QZONE, getString(R.string.share_platform_qzone) ?: "", requireNotNull(getDrawable(R.drawable.share_qzone_ic))))
+            copyLink = ShareBean(null, getString(R.string.share_platform_link) ?: "", requireNotNull(getDrawable(R.drawable.share_link_ic)))
             adapter = ShareAdapter(activity)
             adapter.setData(data)
             adapter.setOnItemClickListener(this)
@@ -67,7 +68,7 @@ class ShareDialog {
         /**
          * 分享网页链接：https://developer.umeng.com/docs/128606/detail/193883#h2-u5206u4EABu7F51u9875u94FEu63A51
          */
-        fun setShareLink(content: UMWeb?): Builder = apply {
+        fun setShareLink(content: UMWeb): Builder = apply {
             shareAction.withMedia(content)
             refreshShareOptions()
         }
@@ -75,7 +76,7 @@ class ShareDialog {
         /**
          * 分享图片：https://developer.umeng.com/docs/128606/detail/193883#h2-u5206u4EABu56FEu72473
          */
-        fun setShareImage(content: UMImage?): Builder = apply {
+        fun setShareImage(content: UMImage): Builder = apply {
             shareAction.withMedia(content)
             refreshShareOptions()
         }
@@ -83,7 +84,7 @@ class ShareDialog {
         /**
          * 分享纯文本：https://developer.umeng.com/docs/128606/detail/193883#h2-u5206u4EABu7EAFu6587u672C5
          */
-        fun setShareText(content: String?): Builder = apply {
+        fun setShareText(content: String): Builder = apply {
             shareAction.withText(content)
             refreshShareOptions()
         }
@@ -91,7 +92,7 @@ class ShareDialog {
         /**
          * 分享音乐：https://developer.umeng.com/docs/128606/detail/193883#h2-u5206u4EABu97F3u4E507
          */
-        fun setShareMusic(content: UMusic?): Builder = apply {
+        fun setShareMusic(content: UMusic): Builder = apply {
             shareAction.withMedia(content)
             refreshShareOptions()
         }
@@ -99,7 +100,7 @@ class ShareDialog {
         /**
          * 分享视频：https://developer.umeng.com/docs/128606/detail/193883#h2-u5206u4EABu89C6u98916
          */
-        fun setShareVideo(content: UMVideo?): Builder = apply {
+        fun setShareVideo(content: UMVideo): Builder = apply {
             shareAction.withMedia(content)
             refreshShareOptions()
         }
@@ -107,7 +108,7 @@ class ShareDialog {
         /**
          * 分享 Gif 表情：https://developer.umeng.com/docs/128606/detail/193883#h2--gif-8
          */
-        fun setShareEmoji(content: UMEmoji?): Builder = apply {
+        fun setShareEmoji(content: UMEmoji): Builder = apply {
             shareAction.withMedia(content)
             refreshShareOptions()
         }
@@ -115,7 +116,7 @@ class ShareDialog {
         /**
          * 分享微信小程序：https://developer.umeng.com/docs/128606/detail/193883#h2-u5206u4EABu5C0Fu7A0Bu5E8F2
          */
-        fun setShareMin(content: UMMin?): Builder = apply {
+        fun setShareMin(content: UMMin): Builder = apply {
             shareAction.withMedia(content)
             refreshShareOptions()
         }
@@ -123,7 +124,7 @@ class ShareDialog {
         /**
          * 分享 QQ 小程序：https://developer.umeng.com/docs/128606/detail/193883#h2-u5206u4EABu5C0Fu7A0Bu5E8F2
          */
-        fun setShareMin(content: UMQQMini?): Builder = apply {
+        fun setShareMin(content: UMQQMini): Builder = apply {
             shareAction.withMedia(content)
             refreshShareOptions()
         }
@@ -138,21 +139,25 @@ class ShareDialog {
         /**
          * [BaseAdapter.OnItemClickListener]
          */
-        override fun onItemClick(recyclerView: RecyclerView?, itemView: View?, position: Int) {
-            val platform = adapter.getItem(position).sharePlatform
+        override fun onItemClick(recyclerView: RecyclerView, itemView: View, position: Int) {
+            val platform = adapter.getItem(position).platform
             if (platform != null) {
                 if (getContext().packageName.endsWith(".debug") &&
                     (platform === Platform.WECHAT || platform === Platform.CIRCLE)) {
                     toast("当前 buildType 不支持进行微信分享")
                     return
                 }
-                UmengClient.share(getContext().getActivity(), platform, shareAction, listener)
+                val activity = getContext().getActivity()
+                if (activity != null) {
+                    UmengClient.share(activity, platform, shareAction, listener)
+                }
             } else {
                 if (shareAction.shareContent.shareType == ShareContent.WEB_STYLE) {
                     // 复制到剪贴板
-                    getSystemService(ClipboardManager::class.java).setPrimaryClip(
-                        ClipData.newPlainText("url", shareAction.shareContent.mMedia.toUrl()))
-                    toast(R.string.share_platform_copy_hint)
+                    getSystemService(ClipboardManager::class.java)?.let {
+                        it.setPrimaryClip(ClipData.newPlainText("url", shareAction.shareContent.mMedia.toUrl()))
+                        toast(R.string.share_platform_copy_hint)
+                    }
                 }
             }
             dismiss()
@@ -192,8 +197,8 @@ class ShareDialog {
 
             override fun onBindView(position: Int) {
                 getItem(position).apply {
-                    imageView?.setImageDrawable(shareIcon)
-                    textView?.text = shareName
+                    imageView?.setImageDrawable(icon)
+                    textView?.text = name
                 }
             }
         }
@@ -201,11 +206,13 @@ class ShareDialog {
 
     class ShareBean (
 
-        /** 分享图标 */
-        val shareIcon: Drawable,
-        /** 分享名称 */
-        val shareName: String,
         /** 分享平台 */
-        val sharePlatform: Platform?
+        val platform: Platform?,
+
+        /** 分享名称 */
+        val name: String,
+
+        /** 分享图标 */
+        val icon: Drawable
     )
 }

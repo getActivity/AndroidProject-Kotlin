@@ -25,7 +25,7 @@ import java.util.LinkedList
  */
 class PayPasswordDialog {
 
-    class Builder constructor(context: Context) : BaseDialog.Builder<Builder>(context),
+    class Builder(context: Context) : BaseDialog.Builder<Builder>(context),
         BaseAdapter.OnItemClickListener {
 
         companion object {
@@ -35,7 +35,6 @@ class PayPasswordDialog {
                 arrayOf("1", "2", "3", "4", "5", "6", "7", "8", "9", "", "0", "")
         }
 
-        private var listener: OnListener? = null
         private var autoDismiss: Boolean = true
         private val recordList: LinkedList<String?> = LinkedList()
 
@@ -46,6 +45,8 @@ class PayPasswordDialog {
         private val passwordView: PasswordView? by lazyFindViewById(R.id.pw_pay_view)
         private val recyclerView: RecyclerView? by lazyFindViewById(R.id.rv_pay_list)
         private val adapter: KeyboardAdapter
+
+        private var listener: OnListener? = null
 
         init {
             setContentView(R.layout.pay_password_dialog)
@@ -92,13 +93,15 @@ class PayPasswordDialog {
         /**
          * [BaseAdapter.OnItemClickListener]
          */
-        override fun onItemClick(recyclerView: RecyclerView?, itemView: View?, position: Int) {
+        override fun onItemClick(recyclerView: RecyclerView, itemView: View, position: Int) {
             when (adapter.getItemViewType(position)) {
                 KeyboardAdapter.TYPE_DELETE ->                     // 点击回退按钮删除
-                    if (recordList.size != 0) {
+                    if (recordList.isNotEmpty()) {
                         recordList.removeLast()
                     }
-                KeyboardAdapter.TYPE_EMPTY -> {}
+                KeyboardAdapter.TYPE_EMPTY -> {
+                    // default implementation ignored
+                }
                 else -> {
                     // 判断密码是否已经输入完毕
                     if (recordList.size < PasswordView.PASSWORD_COUNT) {
@@ -117,7 +120,7 @@ class PayPasswordDialog {
                             for (s: String? in recordList) {
                                 password.append(s)
                             }
-                            listener?.onCompleted(getDialog(), password.toString())
+                            listener?.onCompleted(requireNotNull(getDialog()), password.toString())
                         }, 300)
                     }
                 }
@@ -131,7 +134,7 @@ class PayPasswordDialog {
                 if (autoDismiss) {
                     dismiss()
                 }
-                listener?.onCancel(getDialog())
+                listener?.onCancel(requireNotNull(getDialog()))
             }
         }
     }
@@ -188,11 +191,13 @@ class PayPasswordDialog {
          *
          * @param password      输入的密码
          */
-        fun onCompleted(dialog: BaseDialog?, password: String)
+        fun onCompleted(dialog: BaseDialog, password: String)
 
         /**
          * 点击取消时回调
          */
-        fun onCancel(dialog: BaseDialog?) {}
+        fun onCancel(dialog: BaseDialog) {
+            // default implementation ignored
+        }
     }
 }

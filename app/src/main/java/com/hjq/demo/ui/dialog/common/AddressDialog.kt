@@ -49,11 +49,13 @@ class AddressDialog {
         private val tabAdapter: TabAdapter
         private val adapter: RecyclerViewAdapter
         private val callback: OnPageChangeCallback?
-        private var listener: OnListener? = null
+
         private var province: String = ""
         private var city: String = ""
         private var area: String = ""
         private var ignoreArea = false
+
+        private var listener: OnListener? = null
 
         init {
             setContentView(R.layout.address_dialog)
@@ -76,12 +78,14 @@ class AddressDialog {
                     scrollState = state
                     viewPager2?.let {
                         if (state == ViewPager2.SCROLL_STATE_IDLE && tabAdapter.getSelectedPosition() != it.currentItem) {
-                            onTabSelected(tabView, it.currentItem)
+                            onTabSelected(requireNotNull(tabView), it.currentItem)
                         }
                     }
                 }
 
-                override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {}
+                override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {
+                    // default implementation ignored
+                }
             }
 
             // 显示省份列表
@@ -112,7 +116,7 @@ class AddressDialog {
                 return@apply
             }
             for (i in data.indices) {
-                if (province != data[i]!!.getName()) {
+                if (province != data[i]?.getName()) {
                     continue
                 }
                 selectedAddress(0, i, false)
@@ -136,11 +140,11 @@ class AddressDialog {
                 return@apply
             }
             for (i in data.indices) {
-                if (city != data[i]!!.getName()) {
+                if (city != data[i]?.getName()) {
                     continue
                 }
                 // 避开直辖市，因为选择省的时候已经自动跳过市区了
-                if (adapter.getItem(1)!!.size > 1) {
+                if ((adapter.getItem(1)?.size ?: 0) > 1) {
                     selectedAddress(1, i, false)
                 }
                 break
@@ -180,42 +184,42 @@ class AddressDialog {
             when (type) {
                 0 -> {
                     // 记录当前选择的省份
-                    province = adapter.getItem(type)!![position]!!.getName()!!
+                    province = adapter.getItem(type)?.get(position)?.getName() ?: ""
                     tabAdapter.setItem(type, province)
                     tabAdapter.addItem(getString(R.string.address_hint))
                     tabAdapter.setSelectedPosition(type + 1)
-                    adapter.addItem(AddressManager.getCityList(adapter.getItem(type)!![position]!!.getNext()!!))
+                    adapter.getItem(type)?.get(position)?.getNext()?.let {
+                        adapter.addItem(AddressManager.getCityList(it))
+                    }
                     viewPager2?.setCurrentItem(type + 1, smoothScroll)
 
                     // 如果当前选择的是直辖市，就直接跳过选择城市，直接选择区域
-                    if (adapter.getItem(type + 1)!!.size == 1) {
+                    if ((adapter.getItem(type + 1)?.size ?: 0) == 1) {
                         selectedAddress(type + 1, 0, false)
                     }
                 }
                 1 -> {
                     // 记录当前选择的城市
-                    city = adapter.getItem(type)!![position]!!.getName()!!
+                    city = adapter.getItem(type)?.get(position)?.getName() ?: ""
                     tabAdapter.setItem(type, city)
                     if (ignoreArea) {
-                        listener?.onSelected(getDialog(), province, city, area)
+                        listener?.onSelected(requireNotNull(getDialog()), province, city, area)
                         // 延迟关闭
                         postDelayed({ dismiss() }, 300)
                     } else {
                         tabAdapter.addItem(getString(R.string.address_hint))
                         tabAdapter.setSelectedPosition(type + 1)
-                        adapter.addItem(
-                            AddressManager.getAreaList(
-                                adapter.getItem(type)!![position]!!.getNext()!!
-                            )
-                        )
+                        adapter.getItem(type)?.get(position)?.getNext()?.let {
+                            adapter.addItem(AddressManager.getAreaList(it))
+                        }
                         viewPager2?.setCurrentItem(type + 1, smoothScroll)
                     }
                 }
                 2 -> {
                     // 记录当前选择的区域
-                    area = adapter.getItem(type)!![position]!!.getName()!!
+                    area = adapter.getItem(type)?.get(position)?.getName() ?: ""
                     tabAdapter.setItem(type, area)
-                    listener?.onSelected(getDialog(), province, city, area)
+                    listener?.onSelected(requireNotNull(getDialog()), province, city, area)
 
                     // 延迟关闭
                     postDelayed({ dismiss() }, 300)
@@ -233,14 +237,14 @@ class AddressDialog {
         override fun onClick(view: View) {
             if (view === closeView) {
                 dismiss()
-                listener?.onCancel(getDialog())
+                listener?.onCancel(requireNotNull(getDialog()))
             }
         }
 
         /**
          * [TabAdapter.OnTabListener]
          */
-        override fun onTabSelected(recyclerView: RecyclerView?, position: Int): Boolean {
+        override fun onTabSelected(recyclerView: RecyclerView, position: Int): Boolean {
             synchronized(this) {
                 if (viewPager2?.currentItem != position) {
                     viewPager2?.currentItem = position
@@ -279,7 +283,7 @@ class AddressDialog {
         /**
          * [BaseDialog.OnShowListener]
          */
-        override fun onShow(dialog: BaseDialog?) {
+        override fun onShow(dialog: BaseDialog) {
             // 注册 ViewPager 滑动监听
             callback?.let { viewPager2?.registerOnPageChangeCallback(it) }
         }
@@ -287,7 +291,7 @@ class AddressDialog {
         /**
          * [BaseDialog.OnDismissListener]
          */
-        override fun onDismiss(dialog: BaseDialog?) {
+        override fun onDismiss(dialog: BaseDialog) {
             // 反注册 ViewPager 滑动监听
             callback?.let { viewPager2?.unregisterOnPageChangeCallback(it) }
         }
@@ -347,7 +351,7 @@ class AddressDialog {
                 adapter.setData(getItem(position))
             }
 
-            override fun onItemClick(recyclerView: RecyclerView?, itemView: View?, position: Int) {
+            override fun onItemClick(recyclerView: RecyclerView, itemView: View, position: Int) {
                 listener?.onSelected(getViewHolderPosition(), position)
             }
         }
@@ -358,7 +362,7 @@ class AddressDialog {
         }
     }
 
-    class AddressAdapter constructor(context: Context) : AppAdapter<AddressBean?>(context) {
+    class AddressAdapter(context: Context) : AppAdapter<AddressBean?>(context) {
 
         override fun onCreateViewHolder(parent: ViewGroup, position: Int): AppViewHolder {
             val textView = TextView(parent.context)
@@ -375,17 +379,17 @@ class AddressDialog {
             return ViewHolder(textView)
         }
 
-        inner class ViewHolder constructor(itemView: View) : AppViewHolder(itemView) {
+        inner class ViewHolder(itemView: View) : AppViewHolder(itemView) {
 
             private val textView: TextView by lazy { itemView as TextView }
 
             override fun onBindView(position: Int) {
-                textView.text = getItem(position)!!.getName()
+                textView.text = getItem(position)?.getName()
             }
         }
     }
 
-    class AddressBean constructor(
+    class AddressBean(
         /** （省\市\区）的名称 */
         private val name: String?,
         /** 下一级的 Json */
@@ -413,7 +417,7 @@ class AddressDialog {
                 // 省市区Json数据文件来源：https://github.com/getActivity/ProvinceJson
                 val jsonArray = getProvinceJson(context) ?: return null
                 val length = jsonArray.length()
-                val list: ArrayList<AddressBean?> = ArrayList(length)
+                val list: MutableList<AddressBean?> = mutableListOf()
                 for (i in 0 until length) {
                     val jsonObject = jsonArray.getJSONObject(i)
                     list.add(AddressBean(jsonObject.getString("name"), jsonObject))
@@ -435,7 +439,7 @@ class AddressDialog {
             return try {
                 val listCity = jsonObject.getJSONArray("city")
                 val length = listCity.length()
-                val list: ArrayList<AddressBean?> = ArrayList(length)
+                val list: MutableList<AddressBean?> = mutableListOf()
                 for (i in 0 until length) {
                     list.add(
                         AddressBean(
@@ -461,7 +465,7 @@ class AddressDialog {
             return try {
                 val listArea = jsonObject.getJSONArray("area")
                 val length = listArea.length()
-                val list: ArrayList<AddressBean?> = ArrayList(length)
+                val list: MutableList<AddressBean?> = mutableListOf()
                 for (i in 0 until length) {
                     val string = listArea.getString(i)
                     list.add(AddressBean(string, null))
@@ -510,11 +514,13 @@ class AddressDialog {
          * @param city              市
          * @param area              区
          */
-        fun onSelected(dialog: BaseDialog?, province: String, city: String, area: String)
+        fun onSelected(dialog: BaseDialog, province: String, city: String, area: String)
 
         /**
          * 点击取消时回调
          */
-        fun onCancel(dialog: BaseDialog?) {}
+        fun onCancel(dialog: BaseDialog) {
+            // default implementation ignored
+        }
     }
 }

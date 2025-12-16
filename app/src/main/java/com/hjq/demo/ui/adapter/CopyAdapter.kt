@@ -11,7 +11,7 @@ import com.hjq.demo.app.AppAdapter
  *    time   : 2018/11/05
  *    desc   : 可进行拷贝的副本
  */
-class CopyAdapter constructor(context: Context) : AppAdapter<String?>(context) {
+class CopyAdapter(context: Context) : AppAdapter<String?>(context) {
 
     override fun getItemCount(): Int {
         return 10

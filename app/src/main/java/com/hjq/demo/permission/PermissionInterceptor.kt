@@ -2,12 +2,14 @@ package com.hjq.demo.permission
 
 import android.app.Activity
 import android.content.Context
-import android.os.Build.VERSION
-import android.os.Build.VERSION_CODES
 import android.text.TextUtils
 import com.hjq.base.BaseDialog
 import com.hjq.demo.R
 import com.hjq.demo.ktx.isAndroid10
+import com.hjq.demo.ktx.isAndroid11
+import com.hjq.demo.ktx.isAndroid12
+import com.hjq.demo.ktx.isAndroid13
+import com.hjq.demo.ktx.isAndroid16
 import com.hjq.demo.ktx.toast
 import com.hjq.demo.permission.PermissionConverter.getNickNamesByPermissions
 import com.hjq.demo.ui.dialog.common.MessageDialog
@@ -27,9 +29,9 @@ import com.hjq.permissions.permission.base.IPermission
 class PermissionInterceptor : OnPermissionInterceptor {
 
     override fun onRequestPermissionEnd(activity: Activity, skipRequest: Boolean,
-                                        requestList: List<IPermission>,
-                                        grantedList: List<IPermission?>,
-                                        deniedList: List<IPermission>,
+                                        requestList: MutableList<IPermission>,
+                                        grantedList: MutableList<IPermission?>,
+                                        deniedList: MutableList<IPermission>,
                                         callback: OnPermissionCallback?) {
 
         callback?.onResult(grantedList, deniedList)
@@ -49,13 +51,11 @@ class PermissionInterceptor : OnPermissionInterceptor {
         showPermissionSettingDialog(activity, requestList, deniedList, callback, permissionHint)
     }
 
-    private fun showPermissionSettingDialog(
-        activity: Activity,
-        requestList: List<IPermission>,
-        deniedList: List<IPermission>,
-        callback: OnPermissionCallback?,
-        permissionHint: String
-    ) {
+    private fun showPermissionSettingDialog(activity: Activity,
+                                            requestList: MutableList<IPermission>,
+                                            deniedList: MutableList<IPermission>,
+                                            callback: OnPermissionCallback?,
+                                            permissionHint: String) {
         if (activity.isFinishing || activity.isDestroyed) {
             return
         }
@@ -66,9 +66,9 @@ class PermissionInterceptor : OnPermissionInterceptor {
             .setConfirm(R.string.common_permission_go_to_authorization)
             .setListener(object : MessageDialog.OnListener {
 
-                override fun onConfirm(dialog: BaseDialog?) {
-                    dialog?.dismiss()
-                    XXPermissions.startPermissionActivity(activity, deniedList) { _: List<IPermission>, _: List<IPermission> ->
+                override fun onConfirm(dialog: BaseDialog) {
+                    dialog.dismiss()
+                    XXPermissions.startPermissionActivity(activity, deniedList) { _, _ ->
                         val latestDeniedList = XXPermissions.getDeniedPermissions(activity, requestList)
                         val allGranted = latestDeniedList.isEmpty()
                         if (!allGranted) {
@@ -94,7 +94,7 @@ class PermissionInterceptor : OnPermissionInterceptor {
     /**
      * 生成权限提示文案
      */
-    private fun generatePermissionHint(activity: Activity, deniedList: List<IPermission>, doNotAskAgain: Boolean): String {
+    private fun generatePermissionHint(activity: Activity, deniedList: MutableList<IPermission>, doNotAskAgain: Boolean): String {
         val deniedPermissionCount = deniedList.size
         var deniedLocationPermissionCount = 0
         var deniedSensorsPermissionCount = 0
@@ -121,9 +121,7 @@ class PermissionInterceptor : OnPermissionInterceptor {
                         activity.getString(R.string.common_permission_location_background),
                         getBackgroundPermissionOptionLabel(activity)
                     )
-                } else if (VERSION.SDK_INT >= VERSION_CODES.S &&
-                    XXPermissions.equalsPermission(deniedList[0], PermissionNames.ACCESS_FINE_LOCATION)
-                ) {
+                } else if (isAndroid12() && XXPermissions.equalsPermission(deniedList[0], PermissionNames.ACCESS_FINE_LOCATION)) {
                     // 如果请求的定位权限中，既包含了精确定位权限，又包含了模糊定位权限或者后台定位权限，
                     // 但是用户只同意了模糊定位权限的情况或者后台定位权限，并没有同意精确定位权限的情况，就提示用户开启确切位置选项
                     // 需要注意的是 Android 12 才将模糊定位权限和精确定位权限的授权选项进行分拆，之前的版本没有区分得那么仔细
@@ -135,9 +133,7 @@ class PermissionInterceptor : OnPermissionInterceptor {
                 }
             } else {
                 if (XXPermissions.containsPermission(deniedList, PermissionNames.ACCESS_BACKGROUND_LOCATION)) {
-                    return if (VERSION.SDK_INT >= VERSION_CODES.S &&
-                        XXPermissions.containsPermission(deniedList, PermissionNames.ACCESS_FINE_LOCATION)
-                    ) {
+                    return if (isAndroid12() && XXPermissions.containsPermission(deniedList, PermissionNames.ACCESS_FINE_LOCATION)) {
                         activity.getString(
                             R.string.common_permission_fail_hint_2,
                             activity.getString(R.string.common_permission_location),
@@ -153,10 +149,10 @@ class PermissionInterceptor : OnPermissionInterceptor {
                     }
                 }
             }
-        } else if (deniedSensorsPermissionCount == deniedPermissionCount && VERSION.SDK_INT >= VERSION_CODES.TIRAMISU) {
+        } else if (deniedSensorsPermissionCount == deniedPermissionCount && isAndroid13()) {
             if (deniedPermissionCount == 1) {
                 if (XXPermissions.equalsPermission(deniedList[0], PermissionNames.BODY_SENSORS_BACKGROUND)) {
-                    return if (VERSION.SDK_INT >= VERSION_CODES.BAKLAVA) {
+                    return if (isAndroid16()) {
                         activity.getString(
                             R.string.common_permission_fail_hint_1,
                             activity.getString(R.string.common_permission_health_data_background),
@@ -172,7 +168,7 @@ class PermissionInterceptor : OnPermissionInterceptor {
                 }
             } else {
                 if (doNotAskAgain) {
-                    return if (VERSION.SDK_INT >= VERSION_CODES.BAKLAVA) {
+                    return if (isAndroid16()) {
                         activity.getString(
                             R.string.common_permission_fail_hint_1,
                             activity.getString(R.string.common_permission_health_data),
@@ -187,7 +183,7 @@ class PermissionInterceptor : OnPermissionInterceptor {
                     }
                 }
             }
-        } else if (deniedHealthPermissionCount == deniedPermissionCount && VERSION.SDK_INT >= VERSION_CODES.BAKLAVA) {
+        } else if (deniedHealthPermissionCount == deniedPermissionCount && isAndroid16()) {
             when (deniedPermissionCount) {
                 1 -> if (XXPermissions.equalsPermission(deniedList[0], PermissionNames.READ_HEALTH_DATA_IN_BACKGROUND)) {
                     return activity.getString(
@@ -268,7 +264,7 @@ class PermissionInterceptor : OnPermissionInterceptor {
      */
     private fun getBackgroundPermissionOptionLabel(context: Context): String {
         val packageManager = context.packageManager
-        if (packageManager != null && VERSION.SDK_INT >= VERSION_CODES.R) {
+        if (packageManager != null && isAndroid11()) {
             val backgroundPermissionOptionLabel = packageManager.backgroundPermissionOptionLabel
             if (!TextUtils.isEmpty(backgroundPermissionOptionLabel)) {
                 return backgroundPermissionOptionLabel.toString()

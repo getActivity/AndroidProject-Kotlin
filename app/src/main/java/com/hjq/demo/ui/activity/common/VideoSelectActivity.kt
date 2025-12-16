@@ -81,7 +81,7 @@ class VideoSelectActivity : AppActivity(), StatusAction, Runnable, BaseAdapter.O
                     val multipleVisualMedia = PickMultipleVisualMedia(maxSelect)
                     val intent = multipleVisualMedia.createIntent(activity, visualMediaRequest)
                     activity.startActivityForResult(intent, null, OnActivityCallback { resultCode, data ->
-                        val uris: List<Uri> = multipleVisualMedia.parseResult(resultCode, data)
+                        val uris: MutableList<Uri> = multipleVisualMedia.parseResult(resultCode, data).toMutableList()
                         if (uris.isEmpty()) {
                             return@OnActivityCallback
                         }
@@ -122,9 +122,7 @@ class VideoSelectActivity : AppActivity(), StatusAction, Runnable, BaseAdapter.O
                             listener?.onCancel()
                             return@OnActivityCallback
                         }
-                        val videoBeans: ArrayList<VideoBean>? = data.getParcelableArrayListExtra(
-                            INTENT_KEY_OUT_VIDEO_LIST
-                        )
+                        val videoBeans: MutableList<VideoBean>? = data.getParcelableArrayListExtra(INTENT_KEY_OUT_VIDEO_LIST)
                         if (videoBeans.isNullOrEmpty()) {
                             listener?.onCancel()
                             return@OnActivityCallback
@@ -158,13 +156,13 @@ class VideoSelectActivity : AppActivity(), StatusAction, Runnable, BaseAdapter.O
     private var maxSelect: Int = 1
 
     /** 选中列表 */
-    private val selectVideo: ArrayList<VideoBean> = ArrayList()
+    private val selectVideo: MutableList<VideoBean> = mutableListOf()
 
     /** 全部视频 */
-    private val allVideo: MutableList<VideoBean> = ArrayList<VideoBean>()
+    private val allVideo: MutableList<VideoBean> = mutableListOf()
 
     /** 视频专辑 */
-    private val allAlbum: HashMap<String, MutableList<VideoBean>> = HashMap()
+    private val allAlbum: MutableMap<String, MutableList<VideoBean>> = mutableMapOf()
 
     /** 列表适配器 */
     private val adapter: VideoSelectAdapter = VideoSelectAdapter(this, selectVideo)
@@ -220,7 +218,7 @@ class VideoSelectActivity : AppActivity(), StatusAction, Runnable, BaseAdapter.O
         if (allVideo.isEmpty()) {
             return
         }
-        val data: ArrayList<AlbumInfo> = ArrayList(allAlbum.size + 1)
+        val data: MutableList<AlbumInfo> = mutableListOf()
         var count = 0
         val keys: MutableSet<String> = allAlbum.keys
         for (key: String in keys) {
@@ -238,7 +236,7 @@ class VideoSelectActivity : AppActivity(), StatusAction, Runnable, BaseAdapter.O
             albumDialog = AlbumDialog.Builder(this)
                 .setListener(object : AlbumDialog.OnListener {
 
-                    override fun onSelected(dialog: BaseDialog?, position: Int, bean: AlbumInfo) {
+                    override fun onSelected(dialog: BaseDialog, position: Int, bean: AlbumInfo) {
                         setRightTitle(bean.getName())
                         // 滚动回第一个位置
                         recyclerView?.scrollToPosition(0)
@@ -314,7 +312,8 @@ class VideoSelectActivity : AppActivity(), StatusAction, Runnable, BaseAdapter.O
                 }
 
                 // 完成选择
-                setResult(RESULT_OK, Intent().putParcelableArrayListExtra(INTENT_KEY_OUT_VIDEO_LIST, selectVideo))
+                setResult(RESULT_OK, Intent().putParcelableArrayListExtra(INTENT_KEY_OUT_VIDEO_LIST,
+                          selectVideo.toCollection(ArrayList())))
                 finish()
             }
         }
@@ -326,14 +325,11 @@ class VideoSelectActivity : AppActivity(), StatusAction, Runnable, BaseAdapter.O
      * @param itemView          被点击的条目对象
      * @param position          被点击的条目位置
      */
-    override fun onItemClick(recyclerView: RecyclerView?, itemView: View?, position: Int) {
+    override fun onItemClick(recyclerView: RecyclerView, itemView: View, position: Int) {
         adapter.getItem(position).apply {
             VideoPlayActivity.Builder()
                 .setVideoSource(File(getVideoPath()))
-                .setActivityOrientation(
-                    if (getVideoWidth() > getVideoHeight())
-                    ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE else
-                        ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
+                .setActivityOrientation(if (getVideoWidth() > getVideoHeight()) ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE else ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
                 .start(this@VideoSelectActivity)
         }
     }
@@ -344,7 +340,7 @@ class VideoSelectActivity : AppActivity(), StatusAction, Runnable, BaseAdapter.O
      * @param itemView          被点击的条目对象
      * @param position          被点击的条目位置
      */
-    override fun onItemLongClick(recyclerView: RecyclerView?, itemView: View?, position: Int): Boolean {
+    override fun onItemLongClick(recyclerView: RecyclerView, itemView: View, position: Int): Boolean {
         if (selectVideo.size < maxSelect) {
             // 长按的时候模拟选中
             itemView?.findViewById<View?>(R.id.fl_video_select_check)?.let {
@@ -360,7 +356,7 @@ class VideoSelectActivity : AppActivity(), StatusAction, Runnable, BaseAdapter.O
      * @param childView         被点击的条目子 View Id
      * @param position          被点击的条目位置
      */
-    override fun onChildClick(recyclerView: RecyclerView?, childView: View?, position: Int) {
+    override fun onChildClick(recyclerView: RecyclerView, childView: View, position: Int) {
         when (childView?.id) {
             R.id.fl_video_select_check -> {
                 val bean: VideoBean = adapter.getItem(position)
@@ -432,11 +428,11 @@ class VideoSelectActivity : AppActivity(), StatusAction, Runnable, BaseAdapter.O
                     continue
                 }
                 val type: String? = cursor.getString(mimeTypeIndex)
-                if (type == null || type == "") {
+                if (type == null || type.isEmpty()) {
                     continue
                 }
                 val path: String? = cursor.getString(pathIndex)
-                if (path == null || path == "") {
+                if (path == null || path.isEmpty()) {
                     continue
                 }
                 val file = File(path)
@@ -449,7 +445,7 @@ class VideoSelectActivity : AppActivity(), StatusAction, Runnable, BaseAdapter.O
                 val albumName: String = parentFile.name
                 var data: MutableList<VideoBean>? = allAlbum[albumName]
                 if (data == null) {
-                    data = ArrayList()
+                    data = mutableListOf()
                     allAlbum[albumName] = data
                 }
                 val width: Int = cursor.getInt(widthIndex)
@@ -632,6 +628,8 @@ class VideoSelectActivity : AppActivity(), StatusAction, Runnable, BaseAdapter.O
         /**
          * 取消回调
          */
-        fun onCancel() {}
+        fun onCancel() {
+            // default implementation ignored
+        }
     }
 }

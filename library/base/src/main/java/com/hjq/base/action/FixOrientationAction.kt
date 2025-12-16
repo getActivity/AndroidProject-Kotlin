@@ -7,7 +7,7 @@ import android.os.Build
 
 /**
  *    author : Android 轮子哥
- *    github : https://github.com/getActivity/AndroidProject
+ *    github : https://github.com/getActivity/AndroidProject-Kotlin
  *    time   : 2022/01/20
  *    desc   : 修复透明 Activity 在 Android 8.0 固定屏幕出现崩溃的问题
  */

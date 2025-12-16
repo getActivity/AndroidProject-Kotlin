@@ -39,7 +39,7 @@ class PhoneResetActivity : AppActivity(), OnEditorActionListener {
         private const val INTENT_KEY_IN_CODE: String = "code"
 
         @Log
-        fun start(context: Context, code: String?) {
+        fun start(context: Context, code: String) {
             val intent = context.createIntent(PhoneResetActivity::class.java)
             intent.putExtra(INTENT_KEY_IN_CODE, code)
             context.startActivity(intent)
@@ -148,7 +148,7 @@ class PhoneResetActivity : AppActivity(), OnEditorActionListener {
     /**
      * [TextView.OnEditorActionListener]
      */
-    override fun onEditorAction(v: TextView?, actionId: Int, event: KeyEvent?): Boolean {
+    override fun onEditorAction(v: TextView, actionId: Int, event: KeyEvent): Boolean {
         if (actionId == EditorInfo.IME_ACTION_DONE) {
             // 模拟点击提交按钮
             commitView?.let {

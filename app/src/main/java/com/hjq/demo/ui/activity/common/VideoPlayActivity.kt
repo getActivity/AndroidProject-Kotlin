@@ -41,14 +41,13 @@ open class VideoPlayActivity : AppActivity(), OnPlayListener {
 
     override fun initData() {
         builder = getParcelable(INTENT_KEY_PARAMETERS)
-        if (builder == null) {
-            throw IllegalArgumentException("are you ok?")
-        }
-        playerView?.setVideoTitle(builder!!.getVideoTitle())
-        playerView?.setVideoSource(builder!!.getVideoSource())
-        playerView?.setGestureEnabled(builder!!.isGestureEnabled())
-        if (builder!!.isAutoPlay()) {
-            playerView?.start()
+        requireNotNull(builder).apply {
+            playerView?.setVideoTitle(getVideoTitle())
+            playerView?.setVideoSource(getVideoSource())
+            playerView?.setGestureEnabled(isGestureEnabled())
+            if (isAutoPlay()) {
+                playerView?.start()
+            }
         }
     }
 

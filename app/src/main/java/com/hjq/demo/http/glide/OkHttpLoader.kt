@@ -31,6 +31,8 @@ class OkHttpLoader private constructor(private val factory: Call.Factory) : Mode
             return OkHttpLoader(factory)
         }
 
-        override fun teardown() {}
+        override fun teardown() {
+            // default implementation ignored
+        }
     }
 }

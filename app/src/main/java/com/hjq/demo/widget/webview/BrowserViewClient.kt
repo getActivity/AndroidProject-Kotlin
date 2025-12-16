@@ -21,7 +21,7 @@ import timber.log.Timber
 
 /**
  *    author : Android 轮子哥
- *    github : https://github.com/getActivity/AndroidProject
+ *    github : https://github.com/getActivity/AndroidProject-Kotlin
  *    time   : 2019/09/24
  *    desc   : 基于原生 WebViewClient 封装
  */
@@ -32,7 +32,7 @@ open class BrowserViewClient : WebViewClient() {
     private var description: String? = null
     private var failingUrl: String? = null
 
-    override fun onPageStarted(view: WebView, url: String?, favicon: Bitmap?) {
+    override fun onPageStarted(view: WebView, url: String, favicon: Bitmap?) {
         super.onPageStarted(view, url, favicon)
         log(String.format("onPageStarted: url = %s", url))
         loadingFail = false
@@ -53,7 +53,7 @@ open class BrowserViewClient : WebViewClient() {
     /**
      * 网页加载错误时回调，需要注意的是：这个方法会在 onPageFinished 之前调用
      */
-    override fun onReceivedError(view: WebView, errorCode: Int, description: String?, failingUrl: String?) {
+    override fun onReceivedError(view: WebView, errorCode: Int, description: String, failingUrl: String) {
         super.onReceivedError(view, errorCode, description, failingUrl)
         log(String.format("onReceivedError: errorCode = %s, description = %s, failingUrl = %s",
                             errorCode, description, failingUrl))
@@ -63,7 +63,7 @@ open class BrowserViewClient : WebViewClient() {
         this.failingUrl = failingUrl
     }
 
-    override fun onPageFinished(view: WebView, url: String?) {
+    override fun onPageFinished(view: WebView, url: String) {
         super.onPageFinished(view, url)
         log(String.format("onPageFinished: url = %s", url))
         val progress = view.progress
@@ -75,27 +75,27 @@ open class BrowserViewClient : WebViewClient() {
         }
         if (loadingFail) {
             // 加载出错之后会先调用 onReceivedError 再调用 onPageFinished
-            onWebPageLoadFail(view, errorCode, description, failingUrl)
+            onWebPageLoadFail(view, errorCode, description ?: "", failingUrl ?: "")
         } else {
             onWebPageLoadSuccess(view, url)
         }
         onWebPageLoadFinished(view, url, !loadingFail)
     }
 
-    open fun onWebPageLoadStarted(view: WebView, url: String?, favicon: Bitmap?) {
+    open fun onWebPageLoadStarted(view: WebView, url: String, favicon: Bitmap?) {
         log(String.format("onWebPageLoadStarted: url = %s", url))
     }
 
-    open fun onWebPageLoadSuccess(view: WebView, url: String?) {
+    open fun onWebPageLoadSuccess(view: WebView, url: String) {
         log(String.format("onWebPageLoadSuccess: url = %s", url))
     }
 
-    open fun onWebPageLoadFail(view: WebView, errorCode: Int, description: String?, failingUrl: String?) {
+    open fun onWebPageLoadFail(view: WebView, errorCode: Int, description: String, failingUrl: String) {
         log(String.format("onWebPageLoadFail: errorCode = %s, description = %s, failingUrl = %s",
                             errorCode, description, failingUrl))
     }
 
-    open fun onWebPageLoadFinished(view: WebView, url: String?, success: Boolean) {
+    open fun onWebPageLoadFinished(view: WebView, url: String, success: Boolean) {
         log(String.format("onWebPageLoadFinished: url = %s", url))
     }
 
@@ -125,11 +125,11 @@ open class BrowserViewClient : WebViewClient() {
             .setListener(object : MessageDialog.OnListener {
 
                 @SuppressLint("WebViewClientOnReceivedSslError")
-                override fun onConfirm(dialog: BaseDialog?) {
+                override fun onConfirm(dialog: BaseDialog) {
                     onUserProceedSslError(handler)
                 }
 
-                override fun onCancel(dialog: BaseDialog?) {
+                override fun onCancel(dialog: BaseDialog) {
                     onUserRefuseSslError(handler)
                 }
             })
@@ -141,10 +141,7 @@ open class BrowserViewClient : WebViewClient() {
      */
     protected open fun onUserProceedSslError(handler: SslErrorHandler?) {
         log("onUserProceedSslError")
-        if (handler == null) {
-            return
-        }
-        handler.proceed()
+        handler?.proceed()
     }
 
     /**
@@ -152,10 +149,7 @@ open class BrowserViewClient : WebViewClient() {
      */
     protected open fun onUserRefuseSslError(handler: SslErrorHandler?) {
         log("onUserRefuseSslError")
-        if (handler == null) {
-            return
-        }
-        handler.cancel()
+        handler?.cancel()
     }
 
     /**
@@ -193,7 +187,7 @@ open class BrowserViewClient : WebViewClient() {
             .setCancelable(false)
             .setListener(object : MessageDialog.OnListener {
 
-                override fun onConfirm(dialog: BaseDialog?) {
+                override fun onConfirm(dialog: BaseDialog) {
                     val intent = context.createIntent(Intent.ACTION_DIAL)
                     intent.data = Uri.parse(url)
                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
@@ -204,6 +198,9 @@ open class BrowserViewClient : WebViewClient() {
     }
 
     protected fun log(message: String?) {
+        if (message == null) {
+            return
+        }
         Timber.i(message)
     }
 }

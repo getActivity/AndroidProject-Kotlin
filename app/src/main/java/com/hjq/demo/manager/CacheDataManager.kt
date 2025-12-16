@@ -45,6 +45,7 @@ object CacheDataManager {
             return false
         }
         if (!dir.isDirectory) {
+            // noinspection ResultOfMethodCallIgnored
             return dir.delete()
         }
         val children: Array<out String> = dir.list() ?: return false

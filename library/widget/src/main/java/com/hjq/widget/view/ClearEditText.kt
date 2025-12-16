@@ -27,7 +27,7 @@ class ClearEditText @JvmOverloads constructor(
     RegexEditText(context, attrs, defStyleAttr),
     OnTouchListener, OnFocusChangeListener, TextWatcher {
 
-    private val clearDrawable: Drawable = DrawableCompat.wrap(ContextCompat.getDrawable(context, R.drawable.input_delete_ic)!!)
+    private val clearDrawable: Drawable = DrawableCompat.wrap(requireNotNull(ContextCompat.getDrawable(context, R.drawable.input_delete_ic)))
     private var touchListener: OnTouchListener? = null
     private var focusChangeListener: OnFocusChangeListener? = null
 
@@ -49,12 +49,12 @@ class ClearEditText @JvmOverloads constructor(
             if (visible) clearDrawable else null, drawables[3])
     }
 
-    override fun setOnFocusChangeListener(onFocusChangeListener: OnFocusChangeListener?) {
-        focusChangeListener = onFocusChangeListener
+    override fun setOnFocusChangeListener(listener: OnFocusChangeListener?) {
+        focusChangeListener = listener
     }
 
-    override fun setOnTouchListener(onTouchListener: OnTouchListener?) {
-        touchListener = onTouchListener
+    override fun setOnTouchListener(listener: OnTouchListener?) {
+        touchListener = listener
     }
 
     /**
@@ -100,7 +100,11 @@ class ClearEditText @JvmOverloads constructor(
         }
     }
 
-    override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+    override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {
+        // default implementation ignored
+    }
 
-    override fun afterTextChanged(s: Editable?) {}
+    override fun afterTextChanged(s: Editable) {
+        // default implementation ignored
+    }
 }

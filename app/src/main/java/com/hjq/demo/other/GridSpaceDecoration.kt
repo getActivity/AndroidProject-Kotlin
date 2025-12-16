@@ -14,11 +14,15 @@ import kotlin.math.roundToInt
  *    time   : 2019/07/25
  *    desc   : 图片选择列表分割线
  */
-class GridSpaceDecoration constructor(private val space: Int) : ItemDecoration() {
+class GridSpaceDecoration(private val space: Int) : ItemDecoration() {
 
-    override fun onDraw(canvas: Canvas, recyclerView: RecyclerView, state: RecyclerView.State) {}
+    override fun onDraw(canvas: Canvas, recyclerView: RecyclerView, state: RecyclerView.State) {
+        // default implementation ignored
+    }
 
-    override fun onDrawOver(canvas: Canvas, recyclerView: RecyclerView, state: RecyclerView.State) {}
+    override fun onDrawOver(canvas: Canvas, recyclerView: RecyclerView, state: RecyclerView.State) {
+        // default implementation ignored
+    }
 
     override fun getItemOffsets(rect: Rect, view: View, recyclerView: RecyclerView, state: RecyclerView.State) {
         val position: Int = recyclerView.getChildAdapterPosition(view)

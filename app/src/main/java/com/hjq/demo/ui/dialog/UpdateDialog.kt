@@ -126,7 +126,7 @@ class UpdateDialog {
             if (view === updateView) {
                 // 判断下载状态
                 if (downloadComplete) {
-                    if (apkFile!!.isFile) {
+                    if (apkFile?.isFile == true) {
                         // 下载完毕，安装 Apk
                         startInstall()
                     } else {
@@ -169,7 +169,7 @@ class UpdateDialog {
                 channel.enableVibration(false)
                 channel.vibrationPattern = longArrayOf(0)
                 channel.setSound(null, null)
-                notificationManager.createNotificationChannel(channel)
+                notificationManager?.createNotificationChannel(channel)
                 channelId = channel.id
             }
             val notificationBuilder: NotificationCompat.Builder = NotificationCompat.Builder(getContext(), channelId)
@@ -216,13 +216,13 @@ class UpdateDialog {
                     }
 
                     override fun onDownloadProgressChange(file: File, progress: Int) {
-                        updateView?.text = String.format(getString(R.string.update_status_running)!!, progress)
+                        updateView?.text = String.format(getString(R.string.update_status_running) ?: "", progress)
                         progressView?.progress = progress
                         // 更新下载通知
-                        notificationManager.notify(
+                        notificationManager?.notify(
                             notificationId, notificationBuilder
                                 // 设置通知的文本
-                                .setContentText(String.format(getString(R.string.update_status_running)!!, progress))
+                                .setContentText(String.format(getString(R.string.update_status_running) ?: "", progress))
                                 // 设置下载的进度
                                 .setProgress(100, progress, false)
                                 // 设置点击通知后是否自动消失
@@ -235,6 +235,11 @@ class UpdateDialog {
                     }
 
                     override fun onDownloadSuccess(file: File) {
+                        updateView?.setText(R.string.update_status_successful)
+                        // 标记成下载完成
+                        downloadComplete = true
+                        // 安装 Apk
+                        startInstall()
                         val pendingIntentFlag: Int = if (isAndroid12()) {
                             // Targeting S+ (version 31 and above) requires that one of FLAG_IMMUTABLE or FLAG_MUTABLE be specified when creating a PendingIntent.
                             // Strongly consider using FLAG_IMMUTABLE, only use FLAG_MUTABLE if some functionality depends on the PendingIntent being mutable, e.g.
@@ -244,10 +249,10 @@ class UpdateDialog {
                             PendingIntent.FLAG_UPDATE_CURRENT
                         }
                         // 显示下载成功通知
-                        notificationManager.notify(
+                        notificationManager?.notify(
                             notificationId, notificationBuilder
                                 // 设置通知的文本
-                                .setContentText(String.format(getString(R.string.update_status_successful)!!, 100))
+                                .setContentText(String.format(getString(R.string.update_status_successful) ?: "", 100))
                                 // 设置下载的进度
                                 .setProgress(100, 100, false)
                                 // 设置通知点击之后的意图
@@ -259,16 +264,11 @@ class UpdateDialog {
                                 .setOngoing(false)
                                 .build()
                         )
-                        updateView?.setText(R.string.update_status_successful)
-                        // 标记成下载完成
-                        downloadComplete = true
-                        // 安装 Apk
-                        startInstall()
                     }
 
                     override fun onDownloadFail(file: File, throwable: Throwable) {
                         // 清除通知
-                        notificationManager.cancel(notificationId)
+                        notificationManager?.cancel(notificationId)
                         updateView?.setText(R.string.update_status_failed)
                         // 删除下载的文件
                         file.delete()
@@ -308,15 +308,17 @@ class UpdateDialog {
          */
         private fun getInstallIntent(): Intent {
             val intent = getContext().createIntent(Intent.ACTION_VIEW)
-            val uri: Uri? = if (isAndroid7()) {
-                FileProvider.getUriForFile(getContext(), AppConfig.getPackageName() + ".provider", apkFile!!)
-            } else {
-                Uri.fromFile(apkFile)
+            apkFile?.let {
+                val uri: Uri? = if (isAndroid7()) {
+                    FileProvider.getUriForFile(getContext(), AppConfig.getPackageName() + ".provider", it)
+                } else {
+                    Uri.fromFile(it)
+                }
+                intent.setDataAndType(uri, "application/vnd.android.package-archive")
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                // 对目标应用临时授权该 Uri 读写权限
+                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
             }
-            intent.setDataAndType(uri, "application/vnd.android.package-archive")
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            // 对目标应用临时授权该 Uri 读写权限
-            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
             return intent
         }
     }

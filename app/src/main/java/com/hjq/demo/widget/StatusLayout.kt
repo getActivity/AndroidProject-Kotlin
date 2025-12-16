@@ -5,7 +5,6 @@ import android.content.res.TypedArray
 import android.graphics.drawable.Drawable
 import android.util.AttributeSet
 import android.view.LayoutInflater
-import android.view.View.OnClickListener
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.TextView
@@ -53,9 +52,9 @@ class StatusLayout @JvmOverloads constructor(
         if (isShow()) {
             return
         }
-        retryView!!.visibility = if (listener == null) INVISIBLE else VISIBLE
+        retryView?.visibility = if (listener == null) INVISIBLE else VISIBLE
         // 显示布局
-        mainLayout!!.visibility = VISIBLE
+        mainLayout?.visibility = VISIBLE
     }
 
     /**
@@ -66,7 +65,7 @@ class StatusLayout @JvmOverloads constructor(
             return
         }
         //隐藏布局
-        mainLayout!!.visibility = INVISIBLE
+        mainLayout?.visibility = INVISIBLE
     }
 
     /**
@@ -120,17 +119,17 @@ class StatusLayout @JvmOverloads constructor(
      */
     private fun initLayout() {
         mainLayout = LayoutInflater.from(context).inflate(R.layout.widget_status_layout, this, false) as ViewGroup
-        lottieView = mainLayout!!.findViewById(R.id.iv_status_icon)
-        textView = mainLayout!!.findViewById(R.id.tv_status_text)
-        retryView = mainLayout!!.findViewById(R.id.iv_status_retry)
-        if (mainLayout!!.background == null) {
+        lottieView = mainLayout?.findViewById(R.id.iv_status_icon)
+        textView = mainLayout?.findViewById(R.id.tv_status_text)
+        retryView = mainLayout?.findViewById(R.id.iv_status_retry)
+        if (mainLayout?.background == null) {
             // 默认使用 windowBackground 作为背景
             val typedArray: TypedArray = context.obtainStyledAttributes(intArrayOf(android.R.attr.windowBackground))
-            mainLayout!!.background = typedArray.getDrawable(0)
-            mainLayout!!.isClickable = true
+            mainLayout?.background = typedArray.getDrawable(0)
+            mainLayout?.isClickable = true
             typedArray.recycle()
         }
-        retryView!!.setOnClickListener(clickWrapper)
+        retryView?.setOnClickListener(clickWrapper)
         addView(mainLayout)
     }
 
@@ -140,7 +139,7 @@ class StatusLayout @JvmOverloads constructor(
     fun setOnRetryListener(listener: OnRetryListener?) {
         this.listener = listener
         if (isShow()) {
-            retryView!!.visibility = if (this.listener == null) INVISIBLE else VISIBLE
+            retryView?.visibility = if (this.listener == null) INVISIBLE else VISIBLE
         }
     }
 

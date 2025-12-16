@@ -81,7 +81,7 @@ class SettingActivity : AppActivity(), SwitchButton.OnCheckedChangeListener {
                     .setList(R.string.setting_language_simple, R.string.setting_language_complex)
                     .setListener(object : MenuDialog.OnListener<String> {
 
-                        override fun onSelected(dialog: BaseDialog?, position: Int, data: String) {
+                        override fun onSelected(dialog: BaseDialog, position: Int, data: String) {
                             languageView?.setRightText(data)
                             BrowserActivity.start(this@SettingActivity, "https://github.com/getActivity/MultiLanguages")
                         }
@@ -110,7 +110,7 @@ class SettingActivity : AppActivity(), SwitchButton.OnCheckedChangeListener {
                 SafeDialog.Builder(this)
                     .setListener(object : SafeDialog.OnListener {
 
-                        override fun onConfirm(dialog: BaseDialog?, phone: String, code: String) {
+                        override fun onConfirm(dialog: BaseDialog, phone: String, code: String) {
                             PhoneResetActivity.start(this@SettingActivity, code)
                         }
                     })
@@ -121,7 +121,7 @@ class SettingActivity : AppActivity(), SwitchButton.OnCheckedChangeListener {
                 SafeDialog.Builder(this)
                     .setListener(object : SafeDialog.OnListener {
 
-                        override fun onConfirm(dialog: BaseDialog?, phone: String, code: String) {
+                        override fun onConfirm(dialog: BaseDialog, phone: String, code: String) {
                             PasswordResetActivity.start(this@SettingActivity, phone, code)
                         }
                     })

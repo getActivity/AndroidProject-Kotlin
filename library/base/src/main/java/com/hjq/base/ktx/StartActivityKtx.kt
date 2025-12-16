@@ -7,8 +7,6 @@ import android.os.Bundle
 import androidx.fragment.app.Fragment
 import com.hjq.base.BaseActivity
 import com.hjq.base.BaseFragment
-import java.util.Random
-import kotlin.math.pow
 
 /**
  *    author : Android 轮子哥
@@ -111,10 +109,9 @@ fun BaseActivity.startActivityForResult(action: String, block: (Intent.() -> Uni
 @Suppress("deprecation")
 fun BaseActivity.startActivityForResult(intent: Intent, block: (Intent.() -> Unit)? = null,
                                         callback: BaseActivity.OnActivityCallback?, options: Bundle? = null) {
-    // 请求码必须在 2 的 16 次方以内
     startActivityForResult(intent.apply {
         block?.invoke(this)
-    }, Random().nextInt(2.0.pow(16.0).toInt()), callback, options)
+    }, callback, options)
 }
 
 /* ------------------------------ 我是一条华丽的分割线 ------------------------------ */

@@ -14,11 +14,11 @@ class XCollapsingToolbarLayout @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0) :
     CollapsingToolbarLayout(context, attrs, defStyleAttr) {
 
-    /** 渐变监听 */
-    private var listener: OnScrimsListener? = null
-
     /** 当前渐变状态 */
     private var scrimsShownStatus: Boolean = false
+
+    /** 渐变监听 */
+    private var listener: OnScrimsListener? = null
 
     override fun setScrimsShown(shown: Boolean, animate: Boolean) {
         super.setScrimsShown(shown, true)
@@ -55,6 +55,6 @@ class XCollapsingToolbarLayout @JvmOverloads constructor(
          *
          * @param shown         渐变开关
          */
-        fun onScrimsStateChange(layout: XCollapsingToolbarLayout?, shown: Boolean)
+        fun onScrimsStateChange(layout: XCollapsingToolbarLayout, shown: Boolean)
     }
 }

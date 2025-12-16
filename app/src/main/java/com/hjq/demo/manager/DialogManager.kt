@@ -7,7 +7,7 @@ import com.hjq.base.BaseDialog
 
 /**
  *    author : Android 轮子哥
- *    github : https://github.com/getActivity/AndroidProject
+ *    github : https://github.com/getActivity/AndroidProject-Kotlin
  *    time   : 2021/01/29
  *    desc   : Dialog 显示管理类
  */
@@ -16,7 +16,7 @@ class DialogManager private constructor(lifecycleOwner: LifecycleOwner) :
 
     companion object {
 
-        private val DIALOG_MANAGER = HashMap<LifecycleOwner, DialogManager>()
+        private val DIALOG_MANAGER: MutableMap<LifecycleOwner, DialogManager> = mutableMapOf()
 
         fun getInstance(lifecycleOwner: LifecycleOwner): DialogManager {
             var manager = DIALOG_MANAGER[lifecycleOwner]
@@ -32,10 +32,9 @@ class DialogManager private constructor(lifecycleOwner: LifecycleOwner) :
         lifecycleOwner.lifecycle.addObserver(this)
     }
 
-    var dialogList: MutableList<BaseDialog?> = ArrayList()
-    private set
+    private var dialogList: MutableList<BaseDialog?> = mutableListOf()
 
-    private val dialogPriority = HashMap<BaseDialog?, Int>()
+    private val dialogPriority: MutableMap<BaseDialog?, Int> = mutableMapOf()
 
     /**
      * 添加 Dialog 对象
@@ -53,7 +52,7 @@ class DialogManager private constructor(lifecycleOwner: LifecycleOwner) :
         for (i in dialogList.indices) {
             val itemDialog = dialogList[i]
             val itemPriority = dialogPriority[itemDialog] ?: continue
-            if (priority > itemPriority && !itemDialog!!.isShowing) {
+            if (priority > itemPriority && itemDialog?.isShowing == false) {
                 dialogIndex = i
             }
         }
@@ -97,8 +96,8 @@ class DialogManager private constructor(lifecycleOwner: LifecycleOwner) :
         dialogPriority.clear()
     }
 
-    override fun onDismiss(dialog: BaseDialog?) {
-        dialog?.removeOnDismissListener(this)
+    override fun onDismiss(dialog: BaseDialog) {
+        dialog.removeOnDismissListener(this)
         dialogList.remove(dialog)
         dialogPriority.remove(dialog)
         for (nextDialog in dialogList) {
@@ -116,12 +115,12 @@ class DialogManager private constructor(lifecycleOwner: LifecycleOwner) :
     /**
      * [LifecycleEventObserver]
      */
-    override fun onStateChanged(lifecycleOwner: LifecycleOwner, event: Lifecycle.Event) {
+    override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
         if (event != Lifecycle.Event.ON_DESTROY) {
             return
         }
-        DIALOG_MANAGER.remove(lifecycleOwner)
-        lifecycleOwner.lifecycle.removeObserver(this)
+        DIALOG_MANAGER.remove(source)
+        source.lifecycle.removeObserver(this)
         clearShow()
     }
 }

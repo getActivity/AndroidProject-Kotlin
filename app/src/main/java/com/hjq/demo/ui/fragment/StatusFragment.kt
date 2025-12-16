@@ -40,10 +40,11 @@ class StatusFragment : TitleBarFragment<AppActivity>(), OnRefreshLoadMoreListene
     }
 
     override fun initView() {
-        adapter = StatusAdapter(getAttachActivity()!!)
-        adapter?.setOnItemClickListener(this)
-
-        recyclerView?.adapter = adapter
+        recyclerView?.let {
+            adapter = StatusAdapter(it.context)
+            adapter?.setOnItemClickListener(this)
+            it.adapter = adapter
+        }
 
         val headerView: TextView? = recyclerView?.addHeaderView(R.layout.picker_item)
         headerView?.text = "我是头部"
@@ -63,10 +64,10 @@ class StatusFragment : TitleBarFragment<AppActivity>(), OnRefreshLoadMoreListene
      * 模拟数据
      */
     private fun analogData(): MutableList<String?> {
-        val data: MutableList<String?> = ArrayList()
+        val data: MutableList<String?> = mutableListOf()
         adapter?.let {
             for (i in it.getCount() until it.getCount() + 20) {
-                data.add("我是第 " + i + " 条目")
+                data.add("我是第 $i 条目")
             }
             return data
         }
@@ -80,7 +81,7 @@ class StatusFragment : TitleBarFragment<AppActivity>(), OnRefreshLoadMoreListene
      * @param itemView          被点击的条目对象
      * @param position          被点击的条目位置
      */
-    override fun onItemClick(recyclerView: RecyclerView?, itemView: View?, position: Int) {
+    override fun onItemClick(recyclerView: RecyclerView, itemView: View, position: Int) {
         toast(adapter?.getItem(position))
     }
 

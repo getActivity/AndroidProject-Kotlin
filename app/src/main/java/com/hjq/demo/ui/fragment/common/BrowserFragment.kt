@@ -16,9 +16,9 @@ import com.hjq.demo.ui.activity.common.BrowserActivity
 import com.hjq.demo.widget.StatusLayout
 import com.hjq.demo.widget.StatusLayout.OnRetryListener
 import com.hjq.demo.widget.webview.BrowserChromeClient
+import com.hjq.demo.widget.webview.BrowserFullScreenController
 import com.hjq.demo.widget.webview.BrowserView
 import com.hjq.demo.widget.webview.BrowserViewClient
-import com.hjq.demo.widget.webview.FullScreenModeController
 import com.scwang.smart.refresh.layout.SmartRefreshLayout
 import com.scwang.smart.refresh.layout.api.RefreshLayout
 import com.scwang.smart.refresh.layout.listener.OnRefreshListener
@@ -46,7 +46,7 @@ class BrowserFragment : AppFragment<AppActivity>(), StatusAction, OnRefreshListe
         }
     }
 
-    private val fullScreenModeController by lazy { FullScreenModeController() }
+    private val fullScreenController by lazy { BrowserFullScreenController() }
 
     private val statusLayout: StatusLayout? by lazyFindViewById(R.id.sl_browser_status)
     private val refreshLayout: SmartRefreshLayout? by lazyFindViewById(R.id.sl_browser_refresh)
@@ -70,7 +70,7 @@ class BrowserFragment : AppFragment<AppActivity>(), StatusAction, OnRefreshListe
         browserView?.apply {
             setBrowserViewClient(AppBrowserViewClient())
             setBrowserChromeClient(AppBrowserChromeClient(this))
-            loadUrl(getString(INTENT_KEY_IN_URL)!!)
+            getString(INTENT_KEY_IN_URL)?.let { loadUrl(it) }
         }
         showLoading()
     }
@@ -96,7 +96,7 @@ class BrowserFragment : AppFragment<AppActivity>(), StatusAction, OnRefreshListe
 
     private inner class AppBrowserViewClient : BrowserViewClient() {
 
-        override fun onWebPageLoadFinished(view: WebView, url: String?, success: Boolean) {
+        override fun onWebPageLoadFinished(view: WebView, url: String, success: Boolean) {
             super.onWebPageLoadFinished(view, url, success)
             refreshLayout?.finishRefresh()
             if (success) {
@@ -116,7 +116,7 @@ class BrowserFragment : AppFragment<AppActivity>(), StatusAction, OnRefreshListe
         override fun shouldOverrideUrlLoading(view: WebView, url: String): Boolean {
             val scheme: String = Uri.parse(url).scheme ?: return true
             when (scheme.lowercase(Locale.getDefault())) {
-                "http", "https" -> BrowserActivity.start(getAttachActivity()!!, url)
+                "http", "https" -> getAttachActivity()?.let { BrowserActivity.start(it, url) }
             }
             // 已经处理该链接请求
             return true
@@ -129,14 +129,16 @@ class BrowserFragment : AppFragment<AppActivity>(), StatusAction, OnRefreshListe
          * 播放视频时进入全屏回调
          */
         override fun onShowCustomView(view: View, callback: CustomViewCallback) {
-            fullScreenModeController.enterFullScreenMode(getAttachActivity(), view, callback)
+            val activity = getAttachActivity() ?: return
+            fullScreenController.enterFullScreen(activity, view, callback)
         }
 
         /**
          * 播放视频时退出全屏回调
          */
         override fun onHideCustomView() {
-            fullScreenModeController.exitFullScreenMode(getAttachActivity())
+            val activity = getAttachActivity() ?: return
+            fullScreenController.exitFullScreen(activity)
         }
     }
 }

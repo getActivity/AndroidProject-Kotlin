@@ -20,7 +20,7 @@ import com.hjq.demo.aop.SingleClick
  */
 class MessageDialog {
 
-    open class Builder constructor(context: Context) : StyleDialog.Builder<Builder>(context) {
+    open class Builder(context: Context) : StyleDialog.Builder<Builder>(context) {
 
         val messageView: TextView? by lazyFindViewById(R.id.tv_message_message)
 
@@ -58,11 +58,11 @@ class MessageDialog {
             when (view.id) {
                 R.id.tv_ui_confirm -> {
                     performClickDismiss()
-                    listener?.onConfirm(getDialog())
+                    listener?.onConfirm(requireNotNull(getDialog()))
                 }
                 R.id.tv_ui_cancel -> {
                     performClickDismiss()
-                    listener?.onCancel(getDialog())
+                    listener?.onCancel(requireNotNull(getDialog()))
                 }
             }
         }
@@ -73,11 +73,13 @@ class MessageDialog {
         /**
          * 点击确定时回调
          */
-        fun onConfirm(dialog: BaseDialog?)
+        fun onConfirm(dialog: BaseDialog)
 
         /**
          * 点击取消时回调
          */
-        fun onCancel(dialog: BaseDialog?) {}
+        fun onCancel(dialog: BaseDialog) {
+            // default implementation ignored
+        }
     }
 }

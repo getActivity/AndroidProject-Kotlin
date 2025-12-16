@@ -46,7 +46,7 @@ import java.lang.ref.SoftReference
  *    desc   : PopupWindow 技术基类
  */
 @Suppress("LeakingThis")
-open class BasePopupWindow constructor(private val context: Context) : PopupWindow(context),
+open class BasePopupWindow(private val context: Context) : PopupWindow(context),
     LifecycleOwner, ContextAction, HandlerAction, ClickAction, AnimAction, PopupWindow.OnDismissListener {
 
     override val lifecycle: LifecycleRegistry = LifecycleRegistry(this)
@@ -136,7 +136,10 @@ open class BasePopupWindow constructor(private val context: Context) : PopupWind
         lifecycle.handleLifecycleEvent(Lifecycle.Event.ON_CREATE)
         lifecycle.handleLifecycleEvent(Lifecycle.Event.ON_START)
         lifecycle.handleLifecycleEvent(Lifecycle.Event.ON_RESUME)
-        val listeners = ArrayList<OnShowListener>(showListeners)
+        // 这里解释一下为什么要创建一个新的 ArrayList，这是因为执行监听方法可能会删除 List 集合中的元素
+        // 例如 Builder 类中的 postDelayed 方法，就会移除监听对象，所以这里遍历可能出现 ConcurrentModificationException
+        val listeners: MutableList<OnShowListener> = mutableListOf()
+        showListeners.toCollection(listeners)
         for (listener in listeners) {
             listener.onShow(this)
         }
@@ -149,7 +152,10 @@ open class BasePopupWindow constructor(private val context: Context) : PopupWind
         lifecycle.handleLifecycleEvent(Lifecycle.Event.ON_PAUSE)
         lifecycle.handleLifecycleEvent(Lifecycle.Event.ON_STOP)
         lifecycle.handleLifecycleEvent(Lifecycle.Event.ON_DESTROY)
-        val listeners = ArrayList<OnDismissListener>(dismissListeners)
+        // 这里解释一下为什么要创建一个新的 ArrayList，这是因为执行监听方法可能会删除 List 集合中的元素
+        // 例如 Builder 类中的 postDelayed 方法，就会移除监听对象，所以这里遍历可能出现 ConcurrentModificationException
+        val listeners: MutableList<OnDismissListener> = mutableListOf()
+        dismissListeners.toCollection(listeners)
         for (listener in listeners) {
             listener.onDismiss(this)
         }
@@ -214,8 +220,10 @@ open class BasePopupWindow constructor(private val context: Context) : PopupWind
         }
         if (popupBackground == null && alpha != 1f) {
             popupBackground = PopupBackground()
-            addOnShowListener(popupBackground!!)
-            addOnDismissListener(popupBackground!!)
+            popupBackground?.let {
+                addOnShowListener(it)
+                addOnDismissListener(it)
+            }
         }
         if (popupBackground != null) {
             popupBackground?.setAlpha(alpha)
@@ -241,7 +249,7 @@ open class BasePopupWindow constructor(private val context: Context) : PopupWind
     }
 
     @Suppress("UNCHECKED_CAST")
-    open class Builder<B : Builder<B>> constructor(
+    open class Builder<B : Builder<B>>(
         private val context: Context
     ) : ContextAction, ResourcesAction, ClickAction {
 
@@ -312,10 +320,10 @@ open class BasePopupWindow constructor(private val context: Context) : PopupWind
             }
             contentView = view
             if (isCreated()) {
-                popupWindow!!.contentView = view
+                popupWindow?.contentView = view
                 return this as B
             }
-            val layoutParams: ViewGroup.LayoutParams? = contentView!!.layoutParams
+            val layoutParams: ViewGroup.LayoutParams? = contentView?.layoutParams
             if ((layoutParams != null) && (width == ViewGroup.LayoutParams.WRAP_CONTENT) && (height == ViewGroup.LayoutParams.WRAP_CONTENT)) {
                 // 如果当前 PopupWindow 的宽高设置了自适应，就以布局中设置的宽高为主
                 setWidth(layoutParams.width)
@@ -360,7 +368,7 @@ open class BasePopupWindow constructor(private val context: Context) : PopupWind
         open fun setWidth(width: Int): B {
             this.width = width
             if (isCreated()) {
-                popupWindow!!.width = width
+                popupWindow?.width = width
                 return this as B
             }
             val params: ViewGroup.LayoutParams? = contentView?.layoutParams
@@ -377,7 +385,7 @@ open class BasePopupWindow constructor(private val context: Context) : PopupWind
         open fun setHeight(height: Int): B {
             this.height = height
             if (isCreated()) {
-                popupWindow!!.height = height
+                popupWindow?.height = height
                 return this as B
             }
 
@@ -424,7 +432,7 @@ open class BasePopupWindow constructor(private val context: Context) : PopupWind
         open fun setTouchable(touchable: Boolean): B {
             this.touchable = touchable
             if (isCreated()) {
-                popupWindow!!.isTouchable = touchable
+                popupWindow?.isTouchable = touchable
             }
             return this as B
         }
@@ -435,7 +443,7 @@ open class BasePopupWindow constructor(private val context: Context) : PopupWind
         open fun setFocusable(focusable: Boolean): B {
             this.focusable = focusable
             if (isCreated()) {
-                popupWindow!!.isFocusable = focusable
+                popupWindow?.isFocusable = focusable
             }
             return this as B
         }
@@ -446,7 +454,7 @@ open class BasePopupWindow constructor(private val context: Context) : PopupWind
         open fun setOutsideTouchable(outsideTouchable: Boolean): B {
             this.outsideTouchable = outsideTouchable
             if (isCreated()) {
-                popupWindow!!.isOutsideTouchable = outsideTouchable
+                popupWindow?.isOutsideTouchable = outsideTouchable
             }
             return this as B
         }
@@ -457,7 +465,7 @@ open class BasePopupWindow constructor(private val context: Context) : PopupWind
         open fun setBackgroundDimAmount(@FloatRange(from = 0.0, to = 1.0) dimAmount: Float): B {
             backgroundDimAmount = dimAmount
             if (isCreated()) {
-                popupWindow!!.setBackgroundDimAmount(dimAmount)
+                popupWindow?.setBackgroundDimAmount(dimAmount)
             }
             return this as B
         }
@@ -535,39 +543,27 @@ open class BasePopupWindow constructor(private val context: Context) : PopupWind
         /**
          * 设置文本
          */
-        open fun setText(@IdRes viewId: Int, @StringRes stringId: Int): B {
-            return setText(viewId, getString(stringId))
+        open fun setTextByTextView(@IdRes viewId: Int, @StringRes stringId: Int): B {
+            return setTextByTextView(viewId, getString(stringId))
         }
 
-        open fun setText(@IdRes id: Int, text: CharSequence?): B {
-            (findViewById<View?>(id) as TextView?)?.text = text
+        open fun setTextByTextView(@IdRes id: Int, text: CharSequence?): B {
+            findViewById<TextView?>(id)?.text = text
             return this as B
         }
 
         /**
          * 设置文本颜色
          */
-        open fun setTextColor(@IdRes id: Int, @ColorInt color: Int): B {
-            (findViewById<View?>(id) as TextView?)?.setTextColor(color)
-            return this as B
-        }
-
-        /**
-         * 设置提示
-         */
-        open fun setHint(@IdRes viewId: Int, @StringRes stringId: Int): B {
-            return setHint(viewId, getString(stringId))
-        }
-
-        open fun setHint(@IdRes id: Int, text: CharSequence?): B {
-            (findViewById<View?>(id) as TextView?)?.hint = text
+        open fun setTextColorByTextView(@IdRes id: Int, @ColorInt color: Int): B {
+            findViewById<TextView?>(id)?.setTextColor(color)
             return this as B
         }
 
         /**
          * 设置可见状态
          */
-        open fun setVisibility(@IdRes id: Int, visibility: Int): B {
+        open fun setVisibilityByView(@IdRes id: Int, visibility: Int): B {
             findViewById<View?>(id)?.visibility = visibility
             return this as B
         }
@@ -575,11 +571,11 @@ open class BasePopupWindow constructor(private val context: Context) : PopupWind
         /**
          * 设置背景
          */
-        open fun setBackground(@IdRes viewId: Int, @DrawableRes drawableId: Int): B {
-            return setBackground(viewId, getDrawable(drawableId))
+        open fun setBackgroundByView(@IdRes viewId: Int, @DrawableRes drawableId: Int): B {
+            return setBackgroundByView(viewId, getDrawable(drawableId))
         }
 
-        open fun setBackground(@IdRes id: Int, drawable: Drawable?): B {
+        open fun setBackgroundByView(@IdRes id: Int, drawable: Drawable?): B {
             findViewById<View?>(id)?.background = drawable
             return this as B
         }
@@ -587,25 +583,30 @@ open class BasePopupWindow constructor(private val context: Context) : PopupWind
         /**
          * 设置图片
          */
-        open fun setImageDrawable(@IdRes viewId: Int, @DrawableRes drawableId: Int): B {
-            return setBackground(viewId, getDrawable(drawableId))
+        open fun setDrawableByImageView(@IdRes viewId: Int, @DrawableRes drawableId: Int): B {
+            return setBackgroundByView(viewId, getDrawable(drawableId))
         }
 
-        open fun setImageDrawable(@IdRes id: Int, drawable: Drawable?): B {
-            (findViewById<View?>(id) as ImageView?)?.setImageDrawable(drawable)
+        open fun setDrawableByImageView(@IdRes id: Int, drawable: Drawable?): B {
+            findViewById<ImageView?>(id)?.setImageDrawable(drawable)
             return this as B
         }
 
         /**
          * 设置点击事件
          */
-        open fun setOnClickListener(@IdRes id: Int, listener: OnClickListener<out View>): B {
+        open fun setOnClickListenerByView(@IdRes id: Int, listener: OnClickListener<out View>): B {
             if (clickArray == null) {
                 clickArray = SparseArray()
             }
-            clickArray!!.put(id, listener as OnClickListener<View>)
+            clickArray?.put(id, listener as OnClickListener<View>)
             if (isCreated()) {
-                popupWindow?.findViewById<View?>(id)?.setOnClickListener(ViewClickWrapper(popupWindow, listener))
+                popupWindow?.let {
+                    val view = it.findViewById<View?>(id)
+                    view?.setOnClickListener(
+                        ViewClickWrapper(it, listener as OnClickListener<View>?)
+                    )
+                }
             }
             return this as B
         }
@@ -641,42 +642,42 @@ open class BasePopupWindow constructor(private val context: Context) : PopupWind
                 }
             }
             popupWindow = createPopupWindow(context)
-            popupWindow?.let { popupWindow ->
-                popupWindow.contentView = contentView
-                popupWindow.width = width
-                popupWindow.height = height
-                popupWindow.animationStyle = animStyle
-                popupWindow.isFocusable = focusable
-                popupWindow.isTouchable = touchable
-                popupWindow.isOutsideTouchable = outsideTouchable
-                popupWindow.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+            popupWindow?.let {
+                it.contentView = contentView
+                it.width = width
+                it.height = height
+                it.animationStyle = animStyle
+                it.isFocusable = focusable
+                it.isTouchable = touchable
+                it.isOutsideTouchable = outsideTouchable
+                it.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
 
                 for (listener in showListeners) {
-                    popupWindow.addOnShowListener(listener)
+                    it.addOnShowListener(listener)
                 }
 
                 for (listener in dismissListeners) {
-                    popupWindow.addOnDismissListener(listener)
+                    it.addOnDismissListener(listener)
                 }
 
-                popupWindow.setBackgroundDimAmount(backgroundDimAmount)
+                it.setBackgroundDimAmount(backgroundDimAmount)
 
                 clickArray?.let { array ->
                     var i = 0
                     while (i < array.size()) {
-                        contentView!!.findViewById<View?>(array.keyAt(i))?.
-                        setOnClickListener(ViewClickWrapper(popupWindow, array.valueAt(i)))
+                        val view = contentView?.findViewById<View?>(array.keyAt(i))
+                        view?.setOnClickListener(ViewClickWrapper(it, array.valueAt(i)))
                         i++
                     }
                 }
 
                 // 将 PopupWindow 的生命周期和 Activity 绑定在一起
                 getContext().getActivity()?.let { activity ->
-                    PopupWindowLifecycle.with(activity, popupWindow)
+                    PopupWindowLifecycle.with(activity, it)
                 }
-                createListener?.onCreate(popupWindow)
+                createListener?.onCreate(it)
             }
-            return popupWindow!!
+            return requireNotNull(popupWindow)
         }
 
         /**
@@ -724,7 +725,7 @@ open class BasePopupWindow constructor(private val context: Context) : PopupWind
          * 当前 PopupWindow 是否显示了
          */
         open fun isShowing(): Boolean {
-            return isCreated() && popupWindow!!.isShowing
+            return isCreated() && popupWindow?.isShowing == true
         }
 
         /**
@@ -761,7 +762,7 @@ open class BasePopupWindow constructor(private val context: Context) : PopupWind
                 // 没有 setContentView 就想 findViewById ?
                 throw IllegalStateException("are you ok?")
             }
-            return contentView!!.findViewById(id)
+            return contentView?.findViewById(id)
         }
 
         /**
@@ -782,9 +783,9 @@ open class BasePopupWindow constructor(private val context: Context) : PopupWind
 
             addOnShowListener(object : OnShowListener {
 
-                override fun onShow(popupWindow: BasePopupWindow?) {
+                override fun onShow(popupWindow: BasePopupWindow) {
                     removeOnShowListener(this)
-                    popupWindow?.post(runnable)
+                    popupWindow.post(runnable)
                 }
             })
         }
@@ -800,9 +801,9 @@ open class BasePopupWindow constructor(private val context: Context) : PopupWind
 
             addOnShowListener(object : OnShowListener {
 
-                override fun onShow(popupWindow: BasePopupWindow?) {
+                override fun onShow(popupWindow: BasePopupWindow) {
                     removeOnShowListener(this)
-                    popupWindow?.postDelayed(runnable, delayMillis)
+                    popupWindow.postDelayed(runnable, delayMillis)
                 }
             })
         }
@@ -811,12 +812,13 @@ open class BasePopupWindow constructor(private val context: Context) : PopupWind
     /**
      * PopupWindow 生命周期绑定
      */
-    private class PopupWindowLifecycle constructor(private var activity: Activity?,
-                                                   private var popupWindow: BasePopupWindow?) :
+    private class PopupWindowLifecycle(private var activity: Activity?,
+                                       private var popupWindow: BasePopupWindow?) :
         ActivityLifecycleCallbacks, OnShowListener, OnDismissListener {
 
         companion object {
-            fun with(activity: Activity, popupWindow: BasePopupWindow?) {
+
+            fun with(activity: Activity, popupWindow: BasePopupWindow) {
                 PopupWindowLifecycle(activity, popupWindow)
             }
         }
@@ -826,17 +828,29 @@ open class BasePopupWindow constructor(private val context: Context) : PopupWind
             popupWindow?.addOnDismissListener(this)
         }
 
-        override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {}
+        override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
+            // default implementation ignored
+        }
 
-        override fun onActivityStarted(activity: Activity) {}
+        override fun onActivityStarted(activity: Activity) {
+            // default implementation ignored
+        }
 
-        override fun onActivityResumed(activity: Activity) {}
+        override fun onActivityResumed(activity: Activity) {
+            // default implementation ignored
+        }
 
-        override fun onActivityPaused(activity: Activity) {}
+        override fun onActivityPaused(activity: Activity) {
+            // default implementation ignored
+        }
 
-        override fun onActivityStopped(activity: Activity) {}
+        override fun onActivityStopped(activity: Activity) {
+            // default implementation ignored
+        }
 
-        override fun onActivitySaveInstanceState(activity: Activity, outState: Bundle) {}
+        override fun onActivitySaveInstanceState(activity: Activity, outState: Bundle) {
+            // default implementation ignored
+        }
 
         override fun onActivityDestroyed(activity: Activity) {
             if (this.activity !== activity) {
@@ -854,12 +868,12 @@ open class BasePopupWindow constructor(private val context: Context) : PopupWind
             this.popupWindow = null
         }
 
-        override fun onShow(popupWindow: BasePopupWindow?) {
+        override fun onShow(popupWindow: BasePopupWindow) {
             this.popupWindow = popupWindow
             registerActivityLifecycleCallbacks()
         }
 
-        override fun onDismiss(popupWindow: BasePopupWindow?) {
+        override fun onDismiss(popupWindow: BasePopupWindow) {
             this.popupWindow = null
             unregisterActivityLifecycleCallbacks()
         }
@@ -894,8 +908,8 @@ open class BasePopupWindow constructor(private val context: Context) : PopupWind
     /**
      * PopupWindow 监听包装类（修复原生 PopupWindow 监听器对象导致的内存泄漏）
      */
-    private class ListenersWrapper<T : PopupWindow.OnDismissListener?>(referent: T) :
-        SoftReference<T>(referent), PopupWindow.OnDismissListener {
+    private class ListenersWrapper<T : PopupWindow.OnDismissListener?>(listener: T) :
+        SoftReference<T>(listener), PopupWindow.OnDismissListener {
 
         override fun onDismiss() {
             get()?.onDismiss()
@@ -905,30 +919,28 @@ open class BasePopupWindow constructor(private val context: Context) : PopupWind
     /**
      * PopupWindow 背景遮盖层实现类
      */
-    private class PopupBackground : OnShowListener, OnDismissListener {
+    private class PopupBackground(private var alpha: Float = 0f) : OnShowListener, OnDismissListener {
 
-        private var alpha: Float = 0f
-        
         fun setAlpha(alpha: Float) {
             this.alpha = alpha
         }
 
-        override fun onShow(popupWindow: BasePopupWindow?) {
-            popupWindow?.setActivityAlpha(alpha)
+        override fun onShow(popupWindow: BasePopupWindow) {
+            popupWindow.setActivityAlpha(alpha)
         }
 
-        override fun onDismiss(popupWindow: BasePopupWindow?) {
-            popupWindow?.setActivityAlpha(1f)
+        override fun onDismiss(popupWindow: BasePopupWindow) {
+            popupWindow.setActivityAlpha(1f)
         }
     }
 
     /**
      * 销毁监听包装类
      */
-    private class DismissListenerWrapper constructor(referent: PopupWindow.OnDismissListener?) :
-        SoftReference<PopupWindow.OnDismissListener?>(referent), OnDismissListener {
+    private class DismissListenerWrapper(listener: PopupWindow.OnDismissListener?) :
+        SoftReference<PopupWindow.OnDismissListener?>(listener), OnDismissListener {
 
-        override fun onDismiss(popupWindow: BasePopupWindow?) {
+        override fun onDismiss(popupWindow: BasePopupWindow) {
             // 在横竖屏切换后监听对象会为空
             get()?.onDismiss()
         }
@@ -937,9 +949,8 @@ open class BasePopupWindow constructor(private val context: Context) : PopupWind
     /**
      * 点击事件包装类
      */
-    private class ViewClickWrapper constructor(
-
-        private val popupWindow: BasePopupWindow?,
+    private class ViewClickWrapper(
+        private val popupWindow: BasePopupWindow,
         private val listener: OnClickListener<View>?) : View.OnClickListener {
 
         override fun onClick(view: View) {
@@ -955,7 +966,7 @@ open class BasePopupWindow constructor(private val context: Context) : PopupWind
         /**
          * 点击事件触发了
          */
-        fun onClick(popupWindow: BasePopupWindow?, view: V)
+        fun onClick(popupWindow: BasePopupWindow, view: V)
     }
 
     /**
@@ -966,7 +977,7 @@ open class BasePopupWindow constructor(private val context: Context) : PopupWind
         /**
          * PopupWindow 创建了
          */
-        fun onCreate(popupWindow: BasePopupWindow?)
+        fun onCreate(popupWindow: BasePopupWindow)
     }
 
     /**
@@ -977,7 +988,7 @@ open class BasePopupWindow constructor(private val context: Context) : PopupWind
         /**
          * PopupWindow 显示了
          */
-        fun onShow(popupWindow: BasePopupWindow?)
+        fun onShow(popupWindow: BasePopupWindow)
     }
 
     /**
@@ -988,6 +999,6 @@ open class BasePopupWindow constructor(private val context: Context) : PopupWind
         /**
          * PopupWindow 销毁了
          */
-        fun onDismiss(popupWindow: BasePopupWindow?)
+        fun onDismiss(popupWindow: BasePopupWindow)
     }
 }

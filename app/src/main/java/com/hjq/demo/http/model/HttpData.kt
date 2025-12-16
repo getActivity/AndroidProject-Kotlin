@@ -9,7 +9,7 @@ package com.hjq.demo.http.model
 open class HttpData<T> {
 
     /** 响应头 */
-    private var responseHeaders: Map<String, String>? = null
+    private var responseHeaders: MutableMap<String, String>? = null
 
     /** 返回码 */
     private val code: Int = 0
@@ -20,11 +20,11 @@ open class HttpData<T> {
     /** 数据 */
     private val data: T? = null
 
-    fun setResponseHeaders(headers: Map<String, String>?) {
+    fun setResponseHeaders(headers: MutableMap<String, String>?) {
         this.responseHeaders = headers
     }
 
-    fun getResponseHeaders(): Map<String, String>? {
+    fun getResponseHeaders(): MutableMap<String, String>? {
         return responseHeaders
     }
 

@@ -17,7 +17,7 @@ import com.hjq.demo.http.glide.GlideApp
  *    time   : 2019/07/24
  *    desc   : 图片选择适配器
  */
-class ImageSelectAdapter constructor(context: Context, private val selectImages: MutableList<String>) : AppAdapter<String>(context) {
+class ImageSelectAdapter(context: Context, private val selectImages: MutableList<String>) : AppAdapter<String>(context) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AppViewHolder {
         return ViewHolder()

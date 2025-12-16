@@ -120,7 +120,7 @@ class TabAdapter @JvmOverloads constructor(
     /**
      * [BaseAdapter.OnItemClickListener]
      */
-    override fun onItemClick(recyclerView: RecyclerView?, itemView: View?, position: Int) {
+    override fun onItemClick(recyclerView: RecyclerView, itemView: View, position: Int) {
         if (selectedPosition == position) {
             return
         }
@@ -222,9 +222,13 @@ class TabAdapter @JvmOverloads constructor(
             refreshLayoutManager()
         }
 
-        override fun onItemRangeChanged(positionStart: Int, itemCount: Int, payload: Any?) {}
+        override fun onItemRangeChanged(positionStart: Int, itemCount: Int, payload: Any?) {
+            // default implementation ignored
+        }
 
-        override fun onItemRangeChanged(positionStart: Int, itemCount: Int) {}
+        override fun onItemRangeChanged(positionStart: Int, itemCount: Int) {
+            // default implementation ignored
+        }
 
         override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
             refreshLayoutManager()
@@ -237,7 +241,9 @@ class TabAdapter @JvmOverloads constructor(
             }
         }
 
-        override fun onItemRangeMoved(fromPosition: Int, toPosition: Int, itemCount: Int) {}
+        override fun onItemRangeMoved(fromPosition: Int, toPosition: Int, itemCount: Int) {
+            // default implementation ignored
+        }
 
         private fun refreshLayoutManager() {
             if (!fixed) {
@@ -255,6 +261,6 @@ class TabAdapter @JvmOverloads constructor(
         /**
          * Tab 被选中了
          */
-        fun onTabSelected(recyclerView: RecyclerView?, position: Int): Boolean
+        fun onTabSelected(recyclerView: RecyclerView, position: Int): Boolean
     }
 }

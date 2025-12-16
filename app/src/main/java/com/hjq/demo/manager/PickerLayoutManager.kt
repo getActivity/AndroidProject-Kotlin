@@ -2,7 +2,6 @@ package com.hjq.demo.manager
 
 import android.content.Context
 import android.view.View
-import androidx.core.view.ViewCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearSnapHelper
 import androidx.recyclerview.widget.RecyclerView
@@ -37,12 +36,12 @@ class PickerLayoutManager private constructor(
         super.onAttachedToWindow(recyclerView)
         this.recyclerView = recyclerView
         // 设置子控件的边界可以超过父布局的范围
-        this.recyclerView!!.clipToPadding = false
+        this.recyclerView?.clipToPadding = false
         // 添加 LinearSnapHelper
-        linearSnapHelper.attachToRecyclerView(this.recyclerView)
+        this.linearSnapHelper.attachToRecyclerView(this.recyclerView)
     }
 
-    override fun onDetachedFromWindow(recyclerView: RecyclerView?, recycler: Recycler?) {
+    override fun onDetachedFromWindow(recyclerView: RecyclerView, recycler: Recycler) {
         super.onDetachedFromWindow(recyclerView, recycler)
         this.recyclerView = null
     }
@@ -52,20 +51,20 @@ class PickerLayoutManager private constructor(
     }
 
     override fun onMeasure(recycler: Recycler, state: RecyclerView.State, widthSpec: Int, heightSpec: Int) {
-        var width: Int = chooseSize(widthSpec, paddingLeft + paddingRight, ViewCompat.getMinimumWidth(recyclerView!!))
-        var height: Int = chooseSize(heightSpec, paddingTop + paddingBottom, ViewCompat.getMinimumHeight(recyclerView!!))
+        var width: Int = chooseSize(widthSpec, paddingLeft + paddingRight, recyclerView?.minimumWidth ?: 0)
+        var height: Int = chooseSize(heightSpec, paddingTop + paddingBottom, recyclerView?.minimumHeight ?: 0)
         if (state.itemCount != 0 && maxItem != 0) {
             val itemView: View = recycler.getViewForPosition(0)
             measureChildWithMargins(itemView, widthSpec, heightSpec)
             if (orientation == HORIZONTAL) {
                 val measuredWidth: Int = itemView.measuredWidth
                 val paddingHorizontal: Int = (maxItem - 1) / 2 * measuredWidth
-                recyclerView!!.setPadding(paddingHorizontal, 0, paddingHorizontal, 0)
+                recyclerView?.setPadding(paddingHorizontal, 0, paddingHorizontal, 0)
                 width = measuredWidth * maxItem
             } else if (orientation == VERTICAL) {
                 val measuredHeight: Int = itemView.measuredHeight
                 val paddingVertical: Int = (maxItem - 1) / 2 * measuredHeight
-                recyclerView!!.setPadding(0, paddingVertical, 0, paddingVertical)
+                recyclerView?.setPadding(0, paddingVertical, 0, paddingVertical)
                 height = measuredHeight * maxItem
             }
         }
@@ -166,7 +165,7 @@ class PickerLayoutManager private constructor(
         fun onPicked(recyclerView: RecyclerView, position: Int)
     }
 
-    class Builder constructor(private val context: Context) {
+    class Builder(private val context: Context) {
 
         private var orientation: Int = VERTICAL
         private var reverseLayout: Boolean = false

@@ -85,10 +85,14 @@ abstract class AppActivity : BaseActivity(), TitleBarAction, ImmersionAction, On
         if (dialogCount > 0) {
             dialogCount--
         }
-        if ((dialogCount != 0) || (dialog == null) || !dialog!!.isShowing()) {
+        if (dialogCount != 0) {
             return
         }
-        dialog?.dismiss()
+        dialog?.let {
+            if (it.isShowing()) {
+                it.dismiss()
+            }
+        }
     }
 
     override fun initLayout() {
@@ -143,10 +147,10 @@ abstract class AppActivity : BaseActivity(), TitleBarAction, ImmersionAction, On
      * 获取状态栏沉浸的配置对象
      */
     open fun getStatusBarConfig(): ImmersionBar {
-        if (immersionBar == null) {
-            immersionBar = createStatusBarConfig()
+        createStatusBarConfig().let {
+            immersionBar = it
+            return it
         }
-        return immersionBar!!
     }
 
     /**

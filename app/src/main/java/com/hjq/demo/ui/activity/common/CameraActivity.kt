@@ -108,7 +108,9 @@ class CameraActivity : AppActivity() {
         return 0
     }
 
-    override fun initView() {}
+    override fun initView() {
+
+    }
 
     override fun initData() {
         val intent = createIntent()
@@ -174,6 +176,8 @@ class CameraActivity : AppActivity() {
         /**
          * 取消回调
          */
-        fun onCancel() {}
+        fun onCancel() {
+            // default implementation ignored
+        }
     }
 }

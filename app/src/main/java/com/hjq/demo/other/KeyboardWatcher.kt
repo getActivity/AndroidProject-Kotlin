@@ -80,17 +80,29 @@ class KeyboardWatcher private constructor(private var activity: Activity) :
      * [ActivityLifecycleCallbacks]
      */
 
-    override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {}
+    override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
+        // default implementation ignored
+    }
 
-    override fun onActivityStarted(activity: Activity) {}
+    override fun onActivityStarted(activity: Activity) {
+        // default implementation ignored
+    }
 
-    override fun onActivityResumed(activity: Activity) {}
+    override fun onActivityResumed(activity: Activity) {
+        // default implementation ignored
+    }
 
-    override fun onActivityPaused(activity: Activity) {}
+    override fun onActivityPaused(activity: Activity) {
+        // default implementation ignored
+    }
 
-    override fun onActivityStopped(activity: Activity) {}
+    override fun onActivityStopped(activity: Activity) {
+        // default implementation ignored
+    }
 
-    override fun onActivitySaveInstanceState(activity: Activity, outState: Bundle) {}
+    override fun onActivitySaveInstanceState(activity: Activity, outState: Bundle) {
+        // default implementation ignored
+    }
 
     override fun onActivityDestroyed(activity: Activity) {
         if (this.activity === activity) {

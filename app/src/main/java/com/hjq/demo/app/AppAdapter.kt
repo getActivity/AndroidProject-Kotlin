@@ -13,11 +13,11 @@ import com.hjq.widget.layout.WrapRecyclerView
  *    time   : 2018/12/19
  *    desc   : RecyclerView 适配器业务基类
  */
-abstract class AppAdapter<T> constructor(context: Context) :
+abstract class AppAdapter<T>(context: Context) :
     BaseAdapter<AppAdapter<T>.AppViewHolder>(context) {
 
     /** 列表数据 */
-    private var dataSet: MutableList<T> = ArrayList()
+    private var dataSet: MutableList<T> = mutableListOf()
 
     /** 当前列表的页码，默认为第一页，用于分页加载功能 */
     private var pageNumber = 1
@@ -206,6 +206,8 @@ abstract class AppAdapter<T> constructor(context: Context) :
 
         constructor(itemView: View) : super(itemView)
 
-        override fun onBindView(position: Int) {}
+        override fun onBindView(position: Int) {
+            // default implementation ignored
+        }
     }
 }

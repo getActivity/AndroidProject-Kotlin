@@ -19,7 +19,7 @@ import com.hjq.demo.app.AppAdapter
  *    time   : 2021/02/28
  *    desc   : 导航栏适配器
  */
-class NavigationAdapter constructor(context: Context) :
+class NavigationAdapter(context: Context) :
     AppAdapter<NavigationAdapter.NavigationItem>(context), BaseAdapter.OnItemClickListener {
 
     /** 当前选中条目位置 */
@@ -59,12 +59,12 @@ class NavigationAdapter constructor(context: Context) :
     /**
      * [BaseAdapter.OnItemClickListener]
      */
-    override fun onItemClick(recyclerView: RecyclerView?, itemView: View?, position: Int) {
+    override fun onItemClick(recyclerView: RecyclerView, itemView: View, position: Int) {
         if (selectedPosition == position) {
             return
         }
 
-        if (listener == null || listener!!.onNavigationItemSelected(position)) {
+        if (listener?.onNavigationItemSelected(position) != false) {
             selectedPosition = position
             notifyDataSetChanged()
         }
@@ -85,7 +85,7 @@ class NavigationAdapter constructor(context: Context) :
         }
     }
 
-    class NavigationItem constructor(private val text: String?, private val drawable: Drawable?) {
+    class NavigationItem(private val text: String?, private val drawable: Drawable?) {
 
         fun getText(): String? {
             return text

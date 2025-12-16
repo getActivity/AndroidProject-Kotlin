@@ -70,7 +70,7 @@ abstract class BaseAdapter<VH : BaseAdapter<VH>.BaseViewHolder> (private val con
     /**
      * 条目 ViewHolder，需要子类 ViewHolder 继承
      */
-    abstract inner class BaseViewHolder constructor(itemView: View) :
+    abstract inner class BaseViewHolder(itemView: View) :
         RecyclerView.ViewHolder(itemView), View.OnClickListener, OnLongClickListener {
 
         constructor(@LayoutRes id: Int) : this(
@@ -106,17 +106,23 @@ abstract class BaseAdapter<VH : BaseAdapter<VH>.BaseViewHolder> (private val con
         /**
          * ViewHolder 绑定到窗口回调
          */
-        open fun onAttached() {}
+        open fun onAttached() {
+            // default implementation ignored
+        }
 
         /**
          * ViewHolder 从窗口解绑回调
          */
-        open fun onDetached() {}
+        open fun onDetached() {
+            // default implementation ignored
+        }
 
         /**
          * ViewHolder 回收回调
          */
-        open fun onRecycled() {}
+        open fun onRecycled() {
+            // default implementation ignored
+        }
 
         /**
          * 获取 ViewHolder 位置
@@ -130,14 +136,14 @@ abstract class BaseAdapter<VH : BaseAdapter<VH>.BaseViewHolder> (private val con
          */
         override fun onClick(view: View) {
             val position: Int = getViewHolderPosition()
-            if (position < 0 || position >= itemCount) {
+            if (position !in 0..<itemCount) {
                 return
             }
             if (view === getItemView()) {
-                itemClickListener?.onItemClick(recyclerView, view, position)
+                itemClickListener?.onItemClick(requireNotNull(recyclerView), view, position)
                 return
             }
-            childClickListeners.get(view.id)?.onChildClick(recyclerView, view, position)
+            childClickListeners.get(view.id)?.onChildClick(requireNotNull(recyclerView), view, position)
         }
 
         /**
@@ -145,18 +151,15 @@ abstract class BaseAdapter<VH : BaseAdapter<VH>.BaseViewHolder> (private val con
          */
         override fun onLongClick(view: View): Boolean {
             val position: Int = getViewHolderPosition()
-            if (position < 0 || position >= itemCount) {
+            if (position !in 0..<itemCount) {
                 return false
             }
             if (view === getItemView()) {
-                if (itemLongClickListener != null) {
-                    return itemLongClickListener!!.onItemLongClick(recyclerView, view, position)
-                }
-                return false
+                return itemLongClickListener?.onItemLongClick(requireNotNull(recyclerView), view, position) ?: false
             }
             val listener: OnChildLongClickListener? = childLongClickListeners.get(view.id)
             if (listener != null) {
-                return listener.onChildLongClick(recyclerView, view, position)
+                return listener.onChildLongClick(requireNotNull(recyclerView), view, position)
             }
             return false
         }
@@ -185,7 +188,7 @@ abstract class BaseAdapter<VH : BaseAdapter<VH>.BaseViewHolder> (private val con
     /**
      * 生成默认的布局摆放器
      */
-    protected open fun generateDefaultLayoutManager(context: Context): RecyclerView.LayoutManager? {
+    protected open fun generateDefaultLayoutManager(context: Context): RecyclerView.LayoutManager {
         return LinearLayoutManager(context)
     }
 
@@ -193,7 +196,7 @@ abstract class BaseAdapter<VH : BaseAdapter<VH>.BaseViewHolder> (private val con
      * 设置 RecyclerView 条目点击监听
      */
     open fun setOnItemClickListener(listener: OnItemClickListener?) {
-        checkRecyclerViewState()
+        checkListenerEffective()
         itemClickListener = listener
     }
 
@@ -201,7 +204,7 @@ abstract class BaseAdapter<VH : BaseAdapter<VH>.BaseViewHolder> (private val con
      * 设置 RecyclerView 条目子 View 点击监听
      */
     open fun setOnChildClickListener(@IdRes id: Int, listener: OnChildClickListener?) {
-        checkRecyclerViewState()
+        checkListenerEffective()
         childClickListeners.put(id, listener)
     }
 
@@ -209,7 +212,7 @@ abstract class BaseAdapter<VH : BaseAdapter<VH>.BaseViewHolder> (private val con
      * 设置 RecyclerView 条目长按监听
      */
     open fun setOnItemLongClickListener(listener: OnItemLongClickListener?) {
-        checkRecyclerViewState()
+        checkListenerEffective()
         itemLongClickListener = listener
     }
 
@@ -217,18 +220,19 @@ abstract class BaseAdapter<VH : BaseAdapter<VH>.BaseViewHolder> (private val con
      * 设置 RecyclerView 条目子 View 长按监听
      */
     open fun setOnChildLongClickListener(@IdRes id: Int, listener: OnChildLongClickListener?) {
-        checkRecyclerViewState()
+        checkListenerEffective()
         childLongClickListeners.put(id, listener)
     }
 
     /**
-     * 检查 RecyclerView 状态
+     * 检查监听器是否有效
      */
-    private fun checkRecyclerViewState() {
-        if (recyclerView != null) {
-            // 必须在 RecyclerView.setAdapter() 之前设置监听
-            throw IllegalStateException("are you ok?")
+    private fun checkListenerEffective() {
+        if (recyclerView == null) {
+            return
         }
+        // 必须在 RecyclerView.setAdapter() 之前设置监听
+        throw IllegalStateException("You must set the listener before RecyclerView.setAdapter()")
     }
 
     /**
@@ -243,7 +247,7 @@ abstract class BaseAdapter<VH : BaseAdapter<VH>.BaseViewHolder> (private val con
          * @param itemView          被点击的条目对象
          * @param position          被点击的条目位置
          */
-        fun onItemClick(recyclerView: RecyclerView?, itemView: View?, position: Int)
+        fun onItemClick(recyclerView: RecyclerView, itemView: View, position: Int)
     }
 
     /**
@@ -259,7 +263,7 @@ abstract class BaseAdapter<VH : BaseAdapter<VH>.BaseViewHolder> (private val con
          * @param position          被点击的条目位置
          * @return                  是否拦截事件
          */
-        fun onItemLongClick(recyclerView: RecyclerView?, itemView: View?, position: Int): Boolean
+        fun onItemLongClick(recyclerView: RecyclerView, itemView: View, position: Int): Boolean
     }
 
     /**
@@ -274,7 +278,7 @@ abstract class BaseAdapter<VH : BaseAdapter<VH>.BaseViewHolder> (private val con
          * @param childView         被点击的条目子 View
          * @param position          被点击的条目位置
          */
-        fun onChildClick(recyclerView: RecyclerView?, childView: View?, position: Int)
+        fun onChildClick(recyclerView: RecyclerView, childView: View, position: Int)
     }
 
     /**
@@ -289,6 +293,6 @@ abstract class BaseAdapter<VH : BaseAdapter<VH>.BaseViewHolder> (private val con
          * @param childView         被点击的条目子 View
          * @param position          被点击的条目位置
          */
-        fun onChildLongClick(recyclerView: RecyclerView?, childView: View?, position: Int): Boolean
+        fun onChildLongClick(recyclerView: RecyclerView, childView: View, position: Int): Boolean
     }
 }

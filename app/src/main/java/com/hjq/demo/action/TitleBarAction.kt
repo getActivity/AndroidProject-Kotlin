@@ -1,6 +1,7 @@
 package com.hjq.demo.action
 
 import android.graphics.drawable.Drawable
+import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.StringRes
 import com.hjq.bar.OnTitleBarListener
@@ -110,19 +111,25 @@ interface TitleBarAction : OnTitleBarListener {
     /**
      * 递归获取 ViewGroup 中的 TitleBar 对象
      */
-    fun findTitleBar(group: ViewGroup?): TitleBar? {
-        if (group == null) {
+    fun findTitleBar(contentView: View?): TitleBar? {
+        if (contentView == null) {
             return null
         }
-        for (i in 0 until group.childCount) {
-            val view = group.getChildAt(i)
-            if (view is TitleBar) {
-                return view
-            }
-            if (view is ViewGroup) {
-                val titleBar = findTitleBar(view)
-                if (titleBar != null) {
-                    return titleBar
+        if (contentView is TitleBar) {
+            return contentView
+        }
+        if (contentView is ViewGroup) {
+            for (i in 0..<contentView.childCount) {
+                val view = contentView.getChildAt(i)
+                if ((view is TitleBar)) {
+                    return view
+                }
+
+                if (view is ViewGroup) {
+                    val titleBar = findTitleBar(view)
+                    if (titleBar != null) {
+                        return titleBar
+                    }
                 }
             }
         }

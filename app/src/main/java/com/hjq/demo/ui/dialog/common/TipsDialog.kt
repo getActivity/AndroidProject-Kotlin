@@ -67,7 +67,7 @@ class TipsDialog {
             return super.create()
         }
 
-        override fun onShow(dialog: BaseDialog?) {
+        override fun onShow(dialog: BaseDialog) {
             // 延迟自动关闭
             postDelayed(this, duration.toLong())
         }

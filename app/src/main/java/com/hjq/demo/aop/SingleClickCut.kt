@@ -6,7 +6,7 @@ import timber.log.Timber
 
 /**
  * author : Android 轮子哥
- * github : https://github.com/getActivity/AndroidProject
+ * github : https://github.com/getActivity/AndroidProject-Kotlin
  * time   : 2019/12/06
  * desc   : 防重复点击切面
  */
@@ -21,16 +21,17 @@ class SingleClickCut : BasePointCut<SingleClick> {
 
     @Throws(Throwable::class)
     override fun invoke(joinPoint: ProceedJoinPoint, anno: SingleClick): Any? {
-        val className = if (joinPoint.target != null) joinPoint.target!!.javaClass.getName() else ""
+        val className = joinPoint.target?.javaClass?.name ?: ""
         val methodName = joinPoint.targetMethod.name
         val parameterValues = joinPoint.args
 
         val builder = StringBuilder(className).append(".").append(methodName).append("(")
-        for (i in 0..<(parameterValues?.size ?: 0)) {
+        for (i in 0 until (parameterValues?.size ?: 0)) {
+            val value = parameterValues?.get(i)
             if (i == 0) {
-                builder.append(parameterValues!![i])
+                builder.append(value)
             } else {
-                builder.append(", ").append(parameterValues!![i])
+                builder.append(", ").append(value)
             }
         }
         builder.append(")")

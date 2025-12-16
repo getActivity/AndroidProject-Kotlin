@@ -73,12 +73,16 @@ class PasswordView @JvmOverloads constructor
         when (MeasureSpec.getMode(finalWidthMeasureSpec)) {
             MeasureSpec.AT_MOST, MeasureSpec.UNSPECIFIED ->
                 finalWidthMeasureSpec = MeasureSpec.makeMeasureSpec(itemWidth * PASSWORD_COUNT, MeasureSpec.EXACTLY)
-            MeasureSpec.EXACTLY -> {}
+            MeasureSpec.EXACTLY -> {
+                // default implementation ignored
+            }
         }
         when (MeasureSpec.getMode(finalHeightMeasureSpec)) {
             MeasureSpec.AT_MOST, MeasureSpec.UNSPECIFIED ->
                 finalHeightMeasureSpec = MeasureSpec.makeMeasureSpec(itemHeight, MeasureSpec.EXACTLY)
-            MeasureSpec.EXACTLY -> {}
+            MeasureSpec.EXACTLY -> {
+                // default implementation ignored
+            }
         }
         setMeasuredDimension(finalWidthMeasureSpec, finalHeightMeasureSpec)
     }

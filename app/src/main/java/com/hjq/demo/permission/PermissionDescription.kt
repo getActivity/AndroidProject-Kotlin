@@ -4,23 +4,20 @@ import android.app.Activity
 import android.app.Dialog
 import android.content.Context
 import android.content.res.Configuration
-import android.graphics.Color
 import android.graphics.Point
-import android.graphics.drawable.ColorDrawable
 import android.os.Handler
 import android.os.Looper
 import android.os.SystemClock
 import android.util.DisplayMetrics
 import android.view.Gravity
-import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.PopupWindow
-import android.widget.TextView
 import com.hjq.base.BaseDialog
 import com.hjq.demo.R
 import com.hjq.demo.permission.PermissionConverter.getDescriptionsByPermissions
 import com.hjq.demo.ui.dialog.common.MessageDialog
+import com.hjq.demo.ui.popup.PermissionDescriptionPopup
 import com.hjq.permissions.OnPermissionDescription
 import com.hjq.permissions.permission.PermissionPageType
 import com.hjq.permissions.permission.base.IPermission
@@ -47,12 +44,8 @@ class PermissionDescription : OnPermissionDescription {
     /** 权限申请说明对话框  */
     private var permissionDialog: Dialog? = null
 
-    override fun askWhetherRequestPermission(
-        activity: Activity,
-        requestList: List<IPermission>,
-        continueRequestRunnable: Runnable,
-        breakRequestRunnable: Runnable
-    ) {
+    override fun askWhetherRequestPermission(activity: Activity, requestList: MutableList<IPermission>,
+                                             continueRequestRunnable: Runnable, breakRequestRunnable: Runnable) {
         // 以下情况使用 Dialog 来展示权限说明弹窗，否则使用 PopupWindow 来展示权限说明弹窗
         // 1. 如果请求的权限显示的系统界面是不透明的 Activity
         // 2. 如果当前 Activity 的屏幕是横屏状态的话，要求物理尺寸要够大，否则显示的顶部弹窗会被遮挡住，
@@ -77,14 +70,14 @@ class PermissionDescription : OnPermissionDescription {
         showDialog(activity, activity.getString(R.string.common_permission_description_title),
             generatePermissionDescription(activity, requestList),
             activity.getString(R.string.common_permission_confirm), object : MessageDialog.OnListener {
-                override fun onConfirm(dialog: BaseDialog?) {
-                    dialog?.dismiss()
+                override fun onConfirm(dialog: BaseDialog) {
+                    dialog.dismiss()
                     continueRequestRunnable.run()
                 }
-            });
+            })
     }
 
-    override fun onRequestPermissionStart(activity: Activity, requestList: List<IPermission>) {
+    override fun onRequestPermissionStart(activity: Activity, requestList: MutableList<IPermission>) {
         if (descriptionWindowType != DESCRIPTION_WINDOW_TYPE_POPUP) {
             return
         }
@@ -101,7 +94,7 @@ class PermissionDescription : OnPermissionDescription {
         HANDLER.postAtTime(showPopupRunnable, handlerToken, SystemClock.uptimeMillis() + 350)
     }
 
-    override fun onRequestPermissionEnd(activity: Activity, requestList: List<IPermission>) {
+    override fun onRequestPermissionEnd(activity: Activity, requestList: MutableList<IPermission>) {
         // 移除跟这个 Token 有关但是没有还没有执行的消息
         HANDLER.removeCallbacksAndMessages(handlerToken)
         // 销毁当前正在显示的弹窗
@@ -112,7 +105,7 @@ class PermissionDescription : OnPermissionDescription {
     /**
      * 生成权限描述文案
      */
-    private fun generatePermissionDescription(activity: Activity, requestList: List<IPermission>): String {
+    private fun generatePermissionDescription(activity: Activity, requestList: MutableList<IPermission>): String {
         return getDescriptionsByPermissions(activity, requestList)
     }
 
@@ -152,10 +145,10 @@ class PermissionDescription : OnPermissionDescription {
         if (permissionDialog == null) {
             return
         }
-        if (!permissionDialog!!.isShowing) {
+        if (permissionDialog?.isShowing != true) {
             return
         }
-        permissionDialog!!.dismiss()
+        permissionDialog?.dismiss()
         permissionDialog = null
     }
 
@@ -172,19 +165,10 @@ class PermissionDescription : OnPermissionDescription {
             return
         }
         val decorView = activity.window.decorView as ViewGroup
-        val contentView = LayoutInflater.from(activity)
-            .inflate(R.layout.permission_description_popup, decorView, false)
-        permissionPopupWindow = PopupWindow(activity)
-        permissionPopupWindow!!.contentView = contentView
-        permissionPopupWindow!!.width = WindowManager.LayoutParams.MATCH_PARENT
-        permissionPopupWindow!!.height = WindowManager.LayoutParams.WRAP_CONTENT
-        permissionPopupWindow!!.animationStyle = android.R.style.Animation_Dialog
-        permissionPopupWindow!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-        permissionPopupWindow!!.isTouchable = true
-        permissionPopupWindow!!.isOutsideTouchable = true
-        val messageView = permissionPopupWindow!!.contentView.findViewById<TextView>(R.id.tv_permission_description_message)
-        messageView.text = content
-        permissionPopupWindow!!.showAtLocation(decorView, Gravity.TOP, 0, 0)
+        permissionPopupWindow = PermissionDescriptionPopup.Builder(activity)
+            .setDescription(content)
+            .create()
+        permissionPopupWindow?.showAtLocation(decorView, Gravity.TOP, 0, 0)
     }
 
     /**
@@ -194,10 +178,10 @@ class PermissionDescription : OnPermissionDescription {
         if (permissionPopupWindow == null) {
             return
         }
-        if (!permissionPopupWindow!!.isShowing) {
+        if (permissionPopupWindow?.isShowing != true) {
             return
         }
-        permissionPopupWindow!!.dismiss()
+        permissionPopupWindow?.dismiss()
         permissionPopupWindow = null
     }
 

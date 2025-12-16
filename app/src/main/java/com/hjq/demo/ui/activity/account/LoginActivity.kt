@@ -136,7 +136,7 @@ class LoginActivity : AppActivity(), UmengLogin.OnLoginListener,
             RegisterActivity.start(this, phoneView?.text.toString(), passwordView?.text.toString(),
                 object : RegisterActivity.OnRegisterListener {
 
-                    override fun onRegisterSuccess(phone: String?, password: String?) {
+                    override fun onRegisterSuccess(phone: String, password: String) {
                         // 如果已经注册成功，就执行登录操作
                         phoneView?.setText(phone)
                         passwordView?.setText(password)
@@ -190,7 +190,9 @@ class LoginActivity : AppActivity(), UmengLogin.OnLoginListener,
                         commitView?.showProgress()
                     }
 
-                    override fun onHttpEnd(api: IRequestApi) {}
+                    override fun onHttpEnd(api: IRequestApi) {
+                        // default implementation ignored
+                    }
 
                     override fun onHttpSuccess(data: HttpData<LoginApi.Bean?>) {
                         val bean = data.getData() ?: return
@@ -215,7 +217,7 @@ class LoginActivity : AppActivity(), UmengLogin.OnLoginListener,
         }
         if (view === qqView || view === weChatView) {
             toast("记得改好第三方 AppID 和 Secret，否则会调不起来哦")
-            val platform: Platform?
+            val platform: Platform
             when {
                 view === qqView -> {
                     platform = Platform.QQ
@@ -245,7 +247,7 @@ class LoginActivity : AppActivity(), UmengLogin.OnLoginListener,
      * @param platform      平台名称
      * @param data          用户资料返回
      */
-    override fun onLoginSuccess(platform: Platform?, data: UmengLogin.LoginData?) {
+    override fun onLoginSuccess(platform: Platform, data: UmengLogin.LoginData) {
         if (isFinishing || isDestroyed) {
             // Glide：You cannot start a load for a destroyed activity
             return
@@ -268,10 +270,10 @@ class LoginActivity : AppActivity(), UmengLogin.OnLoginListener,
      * 授权失败的回调
      *
      * @param platform      平台名称
-     * @param t             错误原因
+     * @param throwable             错误原因
      */
-    override fun onLoginFail(platform: Platform?, t: Throwable) {
-        toast("第三方登录出错：" + t.message)
+    override fun onLoginFail(platform: Platform, throwable: Throwable) {
+        toast("第三方登录出错：" + throwable.message)
     }
 
     /**
@@ -335,7 +337,7 @@ class LoginActivity : AppActivity(), UmengLogin.OnLoginListener,
     /**
      * [TextView.OnEditorActionListener]
      */
-    override fun onEditorAction(v: TextView?, actionId: Int, event: KeyEvent?): Boolean {
+    override fun onEditorAction(v: TextView, actionId: Int, event: KeyEvent): Boolean {
         if (actionId == EditorInfo.IME_ACTION_DONE) {
             // 模拟点击提交按钮
             commitView?.let {

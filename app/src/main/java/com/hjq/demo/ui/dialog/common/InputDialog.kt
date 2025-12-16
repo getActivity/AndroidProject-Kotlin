@@ -69,7 +69,7 @@ class InputDialog {
         /**
          * [BaseDialog.OnShowListener]
          */
-        override fun onShow(dialog: BaseDialog?) {
+        override fun onShow(dialog: BaseDialog) {
             postDelayed({ showKeyboard(inputView) }, 500)
         }
 
@@ -78,11 +78,11 @@ class InputDialog {
             when (view.id) {
                 R.id.tv_ui_confirm -> {
                     performClickDismiss()
-                    listener?.onConfirm(getDialog(), inputView?.text?.toString() ?: "")
+                    listener?.onConfirm(requireNotNull(getDialog()), inputView?.text?.toString() ?: "")
                 }
                 R.id.tv_ui_cancel -> {
                     performClickDismiss()
-                    listener?.onCancel(getDialog())
+                    listener?.onCancel(requireNotNull(getDialog()))
                 }
             }
         }
@@ -90,7 +90,7 @@ class InputDialog {
         /**
          * [TextView.OnEditorActionListener]
          */
-        override fun onEditorAction(v: TextView?, actionId: Int, event: KeyEvent?): Boolean {
+        override fun onEditorAction(v: TextView, actionId: Int, event: KeyEvent): Boolean {
             if (actionId == EditorInfo.IME_ACTION_DONE) {
                 findViewById<View>(R.id.tv_ui_confirm)?.let {
                     // 模拟点击确认按钮
@@ -107,11 +107,13 @@ class InputDialog {
         /**
          * 点击确定时回调
          */
-        fun onConfirm(dialog: BaseDialog?, content: String)
+        fun onConfirm(dialog: BaseDialog, content: String)
 
         /**
          * 点击取消时回调
          */
-        fun onCancel(dialog: BaseDialog?) {}
+        fun onCancel(dialog: BaseDialog) {
+            // default implementation ignored
+        }
     }
 }

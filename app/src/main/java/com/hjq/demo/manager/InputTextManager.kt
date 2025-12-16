@@ -109,9 +109,13 @@ class InputTextManager private constructor(view: View, alpha: Boolean) : TextWat
     /**
      * [TextWatcher]
      */
-    override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+    override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {
+        // default implementation ignored
+    }
 
-    override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+    override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
+        // default implementation ignored
+    }
 
     override fun afterTextChanged(s: Editable?) {
         notifyChanged()
@@ -164,7 +168,7 @@ class InputTextManager private constructor(view: View, alpha: Boolean) : TextWat
         }
     }
 
-    class Builder constructor(private val activity: Activity) {
+    class Builder(private val activity: Activity) {
 
         /** 操作按钮的 View */
         private var view: View? = null
@@ -173,7 +177,7 @@ class InputTextManager private constructor(view: View, alpha: Boolean) : TextWat
         private var alpha: Boolean = false
 
         /** TextView集合 */
-        private val viewSet: MutableList<TextView> = ArrayList()
+        private val viewSet: MutableList<TextView> = mutableListOf()
 
         /** 输入变化监听 */
         private var listener: OnInputTextListener? = null
@@ -197,10 +201,7 @@ class InputTextManager private constructor(view: View, alpha: Boolean) : TextWat
         }
 
         fun build(): InputTextManager {
-            if (view == null) {
-                throw IllegalArgumentException("are you ok?")
-            }
-            val helper = InputTextManager(view!!, alpha)
+            val helper = InputTextManager(requireNotNull(view), alpha)
             helper.addViews(viewSet)
             helper.setListener(listener)
             TextInputLifecycle.register(activity, helper)
@@ -225,17 +226,29 @@ class InputTextManager private constructor(view: View, alpha: Boolean) : TextWat
             }
         }
 
-        override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {}
+        override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
+            // default implementation ignored
+        }
 
-        override fun onActivityStarted(activity: Activity) {}
+        override fun onActivityStarted(activity: Activity) {
+            // default implementation ignored
+        }
 
-        override fun onActivityResumed(activity: Activity) {}
+        override fun onActivityResumed(activity: Activity) {
+            // default implementation ignored
+        }
 
-        override fun onActivityPaused(activity: Activity) {}
+        override fun onActivityPaused(activity: Activity) {
+            // default implementation ignored
+        }
 
-        override fun onActivityStopped(activity: Activity) {}
+        override fun onActivityStopped(activity: Activity) {
+            // default implementation ignored
+        }
 
-        override fun onActivitySaveInstanceState(activity: Activity, outState: Bundle) {}
+        override fun onActivitySaveInstanceState(activity: Activity, outState: Bundle) {
+            // default implementation ignored
+        }
 
         override fun onActivityDestroyed(activity: Activity) {
             if (this.activity !== activity) {
@@ -262,6 +275,6 @@ class InputTextManager private constructor(view: View, alpha: Boolean) : TextWat
          *
          * @return          返回按钮的 Enabled 状态
          */
-        fun onInputChange(manager: InputTextManager?): Boolean
+        fun onInputChange(manager: InputTextManager): Boolean
     }
 }

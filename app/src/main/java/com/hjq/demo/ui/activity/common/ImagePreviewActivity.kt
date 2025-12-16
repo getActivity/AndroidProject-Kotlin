@@ -31,18 +31,18 @@ class ImagePreviewActivity : AppActivity(), BaseAdapter.OnItemClickListener {
         private const val INTENT_KEY_IN_IMAGE_INDEX = "imageIndex"
 
         fun start(context: Context, url: String) {
-            val images = ArrayList<String?>(1)
+            val images: MutableList<String> = mutableListOf()
             images.add(url)
             start(context, images)
         }
 
-        fun start(context: Context, urls: List<String?>) {
+        fun start(context: Context, urls: MutableList<String>) {
             start(context, urls, 0)
         }
 
         @Log
-        fun start(context: Context, urls: List<String?>, index: Int) {
-            var finalUrls: List<String?> = urls
+        fun start(context: Context, urls: MutableList<String>, index: Int) {
+            var finalUrls: MutableList<String> = urls
             if (finalUrls.isEmpty()) {
                 return
             }
@@ -52,13 +52,9 @@ class ImagePreviewActivity : AppActivity(), BaseAdapter.OnItemClickListener {
                 // 所以当图片数量过多的时候，我们应当只显示一张，这种一般是手机图片过多导致的
                 // 经过测试，传入 3121 张图片集合的时候会抛出此异常，所以保险值应当是 2000
                 // android.os.TransactionTooLargeException: data parcel size 521984 bytes
-                finalUrls = listOf(finalUrls[index])
+                finalUrls = mutableListOf(finalUrls[index])
             }
-            if (finalUrls is ArrayList<*>) {
-                intent.putExtra(INTENT_KEY_IN_IMAGE_LIST, finalUrls)
-            } else {
-                intent.putExtra(INTENT_KEY_IN_IMAGE_LIST, ArrayList(finalUrls))
-            }
+            intent.putExtra(INTENT_KEY_IN_IMAGE_LIST, finalUrls.toCollection(ArrayList()))
             intent.putExtra(INTENT_KEY_IN_IMAGE_INDEX, index)
             context.startActivity(intent)
         }
@@ -92,7 +88,7 @@ class ImagePreviewActivity : AppActivity(), BaseAdapter.OnItemClickListener {
     }
 
     override fun initData() {
-        val images = getStringArrayList(INTENT_KEY_IN_IMAGE_LIST)
+        val images: MutableList<String?>? = getStringArrayList(INTENT_KEY_IN_IMAGE_LIST)
         if (images == null || images.isEmpty()) {
             finish()
             return
@@ -139,7 +135,7 @@ class ImagePreviewActivity : AppActivity(), BaseAdapter.OnItemClickListener {
      * @param itemView          被点击的条目对象
      * @param position          被点击的条目位置
      */
-    override fun onItemClick(recyclerView: RecyclerView?, itemView: View?, position: Int) {
+    override fun onItemClick(recyclerView: RecyclerView, itemView: View, position: Int) {
         if (isFinishing || isDestroyed) {
             return
         }

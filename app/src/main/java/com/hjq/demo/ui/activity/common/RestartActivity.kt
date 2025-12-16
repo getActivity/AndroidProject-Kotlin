@@ -39,13 +39,14 @@ class RestartActivity : AppActivity() {
         return 0
     }
 
-    override fun initView() {}
-
-    override fun initData() {
+    override fun initView() {
         // 这里解释一下，为什么不用 Toaster 来显示，而是用系统的来显示
         // 这是因为 Application 在初始化第三方框架前会判断当前是否是主进程
         // 如果是主进程才会初始化第三方框架，但是当前 Activity 运行在非主进程中
         Toast.makeText(this, R.string.common_crash_hint, Toast.LENGTH_LONG).show()
+    }
+
+    override fun initData() {
         restart(this)
         finish()
     }

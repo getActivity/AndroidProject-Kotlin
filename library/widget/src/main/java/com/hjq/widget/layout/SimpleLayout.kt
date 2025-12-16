@@ -8,7 +8,7 @@ import kotlin.math.max
 
 /**
  *    author : Android 轮子哥
- *    github : https://github.com/getActivity/AndroidProject
+ *    github : https://github.com/getActivity/AndroidProject-Kotlin
  *    time   : 2018/10/18
  *    desc   : 简单的 Layout 容器，比 FrameLayout 更加轻量
  *             可以用于自定义组合控件继承的基类，可以起到性能优化的作用
@@ -100,12 +100,12 @@ open class SimpleLayout @JvmOverloads constructor(
         return MarginLayoutParams(context, attrs)
     }
 
-    override fun generateDefaultLayoutParams(): LayoutParams? {
-        return MarginLayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT)
+    override fun generateLayoutParams(params: LayoutParams): LayoutParams? {
+        return MarginLayoutParams(params)
     }
 
-    override fun generateLayoutParams(params: LayoutParams?): LayoutParams? {
-        return MarginLayoutParams(params)
+    override fun generateDefaultLayoutParams(): LayoutParams {
+        return MarginLayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT)
     }
 
     override fun checkLayoutParams(params: LayoutParams?): Boolean {

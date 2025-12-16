@@ -41,6 +41,7 @@ class DateDialog {
         private val yearAdapter: PickerAdapter
         private val monthAdapter: PickerAdapter
         private val dayAdapter: PickerAdapter
+
         private var listener: OnListener? = null
 
         init {
@@ -51,20 +52,20 @@ class DateDialog {
             dayAdapter = PickerAdapter(context)
 
             // 生产年份
-            val yearData = ArrayList<String?>(10)
+            val yearData: MutableList<String> = mutableListOf()
             for (i in startYear..endYear) {
                 yearData.add(i.toString() + " " + getString(R.string.common_year))
             }
 
             // 生产月份
-            val monthData = ArrayList<String?>(12)
+            val monthData: MutableList<String> = mutableListOf()
             for (i in 1..12) {
                 monthData.add(i.toString() + " " + getString(R.string.common_month))
             }
             val calendar = Calendar.getInstance(Locale.CHINA)
             val day = calendar.getActualMaximum(Calendar.DATE)
             // 生产天数
-            val dayData = ArrayList<String?>(day)
+            val dayData: MutableList<String> = mutableListOf()
             for (i in 1..day) {
                 dayData.add(i.toString() + " " + getString(R.string.common_day))
             }
@@ -171,12 +172,12 @@ class DateDialog {
             when (view.id) {
                 R.id.tv_ui_confirm -> {
                     performClickDismiss()
-                    listener?.onSelected(getDialog(), startYear + yearManager.getPickedPosition(),
+                    listener?.onSelected(requireNotNull(getDialog()), startYear + yearManager.getPickedPosition(),
                         monthManager.getPickedPosition() + 1, dayManager.getPickedPosition() + 1)
                 }
                 R.id.tv_ui_cancel -> {
                     performClickDismiss()
-                    listener?.onCancel(getDialog())
+                    listener?.onCancel(requireNotNull(getDialog()))
                 }
             }
         }
@@ -208,7 +209,7 @@ class DateDialog {
                 return
             }
 
-            val dayData = ArrayList<String?>(day)
+            val dayData: MutableList<String> = mutableListOf()
             for (i in 1..day) {
                 dayData.add(i.toString() + " " + getString(R.string.common_day))
             }
@@ -220,7 +221,7 @@ class DateDialog {
             yearView?.post(this)
         }
 
-        class PickerAdapter constructor(context: Context) : AppAdapter<String?>(context) {
+        class PickerAdapter(context: Context) : AppAdapter<String>(context) {
 
             override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AppViewHolder {
                 return ViewHolder()
@@ -246,11 +247,13 @@ class DateDialog {
          * @param month             月
          * @param day               日
          */
-        fun onSelected(dialog: BaseDialog?, year: Int, month: Int, day: Int)
+        fun onSelected(dialog: BaseDialog, year: Int, month: Int, day: Int)
 
         /**
          * 点击取消时回调
          */
-        fun onCancel(dialog: BaseDialog?) {}
+        fun onCancel(dialog: BaseDialog) {
+            // default implementation ignored
+        }
     }
 }
