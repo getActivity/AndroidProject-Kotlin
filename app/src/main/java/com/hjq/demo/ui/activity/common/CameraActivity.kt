@@ -12,12 +12,14 @@ import com.hjq.base.ktx.startActivityForResult
 import com.hjq.demo.R
 import com.hjq.demo.aop.Log
 import com.hjq.demo.app.AppActivity
+import com.hjq.demo.ktx.isAndroid11
 import com.hjq.demo.ktx.isAndroid7
 import com.hjq.demo.other.AppConfig
 import com.hjq.demo.permission.PermissionDescription
 import com.hjq.demo.permission.PermissionInterceptor
 import com.hjq.permissions.XXPermissions
 import com.hjq.permissions.permission.PermissionLists
+import com.hjq.permissions.permission.base.IPermission
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -43,10 +45,18 @@ class CameraActivity : AppActivity() {
 
         @Log
         fun start(activity: BaseActivity, video: Boolean, listener: OnCameraListener?) {
+            val permissions: MutableList<IPermission> = mutableListOf()
+            permissions.add(PermissionLists.getCameraPermission())
+            if (!isAndroid11()) {
+                permissions.add(PermissionLists.getReadExternalStoragePermission())
+                permissions.add(PermissionLists.getWriteExternalStoragePermission())
+            }
             XXPermissions.with(activity)
-                .permission(PermissionLists.getCameraPermission())
+                .permissions(permissions)
                 .interceptor(PermissionInterceptor())
                 .description(PermissionDescription())
+                // 设置不触发错误检测机制
+                .unchecked()
                 .request { _, deniedList ->
                     val allGranted = deniedList.isEmpty()
                     if (!allGranted) {
@@ -122,11 +132,19 @@ class CameraActivity : AppActivity() {
             // 拍摄照片
             intent.action = MediaStore.ACTION_IMAGE_CAPTURE
         }
-        if (intent.resolveActivity(packageManager) == null || !XXPermissions.isGrantedPermission(this, PermissionLists.getCameraPermission())) {
+
+        val permissions: MutableList<IPermission> = mutableListOf()
+        permissions.add(PermissionLists.getCameraPermission())
+        if (!isAndroid11()) {
+            permissions.add(PermissionLists.getReadExternalStoragePermission())
+            permissions.add(PermissionLists.getWriteExternalStoragePermission())
+        }
+        if (intent.resolveActivity(packageManager) == null || !XXPermissions.isGrantedPermissions(this, permissions)) {
             setResult(RESULT_ERROR, Intent().putExtra(INTENT_KEY_OUT_ERROR, getString(R.string.camera_launch_fail)))
             finish()
             return
         }
+
         val file: File? = getSerializable(INTENT_KEY_IN_FILE)
         if (file == null) {
             setResult(RESULT_ERROR, Intent().putExtra(INTENT_KEY_OUT_ERROR, getString(R.string.camera_image_error)))

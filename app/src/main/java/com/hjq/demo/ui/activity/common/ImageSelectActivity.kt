@@ -104,6 +104,7 @@ class ImageSelectActivity : AppActivity(), StatusAction, Runnable,
                 .permission(PermissionLists.getReadExternalStoragePermission())
                 .interceptor(PermissionInterceptor())
                 .description(PermissionDescription())
+                // 设置不触发错误检测机制
                 .unchecked()
                 .request { _, deniedList ->
                     val allGranted = deniedList.isEmpty()
