@@ -8,7 +8,7 @@ plugins {
     alias(libs.plugins.application)
     alias(libs.plugins.kotlin)
     alias(libs.plugins.aop)
-    alias(libs.plugins.easylauncher)
+    alias(libs.plugins.easyLauncher)
 }
 
 apply(plugin = "org.jetbrains.kotlin.kapt")

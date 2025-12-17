@@ -8,7 +8,7 @@ plugins {
     alias(libs.plugins.library) apply false
     alias(libs.plugins.kotlin) apply false
     alias(libs.plugins.aop) apply false
-    alias(libs.plugins.easylauncher) apply false
+    alias(libs.plugins.easyLauncher) apply false
 }
 
 // 导入配置文件

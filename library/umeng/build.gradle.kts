@@ -50,5 +50,5 @@ dependencies {
     api(libs.umengShareQQ)
 
     api(libs.qqSdk)
-    api(libs.wechatSdk)
+    api(libs.wxSdk)
 }
