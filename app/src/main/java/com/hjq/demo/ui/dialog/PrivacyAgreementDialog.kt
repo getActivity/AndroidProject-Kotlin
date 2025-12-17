@@ -21,6 +21,9 @@ class PrivacyAgreementDialog {
     class Builder(context: Context) : MessageDialog.Builder(context) {
 
         init {
+            setCancelable(false)
+            setCanceledOnTouchOutside(false)
+
             setTitle(getString(R.string.privacy_agreement_title))
             setConfirm(getString(R.string.privacy_agreement_agree))
             setCancel(getString(R.string.privacy_agreement_disagree))
