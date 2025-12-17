@@ -83,7 +83,7 @@ class HomeActivity : AppActivity(), NavigationAdapter.OnNavigationListener {
         return navigationView
     }
 
-    override fun onNewIntent(intent: Intent?) {
+    override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         pagerAdapter?.let {
             switchFragment(it.getFragmentIndex(getSerializable(INTENT_KEY_IN_FRAGMENT_CLASS)))

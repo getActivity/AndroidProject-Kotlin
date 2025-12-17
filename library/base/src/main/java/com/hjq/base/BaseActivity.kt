@@ -101,7 +101,7 @@ abstract class BaseActivity : AppCompatActivity(), ContextAction,
     /**
      * 如果当前的 Activity（singleTop 启动模式） 被复用时会回调
      */
-    override fun onNewIntent(intent: Intent?) {
+    override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         // 设置为当前的 Intent，避免 Activity 被杀死后重启 Intent 还是最原先的那个
         setIntent(intent)
