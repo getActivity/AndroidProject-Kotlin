@@ -27,7 +27,6 @@ import androidx.annotation.IdRes
 import androidx.annotation.LayoutRes
 import androidx.annotation.StringRes
 import androidx.annotation.StyleRes
-import androidx.core.widget.PopupWindowCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LifecycleRegistry
@@ -210,30 +209,6 @@ open class BasePopupWindow(private val context: Context) : PopupWindow(context),
 
     override fun <V : View?> findViewById(@IdRes id: Int): V? {
         return contentView.findViewById(id)
-    }
-
-    override fun setWindowLayoutType(type: Int) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            super.setWindowLayoutType(type)
-        } else {
-            PopupWindowCompat.setWindowLayoutType(this, type)
-        }
-    }
-
-    override fun getWindowLayoutType(): Int {
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            super.getWindowLayoutType()
-        } else {
-            PopupWindowCompat.getWindowLayoutType(this)
-        }
-    }
-
-    override fun setOverlapAnchor(overlapAnchor: Boolean) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            super.setOverlapAnchor(overlapAnchor)
-        } else {
-            PopupWindowCompat.setOverlapAnchor(this, overlapAnchor)
-        }
     }
 
     /**
