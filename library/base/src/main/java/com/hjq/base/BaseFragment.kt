@@ -3,8 +3,7 @@ package com.hjq.base
 import android.app.Activity
 import android.app.Application
 import android.content.Context
-import android.os.Build.VERSION
-import android.os.Build.VERSION_CODES
+import android.os.Build
 import android.os.Bundle
 import android.view.KeyEvent
 import android.view.LayoutInflater
@@ -268,7 +267,7 @@ abstract class BaseFragment<A : BaseActivity> : Fragment(),
      */
     private fun registerAttachActivityLifecycle() {
         activity?.let {
-            if (VERSION.SDK_INT >= VERSION_CODES.Q) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 it.registerActivityLifecycleCallbacks(this)
             } else {
                 it.application.registerActivityLifecycleCallbacks(this)
@@ -281,7 +280,7 @@ abstract class BaseFragment<A : BaseActivity> : Fragment(),
      */
     private fun unregisterAttachActivityLifecycle() {
         activity?.let {
-            if (VERSION.SDK_INT >= VERSION_CODES.Q) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 it.unregisterActivityLifecycleCallbacks(this)
             } else {
                 it.application.unregisterActivityLifecycleCallbacks(this)
