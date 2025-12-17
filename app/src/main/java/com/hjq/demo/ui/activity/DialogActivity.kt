@@ -399,14 +399,17 @@ class DialogActivity : AppActivity() {
             R.id.btn_dialog_share -> {
 
                 toast("记得改好第三方 AppID 和 Secret，否则会调不起来哦")
-                val content = UMWeb("https://github.com/getActivity/AndroidProject-Kotlin")
-                content.title = "Github"
-                content.setThumb(UMImage(this, R.mipmap.launcher_ic))
-                content.description = getString(R.string.app_name)
+
+                val umWeb = UMWeb("https://github.com/getActivity/AndroidProject-Kotlin")
+                umWeb.title = "Github"
+                umWeb.setThumb(UMImage(this, R.mipmap.launcher_ic))
+                umWeb.description = getString(R.string.app_name)
+
+                /* val umImage = UMImage(this, R.mipmap.launcher_ic) */
 
                 // 分享对话框
                 ShareDialog.Builder(this)
-                    .setShareLink(content)
+                    .setShareLink(umWeb)
                     .setListener(object : OnShareListener {
 
                         override fun onShareSuccess(platform: Platform) {
