@@ -49,7 +49,7 @@ import java.lang.ref.SoftReference
 open class BasePopupWindow(private val context: Context) : PopupWindow(context),
     LifecycleOwner, ContextAction, HandlerAction, ClickAction, AnimAction, PopupWindow.OnDismissListener {
 
-    override val lifecycle: LifecycleRegistry = LifecycleRegistry(this)
+    override var lifecycle: LifecycleRegistry = LifecycleRegistry(this)
 
     private var popupBackground: PopupBackground? = null
 
@@ -133,9 +133,9 @@ open class BasePopupWindow(private val context: Context) : PopupWindow(context),
     }
 
     fun onShow() {
-        lifecycle.handleLifecycleEvent(Lifecycle.Event.ON_CREATE)
-        lifecycle.handleLifecycleEvent(Lifecycle.Event.ON_START)
-        lifecycle.handleLifecycleEvent(Lifecycle.Event.ON_RESUME)
+        handleLifecycleEvent(Lifecycle.Event.ON_CREATE)
+        handleLifecycleEvent(Lifecycle.Event.ON_START)
+        handleLifecycleEvent(Lifecycle.Event.ON_RESUME)
         // 这里解释一下为什么要创建一个新的 ArrayList，这是因为执行监听方法可能会删除 List 集合中的元素
         // 例如 Builder 类中的 postDelayed 方法，就会移除监听对象，所以这里遍历可能出现 ConcurrentModificationException
         val listeners: MutableList<OnShowListener> = mutableListOf()
@@ -149,9 +149,9 @@ open class BasePopupWindow(private val context: Context) : PopupWindow(context),
      * [PopupWindow.OnDismissListener]
      */
     override fun onDismiss() {
-        lifecycle.handleLifecycleEvent(Lifecycle.Event.ON_PAUSE)
-        lifecycle.handleLifecycleEvent(Lifecycle.Event.ON_STOP)
-        lifecycle.handleLifecycleEvent(Lifecycle.Event.ON_DESTROY)
+        handleLifecycleEvent(Lifecycle.Event.ON_PAUSE)
+        handleLifecycleEvent(Lifecycle.Event.ON_STOP)
+        handleLifecycleEvent(Lifecycle.Event.ON_DESTROY)
         // 这里解释一下为什么要创建一个新的 ArrayList，这是因为执行监听方法可能会删除 List 集合中的元素
         // 例如 Builder 类中的 postDelayed 方法，就会移除监听对象，所以这里遍历可能出现 ConcurrentModificationException
         val listeners: MutableList<OnDismissListener> = mutableListOf()
@@ -180,6 +180,32 @@ open class BasePopupWindow(private val context: Context) : PopupWindow(context),
     override fun dismiss() {
         removeCallbacks()
         super.dismiss()
+    }
+
+
+    /**
+     * 处理 Lifecycle 事件
+     */
+    fun handleLifecycleEvent(event: Lifecycle.Event) {
+        // 以下代码主要是为了解决复用 BasePopupWindow 对象会出现异常的问题
+        // https://github.com/androidx/androidx/blob/4bb422f5c09d4ed7200f1bdc03a463b39743af85/lifecycle/lifecycle-runtime/src/commonMain/kotlin/androidx/lifecycle/LifecycleRegistry.kt#L89
+        when (lifecycle.currentState) {
+            Lifecycle.State.INITIALIZED -> if (event == Lifecycle.Event.ON_DESTROY) {
+                // 如果当前是初始化状态，并且下一个状态事件是销毁，必须要有 Create 事件过渡，否则会出现报错
+                // java.lang.IllegalStateException: State must be at least 'CREATED'  to be moved to `DESTROYED` in component
+                lifecycle.handleLifecycleEvent(Lifecycle.Event.ON_CREATE)
+            }
+            Lifecycle.State.DESTROYED -> if (event != Lifecycle.Event.ON_DESTROY) {
+                // 如果当前是销毁状态，并且下一个状态事件不是销毁，需要重置一下 Lifecycle，否则会出现报错
+                // java.lang.IllegalStateException: State is 'DESTROYED' and cannot be moved to `STARTED` in component
+                lifecycle = LifecycleRegistry(this)
+            }
+            else -> {
+                // default implementation ignored
+            }
+        }
+        // 处理下一个状态事件
+        lifecycle.handleLifecycleEvent(event)
     }
 
     override fun <V : View?> findViewById(@IdRes id: Int): V? {

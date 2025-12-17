@@ -43,6 +43,9 @@ class DialogActivity : AppActivity() {
     /** 等待对话框 */
     private var waitDialog: BaseDialog? = null
 
+    /** 菜单弹窗 */
+    private var listPopup: BasePopupWindow? = null;
+
     override fun getLayoutId(): Int {
         return R.layout.dialog_activity
     }
@@ -256,10 +259,10 @@ class DialogActivity : AppActivity() {
                         .setMessage(getString(R.string.common_loading))
                         .create()
                 }
-                waitDialog?.apply {
-                    if (!isShowing) {
-                        show()
-                        postDelayed({ dismiss() }, 2000)
+                waitDialog?.let {
+                    if (!it.isShowing) {
+                        it.show()
+                        postDelayed({ it.dismiss() }, 2000)
                     }
                 }
 
@@ -510,17 +513,23 @@ class DialogActivity : AppActivity() {
     }
 
     override fun onRightClick(titleBar: TitleBar) {
-        // 菜单弹窗
-        ListPopup.Builder(this)
-            .setList("选择拍照", "选取相册")
-            .addOnShowListener { toast("PopupWindow 显示了") }
-            .addOnDismissListener { toast("PopupWindow 销毁了") }
-            .setListener(object : ListPopup.OnListener<String> {
+        if (listPopup == null) {
+            listPopup = ListPopup.Builder(this)
+                .setList("选择拍照", "选取相册")
+                .addOnShowListener { toast("PopupWindow 显示了") }
+                .addOnDismissListener { toast("PopupWindow 销毁了") }
+                .setListener(object : ListPopup.OnListener<String> {
 
-                override fun onSelected(popupWindow: BasePopupWindow, position: Int, data: String) {
-                    toast("点击了：$data")
-                }
-            })
-            .showAsDropDown(titleBar.rightView)
+                    override fun onSelected(popupWindow: BasePopupWindow, position: Int, data: String) {
+                        toast("点击了：$data")
+                    }
+                })
+                .create()
+        }
+        listPopup?.let {
+            if (!it.isShowing) {
+                it.showAsDropDown(titleBar.rightView)
+            }
+        }
     }
 }
