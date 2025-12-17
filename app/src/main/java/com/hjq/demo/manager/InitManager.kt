@@ -8,6 +8,7 @@ import android.net.Network
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
+import com.chuckerteam.chucker.api.ChuckerInterceptor
 import com.google.gson.reflect.TypeToken
 import com.google.gson.stream.JsonToken
 import com.hjq.bar.TitleBar
@@ -138,6 +139,7 @@ object InitManager {
 
         // 网络请求框架初始化
         val okHttpClient: OkHttpClient = OkHttpClient.Builder()
+            .addInterceptor(ChuckerInterceptor(application))
             .build()
 
         EasyConfig.with(okHttpClient)
