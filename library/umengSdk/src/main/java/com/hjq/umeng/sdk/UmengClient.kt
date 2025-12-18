@@ -1,14 +1,12 @@
-package com.hjq.umeng
+package com.hjq.umeng.sdk
 
 import android.app.Activity
 import android.app.Application
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import com.hjq.umeng.UmengLogin.LoginListenerWrapper
-import com.hjq.umeng.UmengLogin.OnLoginListener
-import com.hjq.umeng.UmengShare.OnShareListener
-import com.hjq.umeng.UmengShare.ShareListenerWrapper
+import com.hjq.umeng.sdk.UmengShare.OnShareListener
+import com.hjq.umeng.sdk.UmengShare.ShareListenerWrapper
 import com.tencent.tauth.Tencent
 import com.umeng.analytics.MobclickAgent
 import com.umeng.commonsdk.UMConfigure
@@ -88,7 +86,7 @@ object UmengClient {
      * @param platform              登录平台
      * @param listener              登录监听
      */
-    fun login(activity: Activity, platform: Platform, listener: OnLoginListener?) {
+    fun login(activity: Activity, platform: Platform, listener: UmengLogin.OnLoginListener?) {
         if (!isAppInstalled(activity, platform)) {
             // 当登录的平台软件可能没有被安装的时候
             if (listener == null) {
@@ -105,7 +103,7 @@ object UmengClient {
             Thread.sleep(200)
             // 开启新的第三方登录授权
             UMShareAPI.get(activity).getPlatformInfo(activity, platform.getThirdParty(),
-                LoginListenerWrapper(requireNotNull(platform.getThirdParty()), listener)
+                UmengLogin.LoginListenerWrapper(requireNotNull(platform.getThirdParty()), listener)
             )
         } catch (e: InterruptedException) {
             e.printStackTrace()

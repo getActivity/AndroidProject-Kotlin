@@ -34,8 +34,8 @@ import com.hjq.http.model.HttpHeaders
 import com.hjq.http.model.HttpParams
 import com.hjq.http.request.HttpRequest
 import com.hjq.toast.Toaster
-import com.hjq.umeng.UmengClient
-import com.hjq.umeng.UmengClient.getDeviceOaid
+import com.hjq.umeng.sdk.UmengClient
+import com.hjq.umeng.sdk.UmengClient.getDeviceOaid
 import com.scwang.smart.refresh.layout.SmartRefreshLayout
 import com.scwang.smart.refresh.layout.api.RefreshLayout
 import com.tencent.bugly.library.Bugly

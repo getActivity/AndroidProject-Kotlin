@@ -18,9 +18,9 @@ import com.hjq.base.ktx.lazyFindViewById
 import com.hjq.demo.R
 import com.hjq.demo.app.AppAdapter
 import com.hjq.demo.ktx.toast
-import com.hjq.umeng.Platform
-import com.hjq.umeng.UmengClient
-import com.hjq.umeng.UmengShare.OnShareListener
+import com.hjq.umeng.sdk.Platform
+import com.hjq.umeng.sdk.UmengClient
+import com.hjq.umeng.sdk.UmengShare.OnShareListener
 import com.umeng.socialize.ShareAction
 import com.umeng.socialize.ShareContent
 import com.umeng.socialize.media.UMEmoji

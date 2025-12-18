@@ -9,7 +9,7 @@ val WX_APP_ID = rootProject.extra["WX_APP_ID"].toString()
 val WX_APP_SECRET = rootProject.extra["WX_APP_SECRET"].toString()
 
 android {
-    namespace = "com.hjq.umeng"
+    namespace = "com.hjq.umeng.sdk"
 
     buildFeatures {
         // 是否生成 BuildConfig 类
