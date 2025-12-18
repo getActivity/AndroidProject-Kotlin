@@ -1,4 +1,4 @@
-package com.hjq.widget.view
+package com.hjq.custom.widget.view
 
 import android.content.Context
 import android.content.res.TypedArray
@@ -18,8 +18,8 @@ import android.util.TypedValue
 import android.view.Gravity
 import android.view.View
 import androidx.annotation.StringRes
+import com.hjq.custom.widget.R
 import com.hjq.smallest.width.sp2px
-import com.hjq.widget.R
 import kotlin.math.max
 
 /**

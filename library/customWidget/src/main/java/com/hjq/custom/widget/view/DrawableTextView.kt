@@ -1,11 +1,11 @@
-package com.hjq.widget.view
+package com.hjq.custom.widget.view
 
 import android.content.Context
 import android.content.res.TypedArray
 import android.graphics.drawable.Drawable
 import android.util.AttributeSet
 import androidx.appcompat.widget.AppCompatTextView
-import com.hjq.widget.R
+import com.hjq.custom.widget.R
 
 /**
  *    author : Android 轮子哥

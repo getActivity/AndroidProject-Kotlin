@@ -1,4 +1,4 @@
-package com.hjq.widget.view
+package com.hjq.custom.widget.view
 
 import android.content.Context
 import android.content.res.TypedArray
@@ -15,8 +15,8 @@ import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
 import android.view.animation.AccelerateInterpolator
+import com.hjq.custom.widget.R
 import com.hjq.smallest.width.dp2px
-import com.hjq.widget.R
 
 /**
  *    author : Android 轮子哥

@@ -161,7 +161,7 @@ android {
 dependencies {
     implementation(project(":library:base"))
     implementation(project(":library:smallestWidth"))
-    implementation(project(":library:widget"))
+    implementation(project(":library:customWidget"))
     implementation(project(":library:umeng"))
 
     implementation(libs.deviceCompat)

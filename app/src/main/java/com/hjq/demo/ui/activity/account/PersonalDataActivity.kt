@@ -11,6 +11,7 @@ import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.load.resource.bitmap.CircleCrop
 import com.hjq.base.BaseDialog
 import com.hjq.base.ktx.lazyFindViewById
+import com.hjq.custom.widget.layout.SettingBar
 import com.hjq.demo.R
 import com.hjq.demo.aop.SingleClick
 import com.hjq.demo.app.AppActivity
@@ -19,7 +20,6 @@ import com.hjq.demo.ui.activity.common.ImagePreviewActivity
 import com.hjq.demo.ui.activity.common.ImageSelectActivity
 import com.hjq.demo.ui.dialog.common.AddressDialog
 import com.hjq.demo.ui.dialog.common.InputDialog
-import com.hjq.widget.layout.SettingBar
 
 /**
  *    author : Android 轮子哥

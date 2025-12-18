@@ -8,10 +8,10 @@ import android.widget.TextView
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.content.ContextCompat
 import com.hjq.bar.style.LightBarStyle
+import com.hjq.custom.widget.view.PressAlphaTextView
 import com.hjq.demo.R
 import com.hjq.smallest.width.dp2px
 import com.hjq.smallest.width.sp2px
-import com.hjq.widget.view.PressAlphaTextView
 
 /**
  *    author : Android 轮子哥

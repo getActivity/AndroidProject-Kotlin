@@ -6,6 +6,7 @@ import android.widget.EditText
 import android.widget.TextView
 import com.hjq.base.BaseDialog
 import com.hjq.base.ktx.lazyFindViewById
+import com.hjq.custom.widget.view.CountdownView
 import com.hjq.demo.R
 import com.hjq.demo.aop.SingleClick
 import com.hjq.demo.http.api.GetCodeApi
@@ -15,7 +16,6 @@ import com.hjq.demo.ktx.toast
 import com.hjq.demo.ui.dialog.common.StyleDialog
 import com.hjq.http.EasyHttp
 import com.hjq.http.listener.OnHttpListener
-import com.hjq.widget.view.CountdownView
 
 /**
  *    author : Android 轮子哥

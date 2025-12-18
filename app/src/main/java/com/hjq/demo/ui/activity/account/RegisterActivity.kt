@@ -14,6 +14,8 @@ import com.hjq.base.ktx.createIntent
 import com.hjq.base.ktx.hideKeyboard
 import com.hjq.base.ktx.lazyFindViewById
 import com.hjq.base.ktx.startActivityForResult
+import com.hjq.custom.widget.view.CountdownView
+import com.hjq.custom.widget.view.SubmitButton
 import com.hjq.demo.R
 import com.hjq.demo.aop.Log
 import com.hjq.demo.aop.SingleClick
@@ -26,8 +28,6 @@ import com.hjq.demo.manager.InputTextManager
 import com.hjq.http.EasyHttp
 import com.hjq.http.config.IRequestApi
 import com.hjq.http.listener.HttpCallbackProxy
-import com.hjq.widget.view.CountdownView
-import com.hjq.widget.view.SubmitButton
 
 /**
  *    author : Android 轮子哥

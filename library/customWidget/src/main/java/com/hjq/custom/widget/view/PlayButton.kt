@@ -1,4 +1,4 @@
-package com.hjq.widget.view
+package com.hjq.custom.widget.view
 
 import android.animation.ValueAnimator
 import android.content.Context
@@ -13,8 +13,8 @@ import android.graphics.RectF
 import android.util.AttributeSet
 import android.view.View
 import android.view.animation.AnticipateInterpolator
+import com.hjq.custom.widget.R
 import com.hjq.smallest.width.dp2px
-import com.hjq.widget.R
 
 /**
  *    author : codeestX & Android 轮子哥

@@ -3,7 +3,7 @@ plugins {
 }
 
 android {
-    namespace = "com.hjq.widget"
+    namespace = "com.hjq.custom.widget"
 }
 
 dependencies {

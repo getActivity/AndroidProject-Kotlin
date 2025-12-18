@@ -39,10 +39,10 @@ import com.hjq.base.BaseDialog
 import com.hjq.base.action.ContextAction
 import com.hjq.base.ktx.getActivity
 import com.hjq.base.ktx.lazyFindViewById
+import com.hjq.custom.widget.layout.SimpleLayout
+import com.hjq.custom.widget.view.PlayButton
 import com.hjq.demo.R
 import com.hjq.demo.ui.dialog.common.MessageDialog
-import com.hjq.widget.layout.SimpleLayout
-import com.hjq.widget.view.PlayButton
 import java.io.File
 import java.util.Formatter
 import java.util.Locale

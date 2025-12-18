@@ -8,6 +8,8 @@ import com.hjq.base.BaseDialog
 import com.hjq.base.action.AnimAction
 import com.hjq.base.ktx.lazyFindViewById
 import com.hjq.base.ktx.startActivity
+import com.hjq.custom.widget.layout.SettingBar
+import com.hjq.custom.widget.view.SwitchButton
 import com.hjq.demo.R
 import com.hjq.demo.aop.SingleClick
 import com.hjq.demo.app.AppActivity
@@ -27,8 +29,6 @@ import com.hjq.demo.ui.dialog.UpdateDialog
 import com.hjq.demo.ui.dialog.common.MenuDialog
 import com.hjq.http.EasyHttp
 import com.hjq.http.listener.HttpCallbackProxy
-import com.hjq.widget.layout.SettingBar
-import com.hjq.widget.view.SwitchButton
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext

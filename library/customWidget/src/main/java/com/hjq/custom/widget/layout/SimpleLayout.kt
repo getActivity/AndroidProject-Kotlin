@@ -1,9 +1,9 @@
-package com.hjq.widget.layout
+package com.hjq.custom.widget.layout
 
 import android.content.Context
 import android.util.AttributeSet
 import android.view.ViewGroup
-import com.hjq.widget.R
+import com.hjq.custom.widget.R
 import kotlin.math.max
 
 /**

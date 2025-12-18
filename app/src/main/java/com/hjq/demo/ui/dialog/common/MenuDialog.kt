@@ -11,10 +11,10 @@ import com.hjq.base.BaseAdapter
 import com.hjq.base.BaseDialog
 import com.hjq.base.action.AnimAction
 import com.hjq.base.ktx.lazyFindViewById
+import com.hjq.custom.widget.layout.SimpleLayout
 import com.hjq.demo.R
 import com.hjq.demo.aop.SingleClick
 import com.hjq.demo.app.AppAdapter
-import com.hjq.widget.layout.SimpleLayout
 
 /**
  *    author : Android 轮子哥

@@ -10,6 +10,7 @@ import android.widget.TextView
 import android.widget.TextView.OnEditorActionListener
 import com.hjq.base.ktx.hideKeyboard
 import com.hjq.base.ktx.lazyFindViewById
+import com.hjq.custom.widget.view.CountdownView
 import com.hjq.demo.R
 import com.hjq.demo.aop.SingleClick
 import com.hjq.demo.app.AppActivity
@@ -20,7 +21,6 @@ import com.hjq.demo.ktx.toast
 import com.hjq.demo.manager.InputTextManager
 import com.hjq.http.EasyHttp
 import com.hjq.http.listener.HttpCallbackProxy
-import com.hjq.widget.view.CountdownView
 
 /**
  *    author : Android 轮子哥

@@ -1,4 +1,4 @@
-package com.hjq.widget.layout
+package com.hjq.custom.widget.layout
 
 import android.content.Context
 import android.util.AttributeSet

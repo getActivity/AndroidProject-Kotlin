@@ -10,9 +10,9 @@ import androidx.annotation.StringRes
 import com.hjq.base.BaseDialog
 import com.hjq.base.ktx.lazyFindViewById
 import com.hjq.base.ktx.showKeyboard
+import com.hjq.custom.widget.view.RegexEditText
 import com.hjq.demo.R
 import com.hjq.demo.aop.SingleClick
-import com.hjq.widget.view.RegexEditText
 
 /**
  *    author : Android 轮子哥

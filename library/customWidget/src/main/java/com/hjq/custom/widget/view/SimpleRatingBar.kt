@@ -1,4 +1,4 @@
-package com.hjq.widget.view
+package com.hjq.custom.widget.view
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -9,7 +9,7 @@ import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
 import androidx.core.content.ContextCompat
-import com.hjq.widget.R
+import com.hjq.custom.widget.R
 import kotlin.math.roundToInt
 
 /**

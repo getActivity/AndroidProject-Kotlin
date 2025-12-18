@@ -5,7 +5,7 @@ import android.view.View
 import androidx.annotation.IntRange
 import androidx.annotation.LayoutRes
 import com.hjq.base.BaseAdapter
-import com.hjq.widget.layout.WrapRecyclerView
+import com.hjq.custom.widget.layout.WrapRecyclerView
 
 /**
  *    author : Android 轮子哥

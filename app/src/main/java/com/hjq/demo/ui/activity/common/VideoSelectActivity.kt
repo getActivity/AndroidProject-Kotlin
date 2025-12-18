@@ -22,6 +22,7 @@ import com.hjq.base.BaseAdapter
 import com.hjq.base.BaseDialog
 import com.hjq.base.ktx.lazyFindViewById
 import com.hjq.base.ktx.startActivityForResult
+import com.hjq.custom.widget.view.FloatActionButton
 import com.hjq.demo.R
 import com.hjq.demo.action.StatusAction
 import com.hjq.demo.aop.Log
@@ -39,7 +40,6 @@ import com.hjq.demo.widget.StatusLayout
 import com.hjq.permissions.XXPermissions
 import com.hjq.permissions.permission.PermissionLists
 import com.hjq.smallest.width.dp2px
-import com.hjq.widget.view.FloatActionButton
 import com.tencent.bugly.library.Bugly
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
