@@ -68,6 +68,11 @@ open class RegexEditText @JvmOverloads constructor(
             }
         }
         array.recycle()
+
+        // 适配 RTL 特性
+        if (textAlignment == TEXT_ALIGNMENT_GRAVITY) {
+            textAlignment = TEXT_ALIGNMENT_VIEW_START
+        }
     }
 
     /**

@@ -278,7 +278,16 @@ class SwitchButton @JvmOverloads constructor(
         if (!canVisibleDrawing) {
             return
         }
+
+
+        // 适配 RTL 特性
+        val layoutDirection = resources.configuration.layoutDirection
+        if (layoutDirection == LAYOUT_DIRECTION_RTL) {
+            canvas.save()
+            canvas.scale(-1f, 1f, centerX, centerY)
+        }
         paint.isAntiAlias = true
+
         val isOn: Boolean = (checkedState == STATE_SWITCH_ON || checkedState == STATE_SWITCH_ON2)
         // Draw background
         paint.style = Paint.Style.FILL
@@ -327,6 +336,10 @@ class SwitchButton @JvmOverloads constructor(
         paint.reset()
         if (anim1 > 0 || anim2 > 0) {
             invalidate()
+        }
+
+        if (layoutDirection == LAYOUT_DIRECTION_RTL) {
+            canvas.restore()
         }
     }
 

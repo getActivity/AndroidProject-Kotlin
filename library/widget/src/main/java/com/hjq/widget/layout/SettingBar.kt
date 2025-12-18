@@ -43,116 +43,116 @@ class SettingBar @JvmOverloads constructor(
     }
 
     private val mainLayout: LinearLayout = LinearLayout(getContext())
-    private val leftView: TextView = TextView(getContext())
-    private val rightView: TextView = TextView(getContext())
+    private val startView: TextView = TextView(getContext())
+    private val endView: TextView = TextView(getContext())
     private val lineView: View = View(getContext())
 
     /** 图标着色器 */
-    private var leftDrawableTint: Int = 0
-    private var rightDrawableTint: Int = 0
+    private var startDrawableTint: Int = 0
+    private var endDrawableTint: Int = 0
 
     /** 图标显示大小 */
-    private var leftDrawableSize: Int = 0
-    private var rightDrawableSize: Int = 0
+    private var startDrawableSize: Int = 0
+    private var endDrawableSize: Int = 0
 
     init {
         mainLayout.layoutParams = LayoutParams(LayoutParams.MATCH_PARENT,
             LayoutParams.WRAP_CONTENT, Gravity.CENTER_VERTICAL)
 
-        val leftParams = LinearLayout.LayoutParams(0, LayoutParams.WRAP_CONTENT)
-        leftParams.gravity = Gravity.CENTER_VERTICAL
-        leftParams.weight = 1f
-        leftView.layoutParams = leftParams
+        val startLayoutParams = LinearLayout.LayoutParams(0, LayoutParams.WRAP_CONTENT)
+        startLayoutParams.gravity = Gravity.CENTER_VERTICAL
+        startLayoutParams.weight = 1f
+        startView.layoutParams = startLayoutParams
 
-        val rightParams = LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT)
-        rightParams.gravity = Gravity.CENTER_VERTICAL
-        rightView.layoutParams = rightParams
+        val endLayoutParams = LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT)
+        endLayoutParams.gravity = Gravity.CENTER_VERTICAL
+        endView.layoutParams = endLayoutParams
 
         lineView.layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, 1, Gravity.BOTTOM)
 
-        leftView.gravity = Gravity.START or Gravity.CENTER_VERTICAL
-        rightView.gravity = Gravity.END or Gravity.CENTER_VERTICAL
+        startView.gravity = Gravity.START or Gravity.CENTER_VERTICAL
+        endView.gravity = Gravity.END or Gravity.CENTER_VERTICAL
 
-        leftView.isSingleLine = true
-        rightView.isSingleLine = true
+        startView.isSingleLine = true
+        endView.isSingleLine = true
 
-        leftView.ellipsize = TextUtils.TruncateAt.END
-        rightView.ellipsize = TextUtils.TruncateAt.END
+        startView.ellipsize = TextUtils.TruncateAt.END
+        endView.ellipsize = TextUtils.TruncateAt.END
 
-        leftView.setLineSpacing(dp2px(5), leftView.lineSpacingMultiplier)
-        rightView.setLineSpacing(dp2px(5), rightView.lineSpacingMultiplier)
+        startView.setLineSpacing(dp2px(5), startView.lineSpacingMultiplier)
+        endView.setLineSpacing(dp2px(5), endView.lineSpacingMultiplier)
 
-        leftView.setPaddingRelative(dp2px(15).toInt(), dp2px(12).toInt(),
+        startView.setPaddingRelative(dp2px(15).toInt(), dp2px(12).toInt(),
             dp2px(15).toInt(), dp2px(12).toInt())
-        rightView.setPaddingRelative(dp2px(15).toInt(), dp2px(12).toInt(),
+        endView.setPaddingRelative(dp2px(15).toInt(), dp2px(12).toInt(),
             dp2px(15).toInt(), dp2px(12).toInt())
 
         val array: TypedArray = getContext().obtainStyledAttributes(attrs, R.styleable.SettingBar)
 
         // 文本设置
-        if (array.hasValue(R.styleable.SettingBar_bar_leftText)) {
-            setLeftText(array.getString(R.styleable.SettingBar_bar_leftText))
+        if (array.hasValue(R.styleable.SettingBar_bar_startText)) {
+            setStartText(array.getString(R.styleable.SettingBar_bar_startText))
         }
-        if (array.hasValue(R.styleable.SettingBar_bar_rightText)) {
-            setRightText(array.getString(R.styleable.SettingBar_bar_rightText))
+        if (array.hasValue(R.styleable.SettingBar_bar_endText)) {
+            setEndText(array.getString(R.styleable.SettingBar_bar_endText))
         }
 
         // 提示设置
-        if (array.hasValue(R.styleable.SettingBar_bar_leftTextHint)) {
-            setLeftTextHint(array.getString(R.styleable.SettingBar_bar_leftTextHint))
+        if (array.hasValue(R.styleable.SettingBar_bar_startTextHint)) {
+            setStartTextHint(array.getString(R.styleable.SettingBar_bar_startTextHint))
         }
-        if (array.hasValue(R.styleable.SettingBar_bar_rightTextHint)) {
-            setRightTextHint(array.getString(R.styleable.SettingBar_bar_rightTextHint))
+        if (array.hasValue(R.styleable.SettingBar_bar_endTextHint)) {
+            setEndTextHint(array.getString(R.styleable.SettingBar_bar_endTextHint))
         }
 
         // 图标显示的大小
-        if (array.hasValue(R.styleable.SettingBar_bar_leftDrawableSize)) {
-            setLeftDrawableSize(array.getDimensionPixelSize(R.styleable.SettingBar_bar_leftDrawableSize, 0))
+        if (array.hasValue(R.styleable.SettingBar_bar_startDrawableSize)) {
+            setStartDrawableSize(array.getDimensionPixelSize(R.styleable.SettingBar_bar_startDrawableSize, 0))
         }
 
-        if (array.hasValue(R.styleable.SettingBar_bar_rightDrawableSize)) {
-            setRightDrawableSize(array.getDimensionPixelSize(R.styleable.SettingBar_bar_rightDrawableSize, 0))
+        if (array.hasValue(R.styleable.SettingBar_bar_endDrawableSize)) {
+            setEndDrawableSize(array.getDimensionPixelSize(R.styleable.SettingBar_bar_endDrawableSize, 0))
         }
 
         // 图标着色器
-        if (array.hasValue(R.styleable.SettingBar_bar_leftDrawableTint)) {
-            setLeftDrawableTint(array.getColor(R.styleable.SettingBar_bar_leftDrawableTint, NO_COLOR))
+        if (array.hasValue(R.styleable.SettingBar_bar_startDrawableTint)) {
+            setStartDrawableTint(array.getColor(R.styleable.SettingBar_bar_startDrawableTint, NO_COLOR))
         }
-        if (array.hasValue(R.styleable.SettingBar_bar_rightDrawableTint)) {
-            setRightDrawableTint(array.getColor(R.styleable.SettingBar_bar_rightDrawableTint, NO_COLOR))
+        if (array.hasValue(R.styleable.SettingBar_bar_endDrawableTint)) {
+            setEndDrawableTint(array.getColor(R.styleable.SettingBar_bar_endDrawableTint, NO_COLOR))
         }
 
         // 图标和文字之间的间距
-        setLeftDrawablePadding(
-            if (array.hasValue(R.styleable.SettingBar_bar_leftDrawablePadding)) array.getDimensionPixelSize(
-                R.styleable.SettingBar_bar_leftDrawablePadding,
+        setStartDrawablePadding(
+            if (array.hasValue(R.styleable.SettingBar_bar_startDrawablePadding)) array.getDimensionPixelSize(
+                R.styleable.SettingBar_bar_startDrawablePadding,
                 0
             ) else dp2px(10).toInt()
         )
-        setRightDrawablePadding(
-            if (array.hasValue(R.styleable.SettingBar_bar_rightDrawablePadding))
-                array.getDimensionPixelSize(R.styleable.SettingBar_bar_rightDrawablePadding, 0)
+        setEndDrawablePadding(
+            if (array.hasValue(R.styleable.SettingBar_bar_endDrawablePadding))
+                array.getDimensionPixelSize(R.styleable.SettingBar_bar_endDrawablePadding, 0)
             else
                 dp2px(10).toInt()
         )
 
         // 图标设置
-        if (array.hasValue(R.styleable.SettingBar_bar_leftDrawable)) {
-            setLeftDrawable(array.getDrawable(R.styleable.SettingBar_bar_leftDrawable))
+        if (array.hasValue(R.styleable.SettingBar_bar_startDrawable)) {
+            setStartDrawable(array.getDrawable(R.styleable.SettingBar_bar_startDrawable))
         }
-        if (array.hasValue(R.styleable.SettingBar_bar_rightDrawable)) {
-            setRightDrawable(array.getDrawable(R.styleable.SettingBar_bar_rightDrawable))
+        if (array.hasValue(R.styleable.SettingBar_bar_endDrawable)) {
+            setEndDrawable(array.getDrawable(R.styleable.SettingBar_bar_endDrawable))
         }
 
         // 文字颜色设置
-        setLeftTextColor(array.getColor(R.styleable.SettingBar_bar_leftTextColor, ContextCompat.getColor(getContext(), R.color.black80)))
-        setRightTextColor(array.getColor(R.styleable.SettingBar_bar_rightTextColor, ContextCompat.getColor(getContext(), R.color.black60)))
+        setStartTextColor(array.getColor(R.styleable.SettingBar_bar_startTextColor, ContextCompat.getColor(getContext(), R.color.black80)))
+        setEndTextColor(array.getColor(R.styleable.SettingBar_bar_endTextColor, ContextCompat.getColor(getContext(), R.color.black60)))
 
         // 文字大小设置
-        setLeftTextSize(TypedValue.COMPLEX_UNIT_PX, array.getDimensionPixelSize(
-            R.styleable.SettingBar_bar_leftTextSize, sp2px(15).toInt()).toFloat())
-        setRightTextSize(TypedValue.COMPLEX_UNIT_PX, array.getDimensionPixelSize(
-            R.styleable.SettingBar_bar_rightTextSize, sp2px(14).toInt()).toFloat())
+        setStartTextSize(TypedValue.COMPLEX_UNIT_PX, array.getDimensionPixelSize(
+            R.styleable.SettingBar_bar_startTextSize, sp2px(15).toInt()).toFloat())
+        setEndTextSize(TypedValue.COMPLEX_UNIT_PX, array.getDimensionPixelSize(
+            R.styleable.SettingBar_bar_endTextSize, sp2px(14).toInt()).toFloat())
 
         // 分割线设置
         if (array.hasValue(R.styleable.SettingBar_bar_lineDrawable)) {
@@ -188,8 +188,14 @@ class SettingBar @JvmOverloads constructor(
         }
         array.recycle()
 
-        mainLayout.addView(leftView)
-        mainLayout.addView(rightView)
+
+        // 适配 RTL 特性
+        if (startView.textAlignment == TEXT_ALIGNMENT_GRAVITY) {
+            startView.textAlignment = TEXT_ALIGNMENT_VIEW_START
+        }
+
+        mainLayout.addView(startView)
+        mainLayout.addView(endView)
 
         addView(mainLayout, 0)
         addView(lineView, 1)
@@ -200,7 +206,7 @@ class SettingBar @JvmOverloads constructor(
                                         oldLeft: Int, oldTop: Int, oldRight: Int, oldBottom: Int) {
                 v?.removeOnLayoutChangeListener(this)
                 // 限制右边 View 的宽度，避免文本过长挤掉左边 View
-                rightView.maxWidth = (right - left) / 3 * 2
+                endView.maxWidth = (right - left) / 3 * 2
             }
         })
     }
@@ -208,141 +214,141 @@ class SettingBar @JvmOverloads constructor(
     /**
      * 设置左边的文本
      */
-    fun setLeftText(@StringRes id: Int): SettingBar = apply {
-        setLeftText(resources.getString(id))
+    fun setStartText(@StringRes id: Int): SettingBar = apply {
+        setStartText(resources.getString(id))
     }
 
-    fun setLeftText(text: CharSequence?): SettingBar = apply {
-        leftView.text = text
+    fun setStartText(text: CharSequence?): SettingBar = apply {
+        startView.text = text
     }
 
-    fun getLeftText(): CharSequence? {
-        return leftView.text
+    fun getStartText(): CharSequence? {
+        return startView.text
     }
 
     /**
      * 设置左边的提示
      */
-    fun setLeftTextHint(@StringRes id: Int): SettingBar = apply {
-        setLeftTextHint(resources.getString(id))
+    fun setStartTextHint(@StringRes id: Int): SettingBar = apply {
+        setStartTextHint(resources.getString(id))
     }
 
-    fun setLeftTextHint(hint: CharSequence?): SettingBar = apply {
-        leftView.hint = hint
+    fun setStartTextHint(hint: CharSequence?): SettingBar = apply {
+        startView.hint = hint
     }
 
     /**
      * 设置右边的标题
      */
-    fun setRightText(@StringRes id: Int): SettingBar = apply {
-        setRightText(resources.getString(id))
+    fun setEndText(@StringRes id: Int): SettingBar = apply {
+        setEndText(resources.getString(id))
     }
 
-    fun setRightText(text: CharSequence?): SettingBar = apply {
-        rightView.text = text
+    fun setEndText(text: CharSequence?): SettingBar = apply {
+        endView.text = text
     }
 
-    fun getRightText(): CharSequence? {
-        return rightView.text
+    fun getEndText(): CharSequence? {
+        return endView.text
     }
 
     /**
      * 设置右边的提示
      */
-    fun setRightTextHint(@StringRes id: Int): SettingBar = apply {
-        setRightTextHint(resources.getString(id))
+    fun setEndTextHint(@StringRes id: Int): SettingBar = apply {
+        setEndTextHint(resources.getString(id))
     }
 
-    fun setRightTextHint(hint: CharSequence?): SettingBar = apply {
-        rightView.hint = hint
+    fun setEndTextHint(hint: CharSequence?): SettingBar = apply {
+        endView.hint = hint
     }
 
     /**
      * 设置左边的图标
      */
-    fun setLeftDrawable(@DrawableRes id: Int): SettingBar = apply {
-        setLeftDrawable(ContextCompat.getDrawable(context, id))
+    fun setStartDrawable(@DrawableRes id: Int): SettingBar = apply {
+        setStartDrawable(ContextCompat.getDrawable(context, id))
     }
 
-    fun setLeftDrawable(drawable: Drawable?): SettingBar = apply {
-        leftView.setCompoundDrawablesWithIntrinsicBounds(drawable, null, null, null)
-        setLeftDrawableSize(leftDrawableSize)
-        setLeftDrawableTint(leftDrawableTint)
+    fun setStartDrawable(drawable: Drawable?): SettingBar = apply {
+        startView.setCompoundDrawablesRelative(drawable, null, null, null)
+        setStartDrawableSize(startDrawableSize)
+        setStartDrawableTint(startDrawableTint)
     }
 
-    fun getLeftDrawable(): Drawable? {
-        return leftView.compoundDrawables[0]
+    fun getStartDrawable(): Drawable? {
+        return startView.getCompoundDrawablesRelative()[0]
     }
 
     /**
      * 设置右边的图标
      */
-    fun setRightDrawable(@DrawableRes id: Int): SettingBar = apply {
-        setRightDrawable(ContextCompat.getDrawable(context, id))
+    fun setEndDrawable(@DrawableRes id: Int): SettingBar = apply {
+        setEndDrawable(ContextCompat.getDrawable(context, id))
     }
 
-    fun setRightDrawable(drawable: Drawable?): SettingBar = apply {
-        rightView.setCompoundDrawablesWithIntrinsicBounds(null, null, drawable, null)
-        setRightDrawableSize(rightDrawableSize)
-        setRightDrawableTint(rightDrawableTint)
+    fun setEndDrawable(drawable: Drawable?): SettingBar = apply {
+        endView.setCompoundDrawablesRelative(null, null, drawable, null)
+        setEndDrawableSize(endDrawableSize)
+        setEndDrawableTint(endDrawableTint)
     }
 
-    fun getRightDrawable(): Drawable? {
-        return rightView.compoundDrawables[2]
+    fun getEndDrawable(): Drawable? {
+        return endView.getCompoundDrawablesRelative()[2]
     }
 
     /**
      * 设置左边的图标间距
      */
-    fun setLeftDrawablePadding(padding: Int): SettingBar = apply {
-        leftView.compoundDrawablePadding = padding
+    fun setStartDrawablePadding(padding: Int): SettingBar = apply {
+        startView.compoundDrawablePadding = padding
     }
 
     /**
      * 设置右边的图标间距
      */
-    fun setRightDrawablePadding(padding: Int): SettingBar = apply {
-        rightView.compoundDrawablePadding = padding
+    fun setEndDrawablePadding(padding: Int): SettingBar = apply {
+        endView.compoundDrawablePadding = padding
     }
 
     /**
      * 设置左边的图标大小
      */
-    fun setLeftDrawableSize(size: Int): SettingBar = apply {
-        leftDrawableSize = size
-        val drawable: Drawable? = getLeftDrawable()
+    fun setStartDrawableSize(size: Int): SettingBar = apply {
+        startDrawableSize = size
+        val drawable: Drawable? = getStartDrawable()
         if (drawable != null) {
             if (size > 0) {
                 drawable.setBounds(0, 0, size, size)
             } else {
                 drawable.setBounds(0, 0, drawable.intrinsicWidth, drawable.intrinsicHeight)
             }
-            leftView.setCompoundDrawables(drawable, null, null, null)
+            startView.setCompoundDrawablesRelative(drawable, null, null, null)
         }
     }
 
     /**
      * 设置右边的图标大小
      */
-    fun setRightDrawableSize(size: Int): SettingBar = apply {
-        rightDrawableSize = size
-        val drawable: Drawable? = getRightDrawable()
+    fun setEndDrawableSize(size: Int): SettingBar = apply {
+        endDrawableSize = size
+        val drawable: Drawable? = getEndDrawable()
         if (drawable != null) {
             if (size > 0) {
                 drawable.setBounds(0, 0, size, size)
             } else {
                 drawable.setBounds(0, 0, drawable.intrinsicWidth, drawable.intrinsicHeight)
             }
-            rightView.setCompoundDrawables(null, null, drawable, null)
+            endView.setCompoundDrawablesRelative(null, null, drawable, null)
         }
     }
 
     /**
      * 设置左边的图标着色器
      */
-    fun setLeftDrawableTint(color: Int): SettingBar = apply {
-        leftDrawableTint = color
-        val drawable: Drawable? = getLeftDrawable()
+    fun setStartDrawableTint(color: Int): SettingBar = apply {
+        startDrawableTint = color
+        val drawable: Drawable? = getStartDrawable()
         if (drawable != null && color != NO_COLOR) {
             drawable.mutate()
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
@@ -356,9 +362,9 @@ class SettingBar @JvmOverloads constructor(
     /**
      * 设置右边的图标着色器
      */
-    fun setRightDrawableTint(color: Int): SettingBar = apply {
-        rightDrawableTint = color
-        val drawable: Drawable? = getRightDrawable()
+    fun setEndDrawableTint(color: Int): SettingBar = apply {
+        endDrawableTint = color
+        val drawable: Drawable? = getEndDrawable()
         if (drawable != null && color != NO_COLOR) {
             drawable.mutate()
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
@@ -372,29 +378,29 @@ class SettingBar @JvmOverloads constructor(
     /**
      * 设置左边的文本颜色
      */
-    fun setLeftTextColor(@ColorInt color: Int): SettingBar = apply {
-        leftView.setTextColor(color)
+    fun setStartTextColor(@ColorInt color: Int): SettingBar = apply {
+        startView.setTextColor(color)
     }
 
     /**
      * 设置右边的文本颜色
      */
-    fun setRightTextColor(@ColorInt color: Int): SettingBar = apply {
-        rightView.setTextColor(color)
+    fun setEndTextColor(@ColorInt color: Int): SettingBar = apply {
+        endView.setTextColor(color)
     }
 
     /**
      * 设置左边的文字大小
      */
-    fun setLeftTextSize(unit: Int, size: Float): SettingBar = apply {
-        leftView.setTextSize(unit, size)
+    fun setStartTextSize(unit: Int, size: Float): SettingBar = apply {
+        startView.setTextSize(unit, size)
     }
 
     /**
      * 设置右边的文字大小
      */
-    fun setRightTextSize(unit: Int, size: Float): SettingBar = apply {
-        rightView.setTextSize(unit, size)
+    fun setEndTextSize(unit: Int, size: Float): SettingBar = apply {
+        endView.setTextSize(unit, size)
     }
 
     /**
@@ -450,15 +456,15 @@ class SettingBar @JvmOverloads constructor(
     /**
      * 获取左 TextView
      */
-    fun getLeftView(): TextView {
-        return leftView
+    fun getStartView(): TextView {
+        return startView
     }
 
     /**
      * 获取右 TextView
      */
-    fun getRightView(): TextView {
-        return rightView
+    fun getEndView(): TextView {
+        return endView
     }
 
     /**

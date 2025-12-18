@@ -376,6 +376,8 @@ class AddressDialog {
             )
             textView.setPadding(getResources().getDimension(R.dimen.dp_20).toInt(), getResources().getDimension(R.dimen.dp_10).toInt(),
                 getResources().getDimension(R.dimen.dp_20).toInt(), getResources().getDimension(R.dimen.dp_10).toInt())
+            // 适配 RTL 特性
+            textView.setTextAlignment(View.TEXT_ALIGNMENT_VIEW_START)
             return ViewHolder(textView)
         }
 

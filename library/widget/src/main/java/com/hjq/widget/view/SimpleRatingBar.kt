@@ -8,7 +8,6 @@ import android.graphics.drawable.Drawable
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
-import androidx.annotation.DrawableRes
 import androidx.core.content.ContextCompat
 import com.hjq.widget.R
 import kotlin.math.roundToInt
@@ -24,13 +23,13 @@ class SimpleRatingBar @JvmOverloads constructor(
     View(context, attrs, defStyleAttr) {
 
     /** 默认的星星图标  */
-    private var normalDrawable: Drawable? = null
+    private lateinit var normalDrawable: Drawable
 
     /** 选中的星星图标  */
-    private var fillDrawable: Drawable? = null
+    private lateinit var fillDrawable: Drawable
 
     /** 选中的半星图标  */
-    private var halfDrawable: Drawable? = null
+    private lateinit var halfDrawable: Drawable
 
     /** 当前星等级  */
     private var currentGrade = 0f
@@ -58,11 +57,9 @@ class SimpleRatingBar @JvmOverloads constructor(
 
     init {
         val array = context.obtainStyledAttributes(attrs, R.styleable.SimpleRatingBar)
-        setRatingDrawable(
-            ContextCompat.getDrawable(getContext(), array.getResourceId(R.styleable.SimpleRatingBar_normalDrawable, R.drawable.rating_star_off_ic)),
-            ContextCompat.getDrawable(getContext(), array.getResourceId(R.styleable.SimpleRatingBar_halfDrawable, R.drawable.rating_star_half_ic)),
-            ContextCompat.getDrawable(getContext(), array.getResourceId(R.styleable.SimpleRatingBar_fillDrawable, R.drawable.rating_star_fill_ic))
-        )
+        setRatingDrawable(requireNotNull(ContextCompat.getDrawable(getContext(), array.getResourceId(R.styleable.SimpleRatingBar_normalDrawable, R.drawable.rating_star_off_ic))),
+                            ContextCompat.getDrawable(getContext(), array.getResourceId(R.styleable.SimpleRatingBar_halfDrawable, R.drawable.rating_star_half_ic)),
+                             requireNotNull(ContextCompat.getDrawable(getContext(), array.getResourceId(R.styleable.SimpleRatingBar_fillDrawable, R.drawable.rating_star_fill_ic))))
         setGradeCount(array.getInt(R.styleable.SimpleRatingBar_gradeCount, 5))
         setGradeSpace(array.getDimension(R.styleable.SimpleRatingBar_gradeSpace, gradeWidth / 4f).toInt())
         setGradeWidth(array.getDimensionPixelSize(R.styleable.SimpleRatingBar_gradeWidth, requireNotNull(normalDrawable).intrinsicWidth))
@@ -89,10 +86,16 @@ class SimpleRatingBar @JvmOverloads constructor(
         if (!isEnabled) {
             return false
         }
+        val layoutDirection = resources.configuration.layoutDirection
         when (event.action) {
             MotionEvent.ACTION_DOWN, MotionEvent.ACTION_MOVE -> {
                 var grade = 0f
-                val distance = event.x - paddingLeft - gradeSpace
+                val distance: Float
+                if (layoutDirection == LAYOUT_DIRECTION_RTL) {
+                    distance = (width - event.x) - getPaddingRight() - gradeSpace
+                } else {
+                    distance = event.x - getPaddingLeft() - gradeSpace
+                }
                 if (distance > 0) {
                     grade = distance / (gradeWidth + gradeSpace)
                 }
@@ -119,67 +122,68 @@ class SimpleRatingBar @JvmOverloads constructor(
 
     override fun onDraw(canvas: Canvas) {
         for (i in 0 until gradeCount) {
-            val start = gradeSpace + (gradeWidth + gradeSpace) * i
+            val layoutDirection = resources.configuration.layoutDirection
+            val visualIndex = if (layoutDirection == LAYOUT_DIRECTION_RTL) (gradeCount - 1 - i) else i
+            val start = gradeSpace + (gradeWidth + gradeSpace) * visualIndex
+
             gradeBounds.left = paddingLeft + start
             gradeBounds.top = paddingTop
             gradeBounds.right = gradeBounds.left + gradeWidth
             gradeBounds.bottom = gradeBounds.top + gradeHeight
+
             if (currentGrade > i) {
-                if (halfDrawable != null && gradeStep == GradleStep.HALF &&
-                    currentGrade.toInt() == i && currentGrade - currentGrade.toInt().toFloat() == 0.5f) {
-                    requireNotNull(halfDrawable).bounds = gradeBounds
-                    requireNotNull(halfDrawable).draw(canvas)
+                if (gradeStep == GradleStep.HALF && currentGrade.toInt() == i && currentGrade - currentGrade.toInt() == 0.5f) {
+                    drawDrawableRtlAware(canvas, halfDrawable, gradeBounds)
                 } else {
-                    requireNotNull(fillDrawable).bounds = gradeBounds
-                    requireNotNull(fillDrawable).draw(canvas)
+                    drawDrawableRtlAware(canvas, fillDrawable, gradeBounds)
                 }
             } else {
-                requireNotNull(normalDrawable).bounds = gradeBounds
-                requireNotNull(normalDrawable).draw(canvas)
+                drawDrawableRtlAware(canvas, normalDrawable, gradeBounds)
             }
         }
     }
 
-    fun setRatingDrawable(@DrawableRes normalDrawableId: Int,
-                          @DrawableRes halfDrawableId: Int,
-                          @DrawableRes fillDrawableId: Int) {
-        setRatingDrawable(
-            ContextCompat.getDrawable(context, normalDrawableId),
-            ContextCompat.getDrawable(context, halfDrawableId),
-            ContextCompat.getDrawable(context, fillDrawableId)
-        )
+    private fun drawDrawableRtlAware(canvas: Canvas, drawable: Drawable, bounds: Rect) {
+        drawable.bounds = bounds
+        if (layoutDirection == LAYOUT_DIRECTION_RTL) {
+            val cx = bounds.exactCenterX()
+            val cy = bounds.exactCenterY()
+            canvas.save()
+            canvas.scale(-1f, 1f, cx, cy)
+            drawable.draw(canvas)
+            canvas.restore()
+        } else {
+            drawable.draw(canvas)
+        }
     }
 
-    fun setRatingDrawable(normalDrawable: Drawable?, halfDrawable: Drawable?, fillDrawable: Drawable?) {
-        check(!(normalDrawable == null || fillDrawable == null)) { "Drawable cannot be empty" }
+    fun setRatingDrawable(normalDrawable: Drawable, halfDrawable: Drawable? = null, fillDrawable: Drawable) {
+        this.normalDrawable = normalDrawable
+        // 如果 halfDrawable 是 null，就用 normalDrawable 代替
+        this.halfDrawable = halfDrawable ?: normalDrawable
+        this.fillDrawable = fillDrawable
 
         // 两张图片的宽高不一致
-        check(!(normalDrawable.intrinsicWidth != fillDrawable.intrinsicWidth ||
-                normalDrawable.intrinsicHeight != fillDrawable.intrinsicHeight)
+        check(!(this.normalDrawable.intrinsicWidth != this.fillDrawable.intrinsicWidth ||
+                      this.normalDrawable.intrinsicHeight != this.fillDrawable.intrinsicHeight)
         ) { "The width and height of the picture do not agree" }
 
-        if (halfDrawable != null) {
-            check(!(normalDrawable.intrinsicWidth != halfDrawable.intrinsicWidth ||
-                    normalDrawable.intrinsicHeight != halfDrawable.intrinsicHeight)
-            ) { "The width and height of the picture do not agree" }
+        check(!(this.normalDrawable.intrinsicWidth != this.halfDrawable.intrinsicWidth ||
+                       this.normalDrawable.intrinsicHeight != this.halfDrawable.intrinsicHeight)
+        ) { "The width and height of the picture do not agree" }
+
+        if (gradeWidth == this.normalDrawable.intrinsicWidth) {
+            gradeWidth = 0
+        }
+        if (gradeHeight == this.normalDrawable.intrinsicHeight) {
+            gradeHeight = 0
         }
 
-        if (this.normalDrawable != null) {
-            if (gradeWidth == requireNotNull(this.normalDrawable).intrinsicWidth) {
-                gradeWidth = 0
-            }
-            if (gradeHeight == requireNotNull(this.normalDrawable).intrinsicHeight) {
-                gradeHeight = 0
-            }
-        }
-        this.normalDrawable = normalDrawable
-        this.halfDrawable = halfDrawable
-        this.fillDrawable = fillDrawable
         if (gradeWidth == 0) {
-            gradeWidth = requireNotNull(this.normalDrawable).intrinsicWidth
+            gradeWidth = this.normalDrawable.intrinsicWidth
         }
         if (gradeHeight == 0) {
-            gradeHeight = requireNotNull(this.normalDrawable).intrinsicHeight
+            gradeHeight = this.normalDrawable.intrinsicHeight
         }
         requestLayout()
     }
@@ -254,9 +258,7 @@ class SimpleRatingBar @JvmOverloads constructor(
         }
         when (gradeStep) {
             GradleStep.HALF -> {
-                if (currentGrade - currentGrade.toInt()
-                        .toFloat() > 0.5f
-                ) {
+                if (currentGrade - currentGrade.toInt().toFloat() > 0.5f) {
                     currentGrade = currentGrade.roundToInt().toFloat()
                 } else if (currentGrade - currentGrade.toInt().toFloat() != 0.5f) {
                     currentGrade += 0.5f

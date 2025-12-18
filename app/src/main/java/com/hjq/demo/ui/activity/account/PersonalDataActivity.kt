@@ -1,5 +1,6 @@
 package com.hjq.demo.ui.activity.account
 
+import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.view.View
 import android.view.ViewGroup
@@ -51,6 +52,14 @@ class PersonalDataActivity : AppActivity() {
     }
 
     override fun initView() {
+        // 适配 RTL 特性
+        val iconDrawable: Drawable? = if (getResources().configuration.layoutDirection == View.LAYOUT_DIRECTION_RTL) {
+            getDrawable(R.drawable.arrows_left_ic)
+        } else {
+            getDrawable(R.drawable.arrows_right_ic)
+        }
+        addressView?.setEndDrawable(iconDrawable)
+
         setOnClickListener(avatarLayout, avatarView, nameView, addressView)
     }
 
@@ -64,10 +73,10 @@ class PersonalDataActivity : AppActivity() {
                 .into(it)
         }
 
-        idView?.setRightText("880634")
-        nameView?.setRightText("Android 轮子哥")
+        idView?.setEndText("880634")
+        nameView?.setEndText("Android 轮子哥")
         val address: String = province + city + area
-        addressView?.setRightText(address)
+        addressView?.setEndText(address)
     }
 
     @SingleClick
@@ -93,7 +102,7 @@ class PersonalDataActivity : AppActivity() {
         } else if (view === nameView) {
             InputDialog.Builder(this)
                 .setTitle(getString(R.string.personal_data_name_hint))
-                .setContent(nameView?.getRightText()) //.setHint(getString(R.string.personal_data_name_hint))
+                .setContent(nameView?.getEndText()) //.setHint(getString(R.string.personal_data_name_hint))
                 //.setConfirm("确定")
                 // 设置 null 表示不显示取消按钮
                 //.setCancel("取消")
@@ -103,8 +112,8 @@ class PersonalDataActivity : AppActivity() {
 
                     override fun onConfirm(dialog: BaseDialog, content: String) {
                         nameView?.let {
-                            if (it.getRightText() != content) {
-                                it.setRightText(content)
+                            if (it.getEndText() != content) {
+                                it.setEndText(content)
                             }
                         }
                     }
@@ -121,11 +130,11 @@ class PersonalDataActivity : AppActivity() {
                     override fun onSelected(dialog: BaseDialog, province: String, city: String, area: String) {
                         addressView?.let {
                             val address: String = province + city + area
-                            if (it.getRightText() != address) {
+                            if (it.getEndText() != address) {
                                 this@PersonalDataActivity.province = province
                                 this@PersonalDataActivity.city = city
                                 this@PersonalDataActivity.area = area
-                                it.setRightText(address)
+                                it.setEndText(address)
                             }
                         }
                     }

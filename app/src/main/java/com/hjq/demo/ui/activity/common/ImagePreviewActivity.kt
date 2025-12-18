@@ -75,7 +75,13 @@ class ImagePreviewActivity : AppActivity(), BaseAdapter.OnItemClickListener {
         @Suppress("SetTextI18n")
         override fun onPageSelected(position: Int) {
             super.onPageSelected(position)
-            textIndicatorView?.text = (position + 1).toString() + "/" + adapter.getCount()
+
+            // 适配 RTL 特性
+            textIndicatorView?.text = if (adapter.getContext().resources.configuration.layoutDirection == View.LAYOUT_DIRECTION_RTL) {
+                adapter.getCount().toString() + "/" + (position + 1)
+            } else {
+                (position + 1).toString() + "/" + adapter.getCount()
+            }
         }
     }}
 

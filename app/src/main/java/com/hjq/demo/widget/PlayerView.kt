@@ -6,6 +6,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.res.Resources
 import android.content.res.Resources.NotFoundException
+import android.graphics.drawable.Drawable
 import android.media.AudioManager
 import android.media.MediaPlayer
 import android.media.MediaPlayer.OnCompletionListener
@@ -99,7 +100,7 @@ class PlayerView @JvmOverloads constructor(
 
     private val topLayout: ViewGroup by lazyFindViewById(R.id.ll_player_view_top)
     private val titleView: TextView by lazyFindViewById(R.id.tv_player_view_title)
-    private val leftView: View by lazyFindViewById(R.id.iv_player_view_left)
+    private val backView: ImageView by lazyFindViewById(R.id.iv_player_view_left)
     private val bottomLayout: ViewGroup by lazyFindViewById(R.id.ll_player_view_bottom)
     private val playTime: TextView by lazyFindViewById(R.id.tv_player_view_play_time)
     private val totalTime: TextView by lazyFindViewById(R.id.tv_player_view_total_time)
@@ -227,7 +228,7 @@ class PlayerView @JvmOverloads constructor(
 
     init {
         LayoutInflater.from(getContext()).inflate(R.layout.widget_player_view, this, true)
-        leftView.setOnClickListener(this)
+        backView.setOnClickListener(this)
         controlView.setOnClickListener(this)
         lockView.setOnClickListener(this)
         setOnClickListener(this)
@@ -237,6 +238,14 @@ class PlayerView @JvmOverloads constructor(
         videoView.setOnInfoListener(this)
         videoView.setOnErrorListener(this)
         audioManager = ContextCompat.getSystemService(context, AudioManager::class.java)
+
+        // 注意这里不要用 View 的 getLayoutDirection() 来判断，因为获取到的不准确
+        val backIconDrawable: Drawable? = if (resources.configuration.layoutDirection == LAYOUT_DIRECTION_RTL) {
+            ContextCompat.getDrawable(context, R.drawable.arrows_right_ic)
+        } else {
+            ContextCompat.getDrawable(context, R.drawable.arrows_left_ic)
+        }
+        backView.setImageDrawable(backIconDrawable)
 
         val activity = context.getActivity()
         if (activity != null) {
@@ -392,7 +401,7 @@ class PlayerView @JvmOverloads constructor(
      */
     fun setOnPlayListener(listener: OnPlayListener?) {
         this.listener = listener
-        leftView.visibility = if (this.listener != null) VISIBLE else INVISIBLE
+        backView.visibility = if (this.listener != null) VISIBLE else INVISIBLE
     }
 
     /**
@@ -682,7 +691,7 @@ class PlayerView @JvmOverloads constructor(
             post(showControllerRunnable)
             postDelayed(hideControllerRunnable, CONTROLLER_TIME.toLong())
 
-        } else if (view === leftView) {
+        } else if (view === backView) {
 
             listener?.onClickBack(this)
 
@@ -731,6 +740,9 @@ class PlayerView @JvmOverloads constructor(
         if (!gestureEnabled || lockMode || lottieView.isAnimating) {
             return super.onTouchEvent(event)
         }
+
+        val layoutDirection = getResources().getConfiguration().getLayoutDirection()
+
         when (event.action) {
             MotionEvent.ACTION_DOWN -> {
                 audioManager?.let {
@@ -769,11 +781,19 @@ class PlayerView @JvmOverloads constructor(
 
                 // 如果手指触摸方向是水平的
                 if (touchOrientation == LinearLayout.HORIZONTAL) {
-                    val second: Int = (-(distanceX / width.toFloat() * 60f)).toInt()
+                    var second: Int = (-(distanceX / width.toFloat() * 60f)).toInt()
+                    if (layoutDirection == LAYOUT_DIRECTION_RTL) {
+                        second = -second
+                    }
                     val progress: Int = getProgress() + second * 1000
                     if (progress >= 0 && progress <= getDuration()) {
                         adjustSecond = second
-                        lottieView.setImageResource(if (adjustSecond < 0) R.drawable.video_schedule_rewind_ic else R.drawable.video_schedule_forward_ic)
+                        @DrawableRes val imageResource: Int = if (layoutDirection == LAYOUT_DIRECTION_LTR) {
+                            if (adjustSecond < 0) R.drawable.video_schedule_rewind_ic else R.drawable.video_schedule_forward_ic
+                        } else {
+                            if (adjustSecond < 0) R.drawable.video_schedule_forward_ic else R.drawable.video_schedule_rewind_ic
+                        }
+                        lottieView.setImageResource(imageResource)
                         messageView.text = String.format("%s s", abs(adjustSecond))
                         post(showMessageRunnable)
                     }
@@ -783,7 +803,8 @@ class PlayerView @JvmOverloads constructor(
                 // 如果手指触摸方向是垂直的
                 if (touchOrientation == LinearLayout.VERTICAL) {
                     // 判断触摸点是在屏幕左边还是右边
-                    if (event.x.toInt() < width / 2){
+                    if ((layoutDirection == LAYOUT_DIRECTION_LTR && event.x.toInt() < width / 2) ||
+                        (layoutDirection == LAYOUT_DIRECTION_RTL && event.x.toInt() > width / 2)) {
                         // 手指在屏幕左边
                         val delta: Float =
                             (distanceY / height) * WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_FULL

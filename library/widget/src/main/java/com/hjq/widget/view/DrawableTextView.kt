@@ -78,8 +78,8 @@ class DrawableTextView @JvmOverloads constructor(
         val compoundDrawables = compoundDrawables
         val compoundDrawablesRelative = compoundDrawablesRelative
 
-        // 获取布局方向
-        val layoutDirection = layoutDirection
+        // 适配 RTL 特性
+        val layoutDirection = resources.configuration.layoutDirection
 
         var leftDrawable = compoundDrawablesRelative[if (layoutDirection == LAYOUT_DIRECTION_LTR) DRAWABLE_INDEX_LEFT else DRAWABLE_INDEX_RIGHT]
         if (leftDrawable == null) {

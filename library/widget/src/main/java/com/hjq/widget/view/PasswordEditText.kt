@@ -50,6 +50,11 @@ class PasswordEditText @JvmOverloads constructor(
         super.setOnTouchListener(this)
         super.setOnFocusChangeListener(this)
         super.addTextChangedListener(this)
+
+        // 适配 RTL 特性
+        if (textAlignment == TEXT_ALIGNMENT_GRAVITY) {
+            textAlignment = TEXT_ALIGNMENT_VIEW_START
+        }
     }
 
     private fun setDrawableVisible(visible: Boolean) {
@@ -99,16 +104,10 @@ class PasswordEditText @JvmOverloads constructor(
         val x: Int = event.x.toInt()
 
         // 是否触摸了 Drawable
-        var touchDrawable = false
-        // 获取布局方向
-        val layoutDirection: Int = layoutDirection
-        if (layoutDirection == LAYOUT_DIRECTION_LTR) {
-            // 从左往右
-            touchDrawable = x > width - currentDrawable.intrinsicWidth - paddingEnd && x < width - paddingEnd
-        } else if (layoutDirection == LAYOUT_DIRECTION_RTL) {
-            // 从右往左
-            touchDrawable = x > paddingStart &&
-                    x < paddingStart + currentDrawable.intrinsicWidth
+        val touchDrawable = if (resources.configuration.layoutDirection == LAYOUT_DIRECTION_RTL) {
+            x > paddingStart && x < paddingStart + currentDrawable.intrinsicWidth
+        } else {
+            x > width - currentDrawable.intrinsicWidth - paddingEnd && x < width - paddingEnd
         }
         if (currentDrawable.isVisible && touchDrawable) {
             if (event.action == MotionEvent.ACTION_UP) {
