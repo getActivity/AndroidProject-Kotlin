@@ -9,9 +9,9 @@ import android.util.AttributeSet
 import android.view.animation.AccelerateDecelerateInterpolator
 import androidx.annotation.ColorInt
 import androidx.core.graphics.ColorUtils
-import com.hjq.base.ktx.dp2px
-import com.hjq.base.ktx.sp2px
 import com.hjq.demo.R
+import com.hjq.smallest.width.dp2px
+import com.hjq.smallest.width.sp2px
 import com.scwang.smart.refresh.layout.api.RefreshFooter
 import com.scwang.smart.refresh.layout.api.RefreshLayout
 import com.scwang.smart.refresh.layout.constant.SpinnerStyle

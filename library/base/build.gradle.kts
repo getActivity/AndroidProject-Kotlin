@@ -9,14 +9,4 @@ android {
         // 模块混淆配置
         consumerProguardFiles("proguard-base.pro")
     }
-
-    sourceSets {
-        getByName("main") {
-            // res 资源目录配置
-            res.srcDirs(
-                    "src/main/res",
-                    "src/main/res-sw"
-            )
-        }
-    }
 }

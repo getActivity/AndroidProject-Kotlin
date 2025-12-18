@@ -3,7 +3,6 @@ package com.hjq.demo.ui.fragment.home
 import android.view.View
 import android.widget.ImageView
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
-import com.hjq.base.ktx.dp2px
 import com.hjq.base.ktx.lazyFindViewById
 import com.hjq.demo.R
 import com.hjq.demo.aop.SingleClick
@@ -15,6 +14,7 @@ import com.hjq.demo.permission.PermissionInterceptor
 import com.hjq.demo.ui.activity.HomeActivity
 import com.hjq.permissions.XXPermissions
 import com.hjq.permissions.permission.PermissionLists
+import com.hjq.smallest.width.dp2px
 
 /**
  *    author : Android 轮子哥

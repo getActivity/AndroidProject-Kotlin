@@ -13,7 +13,7 @@ import android.graphics.RectF
 import android.util.AttributeSet
 import android.view.View
 import android.view.animation.AnticipateInterpolator
-import com.hjq.base.ktx.dp2px
+import com.hjq.smallest.width.dp2px
 import com.hjq.widget.R
 
 /**

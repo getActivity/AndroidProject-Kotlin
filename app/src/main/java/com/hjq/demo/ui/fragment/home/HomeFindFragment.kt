@@ -6,7 +6,6 @@ import com.bumptech.glide.load.MultiTransformation
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.load.resource.bitmap.CircleCrop
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
-import com.hjq.base.ktx.dp2px
 import com.hjq.base.ktx.lazyFindViewById
 import com.hjq.demo.R
 import com.hjq.demo.aop.SingleClick
@@ -14,6 +13,7 @@ import com.hjq.demo.app.TitleBarFragment
 import com.hjq.demo.http.glide.GlideApp
 import com.hjq.demo.ktx.toast
 import com.hjq.demo.ui.activity.HomeActivity
+import com.hjq.smallest.width.dp2px
 import com.hjq.widget.view.CountdownView
 import com.hjq.widget.view.SimpleRatingBar
 import com.hjq.widget.view.SwitchButton

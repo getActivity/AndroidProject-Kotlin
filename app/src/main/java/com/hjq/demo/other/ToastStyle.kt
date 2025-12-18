@@ -3,8 +3,8 @@ package com.hjq.demo.other
 import android.content.Context
 import android.graphics.drawable.Drawable
 import android.graphics.drawable.GradientDrawable
-import com.hjq.base.ktx.sp2px
 import com.hjq.demo.R
+import com.hjq.smallest.width.sp2px
 import com.hjq.toast.style.BlackToastStyle
 
 /**

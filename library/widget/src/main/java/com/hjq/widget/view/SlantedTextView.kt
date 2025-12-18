@@ -18,7 +18,7 @@ import android.util.TypedValue
 import android.view.Gravity
 import android.view.View
 import androidx.annotation.StringRes
-import com.hjq.base.ktx.sp2px
+import com.hjq.smallest.width.sp2px
 import com.hjq.widget.R
 import kotlin.math.max
 

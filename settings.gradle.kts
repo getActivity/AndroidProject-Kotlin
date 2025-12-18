@@ -40,6 +40,7 @@ dependencyResolutionManagement {
 
 include(":app")
 include(":library:base")
+include(":library:smallestWidth")
 include(":library:widget")
 include(":library:umeng")
 include(":library:copy")

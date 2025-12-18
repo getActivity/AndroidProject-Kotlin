@@ -15,8 +15,8 @@ import android.view.Gravity
 import android.view.View
 import androidx.annotation.ColorInt
 import androidx.core.content.ContextCompat
-import com.hjq.base.ktx.dp2px
 import com.hjq.demo.R
+import com.hjq.smallest.width.dp2px
 import kotlin.math.max
 import kotlin.math.min
 

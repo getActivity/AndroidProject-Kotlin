@@ -22,8 +22,8 @@ import androidx.annotation.ColorInt
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.core.content.ContextCompat
-import com.hjq.base.ktx.dp2px
-import com.hjq.base.ktx.sp2px
+import com.hjq.smallest.width.dp2px
+import com.hjq.smallest.width.sp2px
 import com.hjq.widget.R
 
 /**

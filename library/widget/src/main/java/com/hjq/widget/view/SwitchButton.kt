@@ -15,7 +15,7 @@ import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
 import android.view.animation.AccelerateInterpolator
-import com.hjq.base.ktx.dp2px
+import com.hjq.smallest.width.dp2px
 import com.hjq.widget.R
 
 /**

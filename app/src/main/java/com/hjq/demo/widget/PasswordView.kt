@@ -7,7 +7,7 @@ import android.graphics.Paint
 import android.graphics.Path
 import android.util.AttributeSet
 import android.view.View
-import com.hjq.base.ktx.dp2px
+import com.hjq.smallest.width.dp2px
 
 /**
  *    author : Android 轮子哥

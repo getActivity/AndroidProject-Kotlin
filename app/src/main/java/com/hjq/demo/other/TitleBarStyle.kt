@@ -8,9 +8,9 @@ import android.widget.TextView
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.content.ContextCompat
 import com.hjq.bar.style.LightBarStyle
-import com.hjq.base.ktx.dp2px
-import com.hjq.base.ktx.sp2px
 import com.hjq.demo.R
+import com.hjq.smallest.width.dp2px
+import com.hjq.smallest.width.sp2px
 import com.hjq.widget.view.PressAlphaTextView
 
 /**

@@ -159,11 +159,9 @@ android {
 // 添加构建依赖项：https://developer.android.google.cn/studio/build/dependencies
 // api 与 implementation 的区别：https://www.jianshu.com/p/8962d6ba936e
 dependencies {
-    // 基类封装
     implementation(project(":library:base"))
-    // 控件封装
+    implementation(project(":library:smallestWidth"))
     implementation(project(":library:widget"))
-    // 友盟封装
     implementation(project(":library:umeng"))
 
     implementation(libs.deviceCompat)

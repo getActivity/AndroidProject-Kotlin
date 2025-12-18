@@ -20,7 +20,6 @@ import com.hjq.bar.TitleBar
 import com.hjq.base.BaseActivity
 import com.hjq.base.BaseAdapter
 import com.hjq.base.BaseDialog
-import com.hjq.base.ktx.dp2px
 import com.hjq.base.ktx.lazyFindViewById
 import com.hjq.base.ktx.startActivityForResult
 import com.hjq.demo.R
@@ -39,6 +38,7 @@ import com.hjq.demo.ui.dialog.common.AlbumDialog.AlbumInfo
 import com.hjq.demo.widget.StatusLayout
 import com.hjq.permissions.XXPermissions
 import com.hjq.permissions.permission.PermissionLists
+import com.hjq.smallest.width.dp2px
 import com.hjq.widget.view.FloatActionButton
 import com.tencent.bugly.library.Bugly
 import kotlinx.coroutines.Dispatchers
