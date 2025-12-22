@@ -206,9 +206,9 @@ class ArrowDrawable private constructor(private val builder: Builder) : Drawable
          * 设置箭头方向（左上右下）
          */
         fun setArrowOrientation(orientation: Int): Builder = apply {
-            when (val finalOrientation: Int = Gravity.getAbsoluteGravity(orientation, context.resources.configuration.layoutDirection)) {
+            when (val actualOrientation: Int = Gravity.getAbsoluteGravity(orientation, context.resources.configuration.layoutDirection)) {
                 Gravity.LEFT, Gravity.TOP, Gravity.RIGHT, Gravity.BOTTOM -> {
-                    arrowOrientation = finalOrientation
+                    arrowOrientation = actualOrientation
                 }
                 // 箭头只能在左上右下这四个位置
                 else -> throw IllegalArgumentException("The arrow can only be in the four positions: left, top, right, and bottom")
@@ -219,18 +219,18 @@ class ArrowDrawable private constructor(private val builder: Builder) : Drawable
          * 设置箭头布局重心
          */
         fun setArrowGravity(gravity: Int): Builder = apply {
-            var finalGravity: Int = gravity
-            finalGravity = Gravity.getAbsoluteGravity(
-                finalGravity,
+            var actualGravity: Int = gravity
+            actualGravity = Gravity.getAbsoluteGravity(
+                actualGravity,
                 context.resources.configuration.layoutDirection
             )
-            if (finalGravity == Gravity.CENTER) {
+            if (actualGravity == Gravity.CENTER) {
                 when (arrowOrientation) {
-                    Gravity.LEFT, Gravity.RIGHT -> finalGravity = Gravity.CENTER_VERTICAL
-                    Gravity.TOP, Gravity.BOTTOM -> finalGravity = Gravity.CENTER_HORIZONTAL
+                    Gravity.LEFT, Gravity.RIGHT -> actualGravity = Gravity.CENTER_VERTICAL
+                    Gravity.TOP, Gravity.BOTTOM -> actualGravity = Gravity.CENTER_HORIZONTAL
                 }
             }
-            when (finalGravity) {
+            when (actualGravity) {
                 Gravity.LEFT, Gravity.RIGHT -> if (arrowOrientation == Gravity.LEFT || arrowOrientation == Gravity.RIGHT) {
                     throw IllegalArgumentException("The arrow direction cannot be the same as the arrow gravity")
                 }
@@ -244,7 +244,7 @@ class ArrowDrawable private constructor(private val builder: Builder) : Drawable
                     throw IllegalArgumentException("The arrow direction cannot be the same as the arrow gravity")
                 }
             }
-            arrowGravity = finalGravity
+            arrowGravity = actualGravity
         }
 
         /**

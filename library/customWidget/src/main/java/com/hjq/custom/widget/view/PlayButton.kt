@@ -99,23 +99,23 @@ class PlayButton @JvmOverloads constructor(
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-        var finalWidthMeasureSpec: Int = widthMeasureSpec
-        var finalHeightMeasureSpec: Int = heightMeasureSpec
-        when (MeasureSpec.getMode(finalWidthMeasureSpec)) {
+        var actualWidthMeasureSpec: Int = widthMeasureSpec
+        var actualHeightMeasureSpec: Int = heightMeasureSpec
+        when (MeasureSpec.getMode(actualWidthMeasureSpec)) {
             MeasureSpec.AT_MOST, MeasureSpec.UNSPECIFIED ->
-                finalWidthMeasureSpec = MeasureSpec.makeMeasureSpec(dp2px(60).toInt(), MeasureSpec.EXACTLY)
+                actualWidthMeasureSpec = MeasureSpec.makeMeasureSpec(dp2px(60).toInt(), MeasureSpec.EXACTLY)
             MeasureSpec.EXACTLY -> {
                 // default implementation ignored
             }
         }
-        when (MeasureSpec.getMode(finalHeightMeasureSpec)) {
+        when (MeasureSpec.getMode(actualHeightMeasureSpec)) {
             MeasureSpec.AT_MOST, MeasureSpec.UNSPECIFIED ->
-                finalHeightMeasureSpec = MeasureSpec.makeMeasureSpec(dp2px(60).toInt(), MeasureSpec.EXACTLY)
+                actualHeightMeasureSpec = MeasureSpec.makeMeasureSpec(dp2px(60).toInt(), MeasureSpec.EXACTLY)
             MeasureSpec.EXACTLY -> {
                 // default implementation ignored
             }
         }
-        setMeasuredDimension(finalWidthMeasureSpec, finalHeightMeasureSpec)
+        setMeasuredDimension(actualWidthMeasureSpec, actualHeightMeasureSpec)
     }
 
     override fun onDraw(canvas: Canvas) {

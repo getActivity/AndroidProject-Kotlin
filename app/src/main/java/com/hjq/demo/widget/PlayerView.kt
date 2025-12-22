@@ -364,14 +364,14 @@ class PlayerView @JvmOverloads constructor(
      * 设置视频播放进度
      */
     fun setProgress(progress: Int) {
-        var finalProgress: Int = progress
-        if (finalProgress > videoView.duration) {
-            finalProgress = videoView.duration
+        var actualProgress: Int = progress
+        if (actualProgress > videoView.duration) {
+            actualProgress = videoView.duration
         }
         // 要跳转的进度必须和当前播放进度相差 1 秒以上
-        if (abs(finalProgress - videoView.currentPosition) > 1000) {
-            videoView.seekTo(finalProgress)
-            progressView.progress = finalProgress
+        if (abs(actualProgress - videoView.currentPosition) > 1000) {
+            videoView.seekTo(actualProgress)
+            progressView.progress = actualProgress
         }
     }
 

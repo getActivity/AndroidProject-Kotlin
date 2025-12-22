@@ -108,28 +108,28 @@ class SwitchButton @JvmOverloads constructor(
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-        var finalWidthMeasureSpec: Int = widthMeasureSpec
-        var finalHeightMeasureSpec: Int = heightMeasureSpec
-        when (MeasureSpec.getMode(finalWidthMeasureSpec)) {
+        var actualWidthMeasureSpec: Int = widthMeasureSpec
+        var actualHeightMeasureSpec: Int = heightMeasureSpec
+        when (MeasureSpec.getMode(actualWidthMeasureSpec)) {
             MeasureSpec.AT_MOST, MeasureSpec.UNSPECIFIED -> {
-                finalWidthMeasureSpec = MeasureSpec.makeMeasureSpec(
+                actualWidthMeasureSpec = MeasureSpec.makeMeasureSpec(
                     (dp2px(56) + paddingLeft + paddingRight).toInt(), MeasureSpec.EXACTLY)
             }
             MeasureSpec.EXACTLY -> {
                 // default implementation ignored
             }
         }
-        when (MeasureSpec.getMode(finalHeightMeasureSpec)) {
+        when (MeasureSpec.getMode(actualHeightMeasureSpec)) {
             MeasureSpec.AT_MOST, MeasureSpec.UNSPECIFIED -> {
-                finalHeightMeasureSpec = MeasureSpec.makeMeasureSpec(
-                        ((MeasureSpec.getSize(finalWidthMeasureSpec) * aspectRatio).toInt() + paddingTop + paddingBottom),
+                actualHeightMeasureSpec = MeasureSpec.makeMeasureSpec(
+                        ((MeasureSpec.getSize(actualWidthMeasureSpec) * aspectRatio).toInt() + paddingTop + paddingBottom),
                     MeasureSpec.EXACTLY)
             }
             MeasureSpec.EXACTLY -> {
                 // default implementation ignored
             }
         }
-        setMeasuredDimension(finalWidthMeasureSpec, finalHeightMeasureSpec)
+        setMeasuredDimension(actualWidthMeasureSpec, actualHeightMeasureSpec)
     }
 
     override fun onSizeChanged(width: Int, height: Int, oldWidth: Int, oldHeight: Int) {

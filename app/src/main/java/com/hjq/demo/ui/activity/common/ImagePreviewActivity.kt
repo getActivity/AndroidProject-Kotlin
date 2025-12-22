@@ -42,19 +42,19 @@ class ImagePreviewActivity : AppActivity(), BaseAdapter.OnItemClickListener {
 
         @Log
         fun start(context: Context, urls: MutableList<String>, index: Int) {
-            var finalUrls: MutableList<String> = urls
-            if (finalUrls.isEmpty()) {
+            var actualUrls: MutableList<String> = urls
+            if (actualUrls.isEmpty()) {
                 return
             }
             val intent = context.createIntent(ImagePreviewActivity::class.java)
-            if (finalUrls.size > 2000) {
+            if (actualUrls.size > 2000) {
                 // 请注意：如果传输的数据量过大，会抛出此异常，并且这种异常是不能被捕获的
                 // 所以当图片数量过多的时候，我们应当只显示一张，这种一般是手机图片过多导致的
                 // 经过测试，传入 3121 张图片集合的时候会抛出此异常，所以保险值应当是 2000
                 // android.os.TransactionTooLargeException: data parcel size 521984 bytes
-                finalUrls = mutableListOf(finalUrls[index])
+                actualUrls = mutableListOf(actualUrls[index])
             }
-            intent.putExtra(INTENT_KEY_IN_IMAGE_LIST, finalUrls.toCollection(ArrayList()))
+            intent.putExtra(INTENT_KEY_IN_IMAGE_LIST, actualUrls.toCollection(ArrayList()))
             intent.putExtra(INTENT_KEY_IN_IMAGE_INDEX, index)
             context.startActivity(intent)
         }

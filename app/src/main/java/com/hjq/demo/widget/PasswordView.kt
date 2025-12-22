@@ -68,23 +68,23 @@ class PasswordView @JvmOverloads constructor
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-        var finalWidthMeasureSpec: Int = widthMeasureSpec
-        var finalHeightMeasureSpec: Int = heightMeasureSpec
-        when (MeasureSpec.getMode(finalWidthMeasureSpec)) {
+        var actualWidthMeasureSpec: Int = widthMeasureSpec
+        var actualHeightMeasureSpec: Int = heightMeasureSpec
+        when (MeasureSpec.getMode(actualWidthMeasureSpec)) {
             MeasureSpec.AT_MOST, MeasureSpec.UNSPECIFIED ->
-                finalWidthMeasureSpec = MeasureSpec.makeMeasureSpec(itemWidth * PASSWORD_COUNT, MeasureSpec.EXACTLY)
+                actualWidthMeasureSpec = MeasureSpec.makeMeasureSpec(itemWidth * PASSWORD_COUNT, MeasureSpec.EXACTLY)
             MeasureSpec.EXACTLY -> {
                 // default implementation ignored
             }
         }
-        when (MeasureSpec.getMode(finalHeightMeasureSpec)) {
+        when (MeasureSpec.getMode(actualHeightMeasureSpec)) {
             MeasureSpec.AT_MOST, MeasureSpec.UNSPECIFIED ->
-                finalHeightMeasureSpec = MeasureSpec.makeMeasureSpec(itemHeight, MeasureSpec.EXACTLY)
+                actualHeightMeasureSpec = MeasureSpec.makeMeasureSpec(itemHeight, MeasureSpec.EXACTLY)
             MeasureSpec.EXACTLY -> {
                 // default implementation ignored
             }
         }
-        setMeasuredDimension(finalWidthMeasureSpec, finalHeightMeasureSpec)
+        setMeasuredDimension(actualWidthMeasureSpec, actualHeightMeasureSpec)
     }
 
     override fun onDraw(canvas: Canvas) {

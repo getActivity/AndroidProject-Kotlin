@@ -116,14 +116,14 @@ abstract class AppAdapter<T>(context: Context) :
     }
 
     open fun addItem(@IntRange(from = 0) position: Int, item: T) {
-        var finalPosition = position
-        if (finalPosition < dataSet.size) {
-            dataSet.add(finalPosition, item)
+        var actualPosition = position
+        if (actualPosition < dataSet.size) {
+            dataSet.add(actualPosition, item)
         } else {
             dataSet.add(item)
-            finalPosition = dataSet.size - 1
+            actualPosition = dataSet.size - 1
         }
-        notifyItemInserted(finalPosition)
+        notifyItemInserted(actualPosition)
     }
 
     /**
