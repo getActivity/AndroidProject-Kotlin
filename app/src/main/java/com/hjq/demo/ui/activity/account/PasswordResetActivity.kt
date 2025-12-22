@@ -9,9 +9,10 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import android.widget.TextView.OnEditorActionListener
-import com.hjq.base.ktx.createIntent
-import com.hjq.base.ktx.hideKeyboard
 import com.hjq.base.ktx.lazyFindViewById
+import com.hjq.core.ktx.createIntent
+import com.hjq.core.ktx.hideKeyboard
+import com.hjq.core.manager.InputTextManager
 import com.hjq.demo.R
 import com.hjq.demo.aop.Log
 import com.hjq.demo.aop.SingleClick
@@ -19,7 +20,6 @@ import com.hjq.demo.app.AppActivity
 import com.hjq.demo.http.api.PasswordApi
 import com.hjq.demo.http.model.HttpData
 import com.hjq.demo.ktx.toast
-import com.hjq.demo.manager.InputTextManager
 import com.hjq.demo.ui.dialog.common.TipsDialog
 import com.hjq.http.EasyHttp
 import com.hjq.http.listener.HttpCallbackProxy

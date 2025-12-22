@@ -8,7 +8,7 @@ import android.webkit.WebViewClient
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
-import com.hjq.base.action.ContextAction
+import com.hjq.core.action.ContextAction
 import com.hjq.demo.other.AppConfig
 import com.hjq.nested.scroll.layout.NestedScrollWebView
 import timber.log.Timber

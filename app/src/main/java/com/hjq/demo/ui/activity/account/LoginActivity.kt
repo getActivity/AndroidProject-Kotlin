@@ -13,10 +13,12 @@ import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
 import com.gyf.immersionbar.ImmersionBar
-import com.hjq.base.ktx.createIntent
-import com.hjq.base.ktx.hideKeyboard
 import com.hjq.base.ktx.lazyFindViewById
 import com.hjq.base.ktx.startActivity
+import com.hjq.core.ktx.createIntent
+import com.hjq.core.ktx.hideKeyboard
+import com.hjq.core.manager.InputTextManager
+import com.hjq.core.tools.KeyboardWatcher
 import com.hjq.custom.widget.view.SubmitButton
 import com.hjq.demo.R
 import com.hjq.demo.aop.Log
@@ -26,8 +28,6 @@ import com.hjq.demo.http.api.LoginApi
 import com.hjq.demo.http.glide.GlideApp
 import com.hjq.demo.http.model.HttpData
 import com.hjq.demo.ktx.toast
-import com.hjq.demo.manager.InputTextManager
-import com.hjq.demo.other.KeyboardWatcher
 import com.hjq.demo.ui.activity.HomeActivity
 import com.hjq.demo.ui.fragment.home.HomeMineFragment
 import com.hjq.http.EasyConfig

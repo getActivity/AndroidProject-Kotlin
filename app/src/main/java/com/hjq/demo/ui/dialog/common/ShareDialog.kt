@@ -13,8 +13,8 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.hjq.base.BaseAdapter
 import com.hjq.base.BaseDialog
-import com.hjq.base.ktx.getActivity
 import com.hjq.base.ktx.lazyFindViewById
+import com.hjq.core.ktx.getActivity
 import com.hjq.demo.R
 import com.hjq.demo.app.AppAdapter
 import com.hjq.demo.ktx.toast

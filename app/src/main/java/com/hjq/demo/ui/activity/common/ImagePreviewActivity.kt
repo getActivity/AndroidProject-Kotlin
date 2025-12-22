@@ -9,8 +9,8 @@ import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
 import com.gyf.immersionbar.BarHide
 import com.gyf.immersionbar.ImmersionBar
 import com.hjq.base.BaseAdapter
-import com.hjq.base.ktx.createIntent
 import com.hjq.base.ktx.lazyFindViewById
+import com.hjq.core.ktx.createIntent
 import com.hjq.demo.R
 import com.hjq.demo.aop.Log
 import com.hjq.demo.app.AppActivity

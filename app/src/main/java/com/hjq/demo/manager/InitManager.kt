@@ -12,11 +12,12 @@ import com.chuckerteam.chucker.api.ChuckerInterceptor
 import com.google.gson.reflect.TypeToken
 import com.google.gson.stream.JsonToken
 import com.hjq.bar.TitleBar
+import com.hjq.core.ktx.isAndroid7
+import com.hjq.core.manager.ActivityManager
 import com.hjq.demo.R
 import com.hjq.demo.http.model.HttpCacheStrategy
 import com.hjq.demo.http.model.RequestHandler
 import com.hjq.demo.http.model.RequestServer
-import com.hjq.demo.ktx.isAndroid7
 import com.hjq.demo.ktx.toast
 import com.hjq.demo.other.AppConfig
 import com.hjq.demo.other.CrashHandler

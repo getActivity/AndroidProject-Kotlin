@@ -3,7 +3,7 @@ package com.hjq.demo.ui.activity.common
 import android.content.Context
 import android.content.Intent
 import android.widget.Toast
-import com.hjq.base.ktx.createIntent
+import com.hjq.core.ktx.createIntent
 import com.hjq.demo.R
 import com.hjq.demo.app.AppActivity
 import com.hjq.demo.ui.activity.HomeActivity

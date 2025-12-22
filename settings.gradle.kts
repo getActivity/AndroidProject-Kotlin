@@ -39,8 +39,8 @@ dependencyResolutionManagement {
 }
 
 include(":app")
+include(":library:core")
 include(":library:base")
 include(":library:smallestWidth")
 include(":library:customWidget")
 include(":library:umengSdk")
-include(":library:copy")

@@ -11,8 +11,8 @@ import android.webkit.WebView
 import android.widget.ProgressBar
 import com.drake.softinput.setWindowSoftInput
 import com.hjq.bar.TitleBar
-import com.hjq.base.ktx.createIntent
 import com.hjq.base.ktx.lazyFindViewById
+import com.hjq.core.ktx.createIntent
 import com.hjq.demo.R
 import com.hjq.demo.action.StatusAction
 import com.hjq.demo.aop.CheckNet

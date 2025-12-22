@@ -4,9 +4,8 @@ plugins {
 
 android {
     namespace = "com.hjq.base"
+}
 
-    defaultConfig {
-        // 模块混淆配置
-        consumerProguardFiles("proguard-base.pro")
-    }
+dependencies {
+    implementation(project(":library:core"))
 }

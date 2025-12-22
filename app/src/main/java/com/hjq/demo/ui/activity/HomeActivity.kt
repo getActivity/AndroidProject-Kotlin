@@ -9,14 +9,14 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager.widget.ViewPager
 import com.gyf.immersionbar.ImmersionBar
 import com.hjq.base.BasePagerAdapter
-import com.hjq.base.ktx.createIntent
 import com.hjq.base.ktx.lazyFindViewById
+import com.hjq.core.ktx.createIntent
+import com.hjq.core.manager.ActivityManager
+import com.hjq.core.tools.DoubleClickTools
 import com.hjq.demo.R
 import com.hjq.demo.app.AppActivity
 import com.hjq.demo.app.AppFragment
 import com.hjq.demo.ktx.toast
-import com.hjq.demo.manager.ActivityManager
-import com.hjq.demo.other.DoubleClickHelper
 import com.hjq.demo.ui.adapter.common.NavigationAdapter
 import com.hjq.demo.ui.fragment.home.HomeFindFragment
 import com.hjq.demo.ui.fragment.home.HomeMainFragment
@@ -135,7 +135,7 @@ class HomeActivity : AppActivity(), NavigationAdapter.OnNavigationListener {
     }
 
     override fun onBackPressed() {
-        if (!DoubleClickHelper.isOnDoubleClick()) {
+        if (!DoubleClickTools.isOnDoubleClick()) {
             toast(R.string.home_exit_hint)
             return
         }

@@ -10,10 +10,11 @@ import android.widget.TextView
 import android.widget.TextView.OnEditorActionListener
 import com.gyf.immersionbar.ImmersionBar
 import com.hjq.base.BaseActivity
-import com.hjq.base.ktx.createIntent
-import com.hjq.base.ktx.hideKeyboard
 import com.hjq.base.ktx.lazyFindViewById
 import com.hjq.base.ktx.startActivityForResult
+import com.hjq.core.ktx.createIntent
+import com.hjq.core.ktx.hideKeyboard
+import com.hjq.core.manager.InputTextManager
 import com.hjq.custom.widget.view.CountdownView
 import com.hjq.custom.widget.view.SubmitButton
 import com.hjq.demo.R
@@ -24,7 +25,6 @@ import com.hjq.demo.http.api.GetCodeApi
 import com.hjq.demo.http.api.RegisterApi
 import com.hjq.demo.http.model.HttpData
 import com.hjq.demo.ktx.toast
-import com.hjq.demo.manager.InputTextManager
 import com.hjq.http.EasyHttp
 import com.hjq.http.config.IRequestApi
 import com.hjq.http.listener.HttpCallbackProxy

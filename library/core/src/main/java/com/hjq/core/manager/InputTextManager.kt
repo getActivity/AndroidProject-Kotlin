@@ -1,13 +1,13 @@
-package com.hjq.demo.manager
+package com.hjq.core.manager
 
 import android.app.Activity
-import android.app.Application.ActivityLifecycleCallbacks
+import android.app.Application
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
 import android.widget.TextView
-import com.hjq.demo.ktx.isAndroid10
+import com.hjq.core.ktx.isAndroid10
 
 /**
  *    author : Android 轮子哥
@@ -212,7 +212,7 @@ class InputTextManager private constructor(view: View, alpha: Boolean) : TextWat
     private class TextInputLifecycle private constructor(
         private var activity: Activity?,
         private var textHelper: InputTextManager?
-    ) : ActivityLifecycleCallbacks {
+    ) : Application.ActivityLifecycleCallbacks {
 
         companion object {
 

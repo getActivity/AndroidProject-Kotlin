@@ -7,10 +7,10 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.hjq.base.BaseDialog
 import com.hjq.base.ktx.lazyFindViewById
+import com.hjq.core.recycler.PickerLayoutManager
 import com.hjq.demo.R
 import com.hjq.demo.aop.SingleClick
 import com.hjq.demo.app.AppAdapter
-import com.hjq.demo.manager.PickerLayoutManager
 import java.util.Calendar
 
 /**

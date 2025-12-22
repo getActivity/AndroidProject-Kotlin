@@ -5,9 +5,11 @@ import android.view.Gravity
 import android.view.View
 import androidx.lifecycle.lifecycleScope
 import com.hjq.base.BaseDialog
-import com.hjq.base.action.AnimAction
 import com.hjq.base.ktx.lazyFindViewById
 import com.hjq.base.ktx.startActivity
+import com.hjq.core.action.AnimAction
+import com.hjq.core.manager.ActivityManager
+import com.hjq.core.manager.CacheDataManager
 import com.hjq.custom.widget.layout.SettingBar
 import com.hjq.custom.widget.view.SwitchButton
 import com.hjq.demo.R
@@ -17,8 +19,6 @@ import com.hjq.demo.http.api.LogoutApi
 import com.hjq.demo.http.glide.GlideApp
 import com.hjq.demo.http.model.HttpData
 import com.hjq.demo.ktx.toast
-import com.hjq.demo.manager.ActivityManager
-import com.hjq.demo.manager.CacheDataManager
 import com.hjq.demo.other.AppConfig
 import com.hjq.demo.ui.activity.account.LoginActivity
 import com.hjq.demo.ui.activity.account.PasswordResetActivity

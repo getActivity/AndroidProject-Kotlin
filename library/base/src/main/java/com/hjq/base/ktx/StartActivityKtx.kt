@@ -7,6 +7,7 @@ import android.os.Bundle
 import androidx.fragment.app.Fragment
 import com.hjq.base.BaseActivity
 import com.hjq.base.BaseFragment
+import com.hjq.core.ktx.createIntent
 
 /**
  *    author : Android 轮子哥

@@ -21,14 +21,14 @@ import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.lifecycleScope
 import com.gyf.immersionbar.ImmersionBar
-import com.hjq.base.ktx.createChooserIntent
-import com.hjq.base.ktx.createIntent
 import com.hjq.base.ktx.lazyFindViewById
 import com.hjq.base.ktx.startActivity
+import com.hjq.core.ktx.createChooserIntent
+import com.hjq.core.ktx.createIntent
+import com.hjq.core.ktx.getSdkVersion
 import com.hjq.demo.R
 import com.hjq.demo.aop.SingleClick
 import com.hjq.demo.app.AppActivity
-import com.hjq.demo.ktx.getSdkVersion
 import com.hjq.demo.other.AppConfig
 import com.tencent.bugly.library.Bugly
 import kotlinx.coroutines.Dispatchers

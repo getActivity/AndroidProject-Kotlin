@@ -9,7 +9,7 @@ import androidx.annotation.IdRes
 import androidx.annotation.LayoutRes
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.hjq.base.action.ResourcesAction
+import com.hjq.core.action.ResourcesAction
 
 
 /**

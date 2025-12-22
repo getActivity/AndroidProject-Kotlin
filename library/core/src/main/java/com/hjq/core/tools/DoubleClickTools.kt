@@ -1,4 +1,4 @@
-package com.hjq.demo.other
+package com.hjq.core.tools
 
 import android.os.SystemClock
 
@@ -8,7 +8,7 @@ import android.os.SystemClock
  *    time   : 2018/10/18
  *    desc   : 双击判断工具类
  */
-object DoubleClickHelper {
+object DoubleClickTools {
 
     /** 数组的长度为2代表只记录双击操作 */
     private val TIME_ARRAY: LongArray = LongArray(2)

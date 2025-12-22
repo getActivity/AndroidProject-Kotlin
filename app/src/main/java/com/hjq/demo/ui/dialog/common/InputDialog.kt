@@ -9,7 +9,7 @@ import android.widget.TextView.OnEditorActionListener
 import androidx.annotation.StringRes
 import com.hjq.base.BaseDialog
 import com.hjq.base.ktx.lazyFindViewById
-import com.hjq.base.ktx.showKeyboard
+import com.hjq.core.ktx.showKeyboard
 import com.hjq.custom.widget.view.RegexEditText
 import com.hjq.demo.R
 import com.hjq.demo.aop.SingleClick

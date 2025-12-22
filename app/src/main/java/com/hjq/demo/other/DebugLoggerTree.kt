@@ -1,6 +1,6 @@
 package com.hjq.demo.other
 
-import com.hjq.demo.ktx.isAndroid8
+import com.hjq.core.ktx.isAndroid8
 import timber.log.Timber.DebugTree
 
 /**

@@ -22,6 +22,7 @@ import com.hjq.base.BaseAdapter
 import com.hjq.base.BaseDialog
 import com.hjq.base.ktx.lazyFindViewById
 import com.hjq.base.ktx.startActivityForResult
+import com.hjq.core.recycler.GridSpaceDecoration
 import com.hjq.custom.widget.view.FloatActionButton
 import com.hjq.demo.R
 import com.hjq.demo.action.StatusAction
@@ -29,7 +30,6 @@ import com.hjq.demo.aop.Log
 import com.hjq.demo.aop.SingleClick
 import com.hjq.demo.app.AppActivity
 import com.hjq.demo.ktx.toast
-import com.hjq.demo.other.GridSpaceDecoration
 import com.hjq.demo.permission.PermissionDescription
 import com.hjq.demo.permission.PermissionInterceptor
 import com.hjq.demo.ui.activity.common.CameraActivity.OnCameraListener

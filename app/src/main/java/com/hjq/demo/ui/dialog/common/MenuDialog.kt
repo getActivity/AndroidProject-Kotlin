@@ -9,8 +9,8 @@ import androidx.annotation.StringRes
 import androidx.recyclerview.widget.RecyclerView
 import com.hjq.base.BaseAdapter
 import com.hjq.base.BaseDialog
-import com.hjq.base.action.AnimAction
 import com.hjq.base.ktx.lazyFindViewById
+import com.hjq.core.action.AnimAction
 import com.hjq.custom.widget.layout.SimpleLayout
 import com.hjq.demo.R
 import com.hjq.demo.aop.SingleClick

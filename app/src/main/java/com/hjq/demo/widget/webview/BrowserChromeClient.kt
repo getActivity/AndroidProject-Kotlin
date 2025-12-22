@@ -14,9 +14,9 @@ import android.webkit.WebChromeClient
 import android.webkit.WebView
 import com.hjq.base.BaseActivity
 import com.hjq.base.BaseDialog
-import com.hjq.base.ktx.createChooserIntent
-import com.hjq.base.ktx.getActivity
 import com.hjq.base.ktx.startActivityForResult
+import com.hjq.core.ktx.createChooserIntent
+import com.hjq.core.ktx.getActivity
 import com.hjq.demo.R
 import com.hjq.demo.permission.PermissionDescription
 import com.hjq.demo.permission.PermissionInterceptor

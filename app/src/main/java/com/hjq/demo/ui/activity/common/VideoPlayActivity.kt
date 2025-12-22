@@ -7,8 +7,8 @@ import android.os.Parcel
 import android.os.Parcelable
 import com.gyf.immersionbar.BarHide
 import com.gyf.immersionbar.ImmersionBar
-import com.hjq.base.ktx.createIntent
 import com.hjq.base.ktx.lazyFindViewById
+import com.hjq.core.ktx.createIntent
 import com.hjq.demo.R
 import com.hjq.demo.app.AppActivity
 import com.hjq.demo.widget.PlayerView

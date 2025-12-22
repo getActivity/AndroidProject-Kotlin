@@ -3,7 +3,7 @@ package com.hjq.demo.ui.dialog
 import android.content.Context
 import android.view.Gravity
 import com.hjq.base.BaseDialog
-import com.hjq.base.action.AnimAction
+import com.hjq.core.action.AnimAction
 import com.hjq.demo.R
 
 /**

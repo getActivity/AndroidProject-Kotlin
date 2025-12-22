@@ -1,4 +1,4 @@
-package com.hjq.demo.ktx
+package com.hjq.core.ktx
 
 import android.os.Build
 

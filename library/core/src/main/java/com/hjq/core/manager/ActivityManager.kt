@@ -1,14 +1,13 @@
-package com.hjq.demo.manager
+package com.hjq.core.manager
 
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.Application
-import android.app.Application.ActivityLifecycleCallbacks
 import android.content.Context
 import android.os.Bundle
 import android.text.TextUtils
-import com.hjq.demo.ktx.isAndroid9
-import timber.log.Timber
+import android.util.Log
+import com.hjq.core.ktx.isAndroid9
 import java.io.FileInputStream
 import java.io.IOException
 import java.lang.reflect.InvocationTargetException
@@ -21,7 +20,7 @@ import java.nio.charset.StandardCharsets
  *    desc   : Activity 管理类
  */
 @Suppress("StaticFieldLeak")
-object ActivityManager : ActivityLifecycleCallbacks {
+object ActivityManager : Application.ActivityLifecycleCallbacks {
 
     /** Activity 存放集合 */
     private val activityList: MutableList<Activity> = mutableListOf()
@@ -148,39 +147,39 @@ object ActivityManager : ActivityLifecycleCallbacks {
     }
 
     override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
-        Timber.i("%s - onCreate", activity.javaClass.simpleName)
+        printLog(String.format("%s - onCreate", activity.javaClass.simpleName))
         if (activityList.isEmpty()) {
             for (callback: ApplicationLifecycleCallback? in lifecycleCallbacks) {
                 callback?.onApplicationCreate(activity)
             }
-            Timber.i("%s - onApplicationCreate", activity.javaClass.simpleName)
+            printLog(String.format("%s - onApplicationCreate", activity.javaClass.simpleName))
         }
         activityList.add(activity)
         topActivity = activity
     }
 
     override fun onActivityStarted(activity: Activity) {
-        Timber.i("%s - onStart", activity.javaClass.simpleName)
+        printLog(String.format("%s - onStart", activity.javaClass.simpleName))
     }
 
     override fun onActivityResumed(activity: Activity) {
-        Timber.i("%s - onResume", activity.javaClass.simpleName)
+        printLog(String.format("%s - onResume", activity.javaClass.simpleName))
         if (topActivity === activity && resumedActivity == null) {
             for (callback: ApplicationLifecycleCallback in lifecycleCallbacks) {
                 callback.onApplicationForeground(activity)
             }
-            Timber.i("%s - onApplicationForeground", activity.javaClass.simpleName)
+            printLog(String.format("%s - onApplicationForeground", activity.javaClass.simpleName))
         }
         topActivity = activity
         resumedActivity = activity
     }
 
     override fun onActivityPaused(activity: Activity) {
-        Timber.i("%s - onPause", activity.javaClass.simpleName)
+        printLog(String.format("%s - onPause", activity.javaClass.simpleName))
     }
 
     override fun onActivityStopped(activity: Activity) {
-        Timber.i("%s - onStop", activity.javaClass.simpleName)
+        printLog(String.format("%s - onStop", activity.javaClass.simpleName))
         if (resumedActivity === activity) {
             resumedActivity = null
         }
@@ -188,16 +187,16 @@ object ActivityManager : ActivityLifecycleCallbacks {
             for (callback: ApplicationLifecycleCallback in lifecycleCallbacks) {
                 callback.onApplicationBackground(activity)
             }
-            Timber.i("%s - onApplicationBackground", activity.javaClass.simpleName)
+            printLog(String.format("%s - onApplicationBackground", activity.javaClass.simpleName))
         }
     }
 
     override fun onActivitySaveInstanceState(activity: Activity, outState: Bundle) {
-        Timber.i("%s - onSaveInstanceState", activity.javaClass.simpleName)
+        printLog(String.format("%s - onSaveInstanceState", activity.javaClass.simpleName))
     }
 
     override fun onActivityDestroyed(activity: Activity) {
-        Timber.i("%s - onDestroy", activity.javaClass.simpleName)
+        printLog(String.format("%s - onDestroy", activity.javaClass.simpleName))
         activityList.remove(activity)
         if (topActivity === activity) {
             topActivity = null
@@ -206,7 +205,7 @@ object ActivityManager : ActivityLifecycleCallbacks {
             for (callback: ApplicationLifecycleCallback in lifecycleCallbacks) {
                 callback.onApplicationDestroy(activity)
             }
-            Timber.i("%s - onApplicationDestroy", activity.javaClass.simpleName)
+            printLog(String.format("%s - onApplicationDestroy", activity.javaClass.simpleName))
         }
     }
 
@@ -279,11 +278,10 @@ object ActivityManager : ActivityLifecycleCallbacks {
     }
 
     /**
-     * 获取某个对象的唯一标记
+     * 打印日志
      */
-    private fun getObjectTag(`object`: Any): String {
-        // 对象所在的包名 + 对象的内存地址
-        return `object`.javaClass.name + Integer.toHexString(`object`.hashCode())
+    private fun printLog(content: String) {
+        Log.i("ActivityManager", content)
     }
 
     /**

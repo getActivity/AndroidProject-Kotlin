@@ -5,8 +5,8 @@ import android.view.View
 import android.widget.TextView
 import androidx.annotation.StringRes
 import com.hjq.base.BaseDialog
-import com.hjq.base.action.AnimAction
 import com.hjq.base.ktx.lazyFindViewById
+import com.hjq.core.action.AnimAction
 import com.hjq.demo.R
 
 /**

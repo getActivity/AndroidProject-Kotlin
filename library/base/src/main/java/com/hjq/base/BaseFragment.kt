@@ -3,7 +3,6 @@ package com.hjq.base
 import android.app.Activity
 import android.app.Application
 import android.content.Context
-import android.os.Build
 import android.os.Bundle
 import android.view.KeyEvent
 import android.view.LayoutInflater
@@ -12,9 +11,10 @@ import android.view.ViewGroup
 import androidx.annotation.IdRes
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
-import com.hjq.base.action.BundleAction
-import com.hjq.base.action.ClickAction
-import com.hjq.base.action.HandlerAction
+import com.hjq.core.action.BundleAction
+import com.hjq.core.action.ClickAction
+import com.hjq.core.action.HandlerAction
+import com.hjq.core.ktx.isAndroid10
 
 /**
  *    author : Android 轮子哥
@@ -267,7 +267,7 @@ abstract class BaseFragment<A : BaseActivity> : Fragment(),
      */
     private fun registerAttachActivityLifecycle() {
         activity?.let {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            if (isAndroid10()) {
                 it.registerActivityLifecycleCallbacks(this)
             } else {
                 it.application.registerActivityLifecycleCallbacks(this)
@@ -280,7 +280,7 @@ abstract class BaseFragment<A : BaseActivity> : Fragment(),
      */
     private fun unregisterAttachActivityLifecycle() {
         activity?.let {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            if (isAndroid10()) {
                 it.unregisterActivityLifecycleCallbacks(this)
             } else {
                 it.application.unregisterActivityLifecycleCallbacks(this)

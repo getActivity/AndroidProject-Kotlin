@@ -5,7 +5,7 @@ import android.view.View
 import com.hjq.bar.TitleBar
 import com.hjq.base.BaseDialog
 import com.hjq.base.BasePopupWindow
-import com.hjq.base.action.AnimAction
+import com.hjq.core.action.AnimAction
 import com.hjq.demo.R
 import com.hjq.demo.aop.SingleClick
 import com.hjq.demo.app.AppActivity

@@ -7,11 +7,11 @@ import androidx.annotation.StringRes
 import com.gyf.immersionbar.ImmersionBar
 import com.hjq.bar.TitleBar
 import com.hjq.base.BaseActivity
+import com.hjq.core.ktx.isAndroid15
 import com.hjq.demo.R
 import com.hjq.demo.action.ImmersionAction
 import com.hjq.demo.action.TitleBarAction
 import com.hjq.demo.http.model.HttpData
-import com.hjq.demo.ktx.isAndroid15
 import com.hjq.demo.ktx.toast
 import com.hjq.demo.ui.dialog.common.WaitDialog
 import com.hjq.http.config.IRequestApi

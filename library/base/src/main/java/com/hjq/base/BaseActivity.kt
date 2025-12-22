@@ -10,12 +10,12 @@ import android.view.Window
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
-import com.hjq.base.action.BundleAction
-import com.hjq.base.action.ClickAction
-import com.hjq.base.action.ContextAction
-import com.hjq.base.action.FixOrientationAction
-import com.hjq.base.action.HandlerAction
-import com.hjq.base.ktx.hideKeyboard
+import com.hjq.core.action.BundleAction
+import com.hjq.core.action.ClickAction
+import com.hjq.core.action.ContextAction
+import com.hjq.core.action.FixOrientationAction
+import com.hjq.core.action.HandlerAction
+import com.hjq.core.ktx.hideKeyboard
 import java.util.Random
 import kotlin.math.pow
 

@@ -5,7 +5,6 @@ import android.app.Application.ActivityLifecycleCallbacks
 import android.content.Context
 import android.content.DialogInterface
 import android.graphics.drawable.Drawable
-import android.os.Build
 import android.os.Bundle
 import android.util.SparseArray
 import android.view.Gravity
@@ -30,13 +29,14 @@ import androidx.appcompat.app.AppCompatDialog
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LifecycleRegistry
-import com.hjq.base.action.AnimAction
-import com.hjq.base.action.ClickAction
-import com.hjq.base.action.ContextAction
-import com.hjq.base.action.HandlerAction
-import com.hjq.base.action.ResourcesAction
-import com.hjq.base.ktx.getActivity
-import com.hjq.base.ktx.hideKeyboard
+import com.hjq.core.action.AnimAction
+import com.hjq.core.action.ClickAction
+import com.hjq.core.action.ContextAction
+import com.hjq.core.action.HandlerAction
+import com.hjq.core.action.ResourcesAction
+import com.hjq.core.ktx.getActivity
+import com.hjq.core.ktx.hideKeyboard
+import com.hjq.core.ktx.isAndroid10
 import java.lang.ref.SoftReference
 
 /**
@@ -1139,7 +1139,7 @@ open class BaseDialog(context: Context, @StyleRes themeResId: Int = R.style.Base
          */
         private fun registerActivityLifecycleCallbacks() {
             activity?.let {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                if (isAndroid10()) {
                     it.registerActivityLifecycleCallbacks(this)
                 } else {
                     it.application.registerActivityLifecycleCallbacks(this)
@@ -1152,7 +1152,7 @@ open class BaseDialog(context: Context, @StyleRes themeResId: Int = R.style.Base
          */
         private fun unregisterActivityLifecycleCallbacks() {
             activity?.let {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                if (isAndroid10()) {
                     it.unregisterActivityLifecycleCallbacks(this)
                 } else {
                     it.application.unregisterActivityLifecycleCallbacks(this)

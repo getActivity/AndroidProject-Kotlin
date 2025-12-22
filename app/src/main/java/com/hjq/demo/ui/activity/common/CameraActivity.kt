@@ -7,13 +7,13 @@ import android.os.Environment
 import android.provider.MediaStore
 import androidx.core.content.FileProvider
 import com.hjq.base.BaseActivity
-import com.hjq.base.ktx.createIntent
 import com.hjq.base.ktx.startActivityForResult
+import com.hjq.core.ktx.createIntent
+import com.hjq.core.ktx.isAndroid11
+import com.hjq.core.ktx.isAndroid7
 import com.hjq.demo.R
 import com.hjq.demo.aop.Log
 import com.hjq.demo.app.AppActivity
-import com.hjq.demo.ktx.isAndroid11
-import com.hjq.demo.ktx.isAndroid7
 import com.hjq.demo.other.AppConfig
 import com.hjq.demo.permission.PermissionDescription
 import com.hjq.demo.permission.PermissionInterceptor

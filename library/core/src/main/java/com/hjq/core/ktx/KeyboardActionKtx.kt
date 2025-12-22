@@ -1,4 +1,4 @@
-package com.hjq.base.ktx
+package com.hjq.core.ktx
 
 import android.content.Context
 import android.view.View

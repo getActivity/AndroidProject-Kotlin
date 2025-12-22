@@ -36,9 +36,9 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
 import com.airbnb.lottie.LottieAnimationView
 import com.hjq.base.BaseDialog
-import com.hjq.base.action.ContextAction
-import com.hjq.base.ktx.getActivity
 import com.hjq.base.ktx.lazyFindViewById
+import com.hjq.core.action.ContextAction
+import com.hjq.core.ktx.getActivity
 import com.hjq.custom.widget.layout.SimpleLayout
 import com.hjq.custom.widget.view.PlayButton
 import com.hjq.demo.R

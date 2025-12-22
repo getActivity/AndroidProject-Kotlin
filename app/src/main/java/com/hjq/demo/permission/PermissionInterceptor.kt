@@ -4,12 +4,12 @@ import android.app.Activity
 import android.content.Context
 import android.text.TextUtils
 import com.hjq.base.BaseDialog
+import com.hjq.core.ktx.isAndroid10
+import com.hjq.core.ktx.isAndroid11
+import com.hjq.core.ktx.isAndroid12
+import com.hjq.core.ktx.isAndroid13
+import com.hjq.core.ktx.isAndroid16
 import com.hjq.demo.R
-import com.hjq.demo.ktx.isAndroid10
-import com.hjq.demo.ktx.isAndroid11
-import com.hjq.demo.ktx.isAndroid12
-import com.hjq.demo.ktx.isAndroid13
-import com.hjq.demo.ktx.isAndroid16
 import com.hjq.demo.ktx.toast
 import com.hjq.demo.permission.PermissionConverter.getNickNamesByPermissions
 import com.hjq.demo.ui.dialog.common.MessageDialog

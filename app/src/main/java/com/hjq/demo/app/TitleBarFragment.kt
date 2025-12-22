@@ -5,10 +5,10 @@ import android.view.View
 import android.view.WindowInsets
 import com.gyf.immersionbar.ImmersionBar
 import com.hjq.bar.TitleBar
+import com.hjq.core.ktx.isAndroid15
 import com.hjq.demo.R
 import com.hjq.demo.action.ImmersionAction
 import com.hjq.demo.action.TitleBarAction
-import com.hjq.demo.ktx.isAndroid15
 
 /**
  *    author : Android 轮子哥

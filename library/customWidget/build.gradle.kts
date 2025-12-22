@@ -7,6 +7,6 @@ android {
 }
 
 dependencies {
-    implementation(project(":library:base"))
+    implementation(project(":library:core"))
     implementation(project(":library:smallestWidth"))
 }

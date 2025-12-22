@@ -5,8 +5,8 @@ import android.net.ConnectivityManager
 import androidx.core.content.ContextCompat
 import com.flyjingfish.android_aop_annotation.ProceedJoinPoint
 import com.flyjingfish.android_aop_annotation.base.BasePointCut
+import com.hjq.core.manager.ActivityManager
 import com.hjq.demo.R
-import com.hjq.demo.manager.ActivityManager
 import com.hjq.toast.Toaster
 
 /**

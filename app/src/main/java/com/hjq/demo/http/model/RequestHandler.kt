@@ -6,11 +6,11 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.ConnectivityManager
 import android.net.NetworkInfo
-import com.hjq.base.ktx.createIntent
+import com.hjq.core.ktx.createIntent
+import com.hjq.core.manager.ActivityManager
 import com.hjq.demo.R
 import com.hjq.demo.http.exception.ResultException
 import com.hjq.demo.http.exception.TokenException
-import com.hjq.demo.manager.ActivityManager
 import com.hjq.demo.ui.activity.account.LoginActivity
 import com.hjq.gson.factory.GsonFactory
 import com.hjq.http.EasyLog

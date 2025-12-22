@@ -1,9 +1,9 @@
-package com.hjq.base.action
+package com.hjq.core.action
 
 import android.app.Activity
 import android.content.pm.ActivityInfo
 import android.content.res.TypedArray
-import android.os.Build
+import com.hjq.core.ktx.isAndroid8
 
 /**
  *    author : Android 轮子哥
@@ -17,7 +17,7 @@ interface FixOrientationAction {
      * 是否允许 Activity 设置显示方向
      */
     fun isAllowOrientation(activity: Activity): Boolean {
-        if (Build.VERSION.SDK_INT != Build.VERSION_CODES.O) {
+        if (isAndroid8()) {
             return true
         }
         return !isTranslucentOrFloating(activity)
@@ -54,7 +54,7 @@ interface FixOrientationAction {
      * java.lang.IllegalStateException: Only fullscreen opaque activities can request orientation
      */
     @Suppress("JavaReflectionMemberAccess", "DiscouragedPrivateApi")
-    fun fixScreenOrientation(activity: Activity?) {
+    fun fixScreenOrientation(activity: Activity) {
         try {
             val field = Activity::class.java.getDeclaredField("mActivityInfo")
             field.isAccessible = true

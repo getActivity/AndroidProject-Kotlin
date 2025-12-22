@@ -1,15 +1,14 @@
-package com.hjq.demo.other
+package com.hjq.core.tools
 
 import android.app.Activity
-import android.app.Application.ActivityLifecycleCallbacks
+import android.app.Application
 import android.graphics.Rect
 import android.os.Bundle
 import android.view.View
 import android.view.ViewTreeObserver
-import android.view.ViewTreeObserver.OnGlobalLayoutListener
 import android.view.Window
 import android.view.WindowManager
-import com.hjq.demo.ktx.isAndroid10
+import com.hjq.core.ktx.isAndroid10
 
 /**
  *    author : Android 轮子哥
@@ -18,7 +17,7 @@ import com.hjq.demo.ktx.isAndroid10
  *    desc   : 软键盘监听类
  */
 class KeyboardWatcher private constructor(private var activity: Activity) :
-    OnGlobalLayoutListener, ActivityLifecycleCallbacks {
+    ViewTreeObserver.OnGlobalLayoutListener, Application.ActivityLifecycleCallbacks {
 
     companion object {
 
@@ -77,7 +76,7 @@ class KeyboardWatcher private constructor(private var activity: Activity) :
     }
 
     /**
-     * [ActivityLifecycleCallbacks]
+     * [Application.ActivityLifecycleCallbacks]
      */
 
     override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
