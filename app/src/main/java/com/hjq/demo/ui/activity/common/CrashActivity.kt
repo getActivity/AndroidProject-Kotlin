@@ -30,6 +30,9 @@ import com.hjq.demo.R
 import com.hjq.demo.aop.SingleClick
 import com.hjq.demo.app.AppActivity
 import com.hjq.demo.other.AppConfig
+import com.hjq.device.compat.DeviceBrand
+import com.hjq.device.compat.DeviceMarketName
+import com.hjq.device.compat.DeviceOs
 import com.tencent.bugly.library.Bugly
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -165,8 +168,14 @@ class CrashActivity : AppActivity() {
             }
         }
         val builder: StringBuilder = StringBuilder()
-        builder.append("设备品牌：\t").append(Build.BRAND)
-            .append("\n设备型号：\t").append(Build.MODEL)
+        builder.append("设备品牌：\t").append(DeviceBrand.getBrandName())
+
+        val marketName = DeviceMarketName.getMarketName(this)
+        if (!TextUtils.isEmpty(marketName)) {
+            builder.append("\n设备名称：\t").append(marketName)
+        }
+
+        builder.append("\n设备型号：\t").append(Build.MODEL)
             .append("\n设备类型：\t").append(if (isTabletDevice()) "平板" else "手机")
 
         builder.append("\n屏幕宽高：\t").append(screenWidth).append(" x ").append(screenHeight)
@@ -178,6 +187,15 @@ class CrashActivity : AppActivity() {
         builder.append("\n安卓版本：\t").append(Build.VERSION.RELEASE)
             .append("\nAPI 版本：\t").append(getSdkVersion())
             .append("\nCPU 架构：\t").append(Build.SUPPORTED_ABIS[0])
+
+        val osName = DeviceOs.getOsName()
+        if (!TextUtils.isEmpty(osName)) {
+            builder.append("\n厂商系统：\t").append(osName)
+            val osVersionName = DeviceOs.getOsVersionName()
+            if (!TextUtils.isEmpty(osVersionName)) {
+                builder.append("\n厂商版本：\t").append(osVersionName)
+            }
+        }
 
         builder.append("\n应用版本：\t").append(AppConfig.getVersionName())
             .append("\n版本代码：\t").append(AppConfig.getVersionCode())
