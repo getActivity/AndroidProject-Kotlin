@@ -121,7 +121,7 @@ class StatusLayout @JvmOverloads constructor(
         mainLayout = LayoutInflater.from(context).inflate(R.layout.widget_status_layout, this, false) as ViewGroup
         lottieView = mainLayout?.findViewById(R.id.iv_status_icon)
         textView = mainLayout?.findViewById(R.id.tv_status_text)
-        retryView = mainLayout?.findViewById(R.id.iv_status_retry)
+        retryView = mainLayout?.findViewById(R.id.btn_status_retry)
         if (mainLayout?.background == null) {
             // 默认使用 windowBackground 作为背景
             val typedArray: TypedArray = context.obtainStyledAttributes(intArrayOf(android.R.attr.windowBackground))
