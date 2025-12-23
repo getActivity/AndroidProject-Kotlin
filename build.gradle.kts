@@ -2,7 +2,7 @@ import com.android.build.gradle.BaseExtension
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-// AndroidProject 版本：v15.0
+// AndroidProject-Kotlin 版本：v16.0
 plugins {
     alias(libs.plugins.application) apply false
     alias(libs.plugins.library) apply false
