@@ -25,7 +25,7 @@ class AppApplication : Application() {
 
         InitManager.preInitSdk(this)
         if (InitManager.isAgreePrivacy(this)) {
-            InitManager.initSdk(this);
+            InitManager.initSdk(this)
         }
     }
 

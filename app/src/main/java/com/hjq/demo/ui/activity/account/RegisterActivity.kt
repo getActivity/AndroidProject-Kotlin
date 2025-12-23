@@ -97,12 +97,12 @@ class RegisterActivity : AppActivity(), OnEditorActionListener {
         secondPassword?.setText(getString(INTENT_KEY_PASSWORD))
     }
 
-    public override fun getImmersionTopView(): View? {
-        return findViewById<View?>(R.id.fl_register_container)
+    override fun getImmersionTopView(): View? {
+        return findViewById(R.id.fl_register_container)
     }
 
     override fun getImmersionBottomView(): View? {
-        return findViewById<View?>(R.id.fl_register_container)
+        return findViewById(R.id.fl_register_container)
     }
 
     @SingleClick

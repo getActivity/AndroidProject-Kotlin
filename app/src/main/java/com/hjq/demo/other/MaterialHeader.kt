@@ -3,7 +3,6 @@ package com.hjq.demo.other
 import android.content.Context
 import android.content.res.TypedArray
 import android.graphics.Canvas
-import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Path
 import android.util.AttributeSet
@@ -11,6 +10,7 @@ import android.widget.ImageView
 import androidx.annotation.ColorInt
 import androidx.annotation.ColorRes
 import androidx.core.content.ContextCompat
+import androidx.core.graphics.toColorInt
 import com.hjq.demo.R
 import com.hjq.smallest.width.dp2px
 import com.scwang.smart.refresh.header.material.CircleImageView
@@ -43,7 +43,7 @@ class MaterialHeader @JvmOverloads constructor(context: Context, attrs: Attribut
         /** 刷新球默认样式 */
         const val BALL_STYLE_DEFAULT: Int = 1
 
-        private val CIRCLE_BG_LIGHT: Int = Color.parseColor("#FAFAFA")
+        private val CIRCLE_BG_LIGHT: Int = "#FAFAFA".toColorInt()
         private const val MAX_PROGRESS_ANGLE: Float = 0.8f
     }
 
@@ -64,11 +64,11 @@ class MaterialHeader @JvmOverloads constructor(context: Context, attrs: Attribut
         minimumHeight = dp2px(100).toInt()
         progressDrawable = MaterialProgressDrawable(this)
         progressDrawable.setColorSchemeColors(
-            Color.parseColor("#0099CC"),
-            Color.parseColor("#FF4444"),
-            Color.parseColor("#669900"),
-            Color.parseColor("#AA66CC"),
-            Color.parseColor("#FF8800"))
+            "#0099CC".toColorInt(),
+            "#FF4444".toColorInt(),
+            "#669900".toColorInt(),
+            "#AA66CC".toColorInt(),
+            "#FF8800".toColorInt())
         circleView = CircleImageView(context, CIRCLE_BG_LIGHT)
         circleView.setImageDrawable(progressDrawable)
         circleView.alpha = 0f
@@ -81,21 +81,21 @@ class MaterialHeader @JvmOverloads constructor(context: Context, attrs: Attribut
         val typedArray: TypedArray = context.obtainStyledAttributes(attrs, R.styleable.MaterialHeader)
         showBezierWave = typedArray.getBoolean(R.styleable.MaterialHeader_srlShowBezierWave, showBezierWave)
         scrollableWhenRefreshing = typedArray.getBoolean(R.styleable.MaterialHeader_srlScrollableWhenRefreshing, scrollableWhenRefreshing)
-        bezierPaint.color = typedArray.getColor(R.styleable.MaterialHeader_srlPrimaryColor, Color.parseColor("#11BBFF"))
+        bezierPaint.color = typedArray.getColor(R.styleable.MaterialHeader_srlPrimaryColor, "#11BBFF".toColorInt())
         if (typedArray.hasValue(R.styleable.MaterialHeader_srlShadowRadius)) {
             val radius: Int = typedArray.getDimensionPixelOffset(R.styleable.MaterialHeader_srlShadowRadius, 0)
-            val color: Int = typedArray.getColor(R.styleable.MaterialHeader_mhShadowColor, Color.parseColor("#000000"))
+            val color: Int = typedArray.getColor(R.styleable.MaterialHeader_mhShadowColor, "#000000".toColorInt())
             bezierPaint.setShadowLayer(radius.toFloat(), 0f, 0f, color)
             setLayerType(LAYER_TYPE_SOFTWARE, null)
         }
         showBezierWave = typedArray.getBoolean(R.styleable.MaterialHeader_mhShowBezierWave, showBezierWave)
         scrollableWhenRefreshing = typedArray.getBoolean(R.styleable.MaterialHeader_mhScrollableWhenRefreshing, scrollableWhenRefreshing)
         if (typedArray.hasValue(R.styleable.MaterialHeader_mhPrimaryColor)) {
-            bezierPaint.color = typedArray.getColor(R.styleable.MaterialHeader_mhPrimaryColor, Color.parseColor("#11BBFF"))
+            bezierPaint.color = typedArray.getColor(R.styleable.MaterialHeader_mhPrimaryColor, "#11BBFF".toColorInt())
         }
         if (typedArray.hasValue(R.styleable.MaterialHeader_mhShadowRadius)) {
             val radius: Int = typedArray.getDimensionPixelOffset(R.styleable.MaterialHeader_mhShadowRadius, 0)
-            val color: Int = typedArray.getColor(R.styleable.MaterialHeader_mhShadowColor, Color.parseColor("#000000"))
+            val color: Int = typedArray.getColor(R.styleable.MaterialHeader_mhShadowColor, "#000000".toColorInt())
             bezierPaint.setShadowLayer(radius.toFloat(), 0f, 0f, color)
             setLayerType(LAYER_TYPE_SOFTWARE, null)
         }

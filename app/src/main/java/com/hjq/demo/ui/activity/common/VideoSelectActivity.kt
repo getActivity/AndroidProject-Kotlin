@@ -344,7 +344,7 @@ class VideoSelectActivity : AppActivity(), StatusAction, Runnable, BaseAdapter.O
     override fun onItemLongClick(recyclerView: RecyclerView, itemView: View, position: Int): Boolean {
         if (selectVideo.size < maxSelect) {
             // 长按的时候模拟选中
-            itemView?.findViewById<View?>(R.id.fl_video_select_check)?.let {
+            itemView.findViewById<View?>(R.id.fl_video_select_check)?.let {
                 return it.performClick()
             }
         }
@@ -358,7 +358,7 @@ class VideoSelectActivity : AppActivity(), StatusAction, Runnable, BaseAdapter.O
      * @param position          被点击的条目位置
      */
     override fun onChildClick(recyclerView: RecyclerView, childView: View, position: Int) {
-        when (childView?.id) {
+        when (childView.id) {
             R.id.fl_video_select_check -> {
                 val bean: VideoBean = adapter.getItem(position)
                 val file = File(bean.getVideoPath())
@@ -535,9 +535,9 @@ class VideoSelectActivity : AppActivity(), StatusAction, Runnable, BaseAdapter.O
             return videoSize
         }
 
-        override fun equals(obj: Any?): Boolean {
-            if (obj is VideoBean) {
-                return (videoPath == obj.videoPath)
+        override fun equals(other: Any?): Boolean {
+            if (other is VideoBean) {
+                return (videoPath == other.videoPath)
             }
             return false
         }

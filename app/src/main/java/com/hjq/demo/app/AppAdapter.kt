@@ -1,5 +1,6 @@
 package com.hjq.demo.app
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.view.View
 import androidx.annotation.IntRange
@@ -42,6 +43,7 @@ abstract class AppAdapter<T>(context: Context) :
     /**
      * 设置新的数据
      */
+    @SuppressLint("NotifyDataSetChanged")
     open fun setData(data: MutableList<T>?) {
         if (data == null) {
             dataSet.clear()
@@ -72,6 +74,7 @@ abstract class AppAdapter<T>(context: Context) :
     /**
      * 清空当前数据
      */
+    @SuppressLint("NotifyDataSetChanged")
     open fun clearData() {
         dataSet.clear()
         notifyDataSetChanged()

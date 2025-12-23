@@ -1,5 +1,6 @@
 package com.hjq.demo.ui.dialog.common
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.view.View
 import android.view.ViewGroup
@@ -150,6 +151,7 @@ class SelectDialog {
             return ViewHolder()
         }
 
+        @SuppressLint("NotifyDataSetChanged")
         fun setSelect(vararg positions: Int) {
             for (position in positions) {
                 selectSet[position] = getItem(position)
@@ -185,6 +187,7 @@ class SelectDialog {
         /**
          * [BaseAdapter.OnItemClickListener]
          */
+        @SuppressLint("NotifyDataSetChanged")
         override fun onItemClick(recyclerView: RecyclerView, itemView: View, position: Int) {
             if (selectSet.containsKey(position)) {
                 // 当前必须不是单选模式才能取消选中

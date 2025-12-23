@@ -2,6 +2,7 @@ package com.hjq.demo.ui.activity
 
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.view.View
 import com.airbnb.lottie.LottieAnimationView
@@ -29,6 +30,7 @@ import java.util.Locale
  *    time   : 2018/10/18
  *    desc   : 闪屏界面
  */
+@SuppressLint("CustomSplashScreen")
 class SplashActivity : AppActivity() {
 
     private val lottieView: LottieAnimationView? by lazyFindViewById(R.id.lav_splash_lottie)
@@ -100,7 +102,7 @@ class SplashActivity : AppActivity() {
 
     override fun onBackPressed() {
         // 禁用返回键
-        //super.onBackPressed();
+        //super.onBackPressed()
     }
 
     override fun initActivity() {

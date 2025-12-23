@@ -1,7 +1,6 @@
 package com.hjq.demo.ui.dialog.common
 
 import android.content.Context
-import android.graphics.Color
 import android.text.TextUtils
 import android.util.TypedValue
 import android.view.Gravity
@@ -10,6 +9,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.annotation.StringRes
+import androidx.core.graphics.toColorInt
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
 import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
@@ -37,6 +37,13 @@ import java.io.InputStream
  *    doc    : https://baijiahao.baidu.com/s?id=1615894776741007967
  */
 class AddressDialog {
+
+    companion object {
+
+        private const val TYPE_PROVINCE: Int = 0
+        private const val TYPE_CITY: Int = 1
+        private const val TYPE_AREA: Int = 2
+    }
 
     class Builder(context: Context) : BaseDialog.Builder<Builder>(context), OnTabListener,
         Runnable, OnSelectListener, BaseDialog.OnShowListener, BaseDialog.OnDismissListener {
@@ -119,7 +126,7 @@ class AddressDialog {
                 if (province != data[i]?.getName()) {
                     continue
                 }
-                selectedAddress(0, i, false)
+                selectedAddress(TYPE_PROVINCE, i, false)
                 break
             }
         }
@@ -145,7 +152,7 @@ class AddressDialog {
                 }
                 // 避开直辖市，因为选择省的时候已经自动跳过市区了
                 if ((adapter.getItem(1)?.size ?: 0) > 1) {
-                    selectedAddress(1, i, false)
+                    selectedAddress(TYPE_CITY, i, false)
                 }
                 break
             }
@@ -182,23 +189,23 @@ class AddressDialog {
          */
         private fun selectedAddress(type: Int, position: Int, smoothScroll: Boolean) {
             when (type) {
-                0 -> {
+                TYPE_PROVINCE -> {
                     // 记录当前选择的省份
                     province = adapter.getItem(type)?.get(position)?.getName() ?: ""
                     tabAdapter.setItem(type, province)
                     tabAdapter.addItem(getString(R.string.address_hint))
-                    tabAdapter.setSelectedPosition(type + 1)
+                    tabAdapter.setSelectedPosition(TYPE_CITY)
                     adapter.getItem(type)?.get(position)?.getNext()?.let {
                         adapter.addItem(AddressManager.getCityList(it))
                     }
-                    viewPager2?.setCurrentItem(type + 1, smoothScroll)
+                    viewPager2?.setCurrentItem(TYPE_CITY, smoothScroll)
 
                     // 如果当前选择的是直辖市，就直接跳过选择城市，直接选择区域
-                    if ((adapter.getItem(type + 1)?.size ?: 0) == 1) {
-                        selectedAddress(type + 1, 0, false)
+                    if ((adapter.getItem(TYPE_CITY)?.size ?: 0) == 1) {
+                        selectedAddress(TYPE_CITY, 0, false)
                     }
                 }
-                1 -> {
+                TYPE_CITY -> {
                     // 记录当前选择的城市
                     city = adapter.getItem(type)?.get(position)?.getName() ?: ""
                     tabAdapter.setItem(type, city)
@@ -208,14 +215,14 @@ class AddressDialog {
                         postDelayed({ dismiss() }, 300)
                     } else {
                         tabAdapter.addItem(getString(R.string.address_hint))
-                        tabAdapter.setSelectedPosition(type + 1)
+                        tabAdapter.setSelectedPosition(TYPE_AREA)
                         adapter.getItem(type)?.get(position)?.getNext()?.let {
                             adapter.addItem(AddressManager.getAreaList(it))
                         }
-                        viewPager2?.setCurrentItem(type + 1, smoothScroll)
+                        viewPager2?.setCurrentItem(TYPE_AREA, smoothScroll)
                     }
                 }
-                2 -> {
+                TYPE_AREA -> {
                     // 记录当前选择的区域
                     area = adapter.getItem(type)?.get(position)?.getName() ?: ""
                     tabAdapter.setItem(type, area)
@@ -331,7 +338,7 @@ class AddressDialog {
             this.listener = listener
         }
 
-        inner class ViewHolder : AppViewHolder (RecyclerView(getContext())), OnItemClickListener {
+        inner class ViewHolder : AppViewHolder(RecyclerView(getContext())), OnItemClickListener {
 
             private val adapter: AddressAdapter
 
@@ -368,16 +375,16 @@ class AddressDialog {
             val textView = TextView(parent.context)
             textView.gravity = Gravity.CENTER_VERTICAL
             textView.setBackgroundResource(R.drawable.transparent_selector)
-            textView.setTextColor(Color.parseColor("#222222"))
+            textView.setTextColor("#222222".toColorInt())
             textView.setTextSize(TypedValue.COMPLEX_UNIT_PX, getResources().getDimension(R.dimen.sp_14))
             textView.layoutParams = ViewGroup.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT
             )
             textView.setPadding(getResources().getDimension(R.dimen.dp_20).toInt(), getResources().getDimension(R.dimen.dp_10).toInt(),
-                getResources().getDimension(R.dimen.dp_20).toInt(), getResources().getDimension(R.dimen.dp_10).toInt())
+                               getResources().getDimension(R.dimen.dp_20).toInt(), getResources().getDimension(R.dimen.dp_10).toInt())
             // 适配 RTL 特性
-            textView.setTextAlignment(View.TEXT_ALIGNMENT_VIEW_START)
+            textView.textAlignment = View.TEXT_ALIGNMENT_VIEW_START
             return ViewHolder(textView)
         }
 

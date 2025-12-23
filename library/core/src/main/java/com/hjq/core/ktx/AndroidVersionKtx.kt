@@ -1,6 +1,7 @@
 package com.hjq.core.ktx
 
 import android.os.Build
+import androidx.annotation.ChecksSdkIntAtLeast
 
 /**
  *    author : Android 轮子哥
@@ -57,6 +58,7 @@ fun getSdkVersion(): Int {
 /**
  * 是否是 Android 16 及以上版本
  */
+@ChecksSdkIntAtLeast(api = ANDROID_16)
 fun isAndroid16(): Boolean {
     return Build.VERSION.SDK_INT >= ANDROID_16
 }
@@ -64,6 +66,7 @@ fun isAndroid16(): Boolean {
 /**
  * 是否是 Android 15 及以上版本
  */
+@ChecksSdkIntAtLeast(api = ANDROID_15)
 fun isAndroid15(): Boolean {
     return Build.VERSION.SDK_INT >= ANDROID_15
 }
@@ -71,6 +74,7 @@ fun isAndroid15(): Boolean {
 /**
  * 是否是 Android 14 及以上版本
  */
+@ChecksSdkIntAtLeast(api = ANDROID_14)
 fun isAndroid14(): Boolean {
     return Build.VERSION.SDK_INT >= ANDROID_14
 }
@@ -78,6 +82,7 @@ fun isAndroid14(): Boolean {
 /**
  * 是否是 Android 13 及以上版本
  */
+@ChecksSdkIntAtLeast(api = ANDROID_13)
 fun isAndroid13(): Boolean {
     return Build.VERSION.SDK_INT >= ANDROID_13
 }
@@ -85,6 +90,7 @@ fun isAndroid13(): Boolean {
 /**
  * 是否是 Android 12.1（又称 Android 12L）及以上版本
  */
+@ChecksSdkIntAtLeast(api = ANDROID_12_1)
 fun isAndroid12_1(): Boolean {
     return Build.VERSION.SDK_INT >= ANDROID_12_1
 }
@@ -92,6 +98,7 @@ fun isAndroid12_1(): Boolean {
 /**
  * 是否是 Android 12 及以上版本
  */
+@ChecksSdkIntAtLeast(api = ANDROID_12)
 fun isAndroid12(): Boolean {
     return Build.VERSION.SDK_INT >= ANDROID_12
 }
@@ -99,6 +106,8 @@ fun isAndroid12(): Boolean {
 /**
  * 是否是 Android 11 及以上版本
  */
+@Suppress("unused")
+@ChecksSdkIntAtLeast(api = ANDROID_11)
 fun isAndroid11(): Boolean {
     return Build.VERSION.SDK_INT >= ANDROID_11
 }
@@ -106,6 +115,7 @@ fun isAndroid11(): Boolean {
 /**
  * 是否是 Android 10 及以上版本
  */
+@ChecksSdkIntAtLeast(api = ANDROID_10)
 fun isAndroid10(): Boolean {
     return Build.VERSION.SDK_INT >= ANDROID_10
 }
@@ -113,6 +123,7 @@ fun isAndroid10(): Boolean {
 /**
  * 是否是 Android 9.0 及以上版本
  */
+@ChecksSdkIntAtLeast(api = ANDROID_9)
 fun isAndroid9(): Boolean {
     return Build.VERSION.SDK_INT >= ANDROID_9
 }
@@ -120,6 +131,7 @@ fun isAndroid9(): Boolean {
 /**
  * 是否是 Android 8.1 及以上版本
  */
+@ChecksSdkIntAtLeast(api = ANDROID_8_1)
 fun isAndroid8_1(): Boolean {
     return Build.VERSION.SDK_INT >= ANDROID_8_1
 }
@@ -127,6 +139,7 @@ fun isAndroid8_1(): Boolean {
 /**
  * 是否是 Android 8.0 及以上版本
  */
+@ChecksSdkIntAtLeast(api = ANDROID_8)
 fun isAndroid8(): Boolean {
     return Build.VERSION.SDK_INT >= ANDROID_8
 }
@@ -134,6 +147,7 @@ fun isAndroid8(): Boolean {
 /**
  * 是否是 Android 7.1 及以上版本
  */
+@ChecksSdkIntAtLeast(api = ANDROID_7_1)
 fun isAndroid7_1(): Boolean {
     return Build.VERSION.SDK_INT >= ANDROID_7_1
 }
@@ -141,6 +155,7 @@ fun isAndroid7_1(): Boolean {
 /**
  * 是否是 Android 7.0 及以上版本
  */
+@ChecksSdkIntAtLeast(api = ANDROID_7)
 fun isAndroid7(): Boolean {
     return Build.VERSION.SDK_INT >= ANDROID_7
 }

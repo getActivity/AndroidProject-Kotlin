@@ -17,6 +17,7 @@ import android.util.TypedValue
 import android.view.animation.AccelerateInterpolator
 import androidx.annotation.FloatRange
 import androidx.appcompat.widget.AppCompatButton
+import androidx.core.graphics.toColorInt
 import com.hjq.custom.widget.R
 import kotlin.math.sqrt
 
@@ -105,8 +106,8 @@ class SubmitButton @JvmOverloads constructor(
         setLayerType(LAYER_TYPE_SOFTWARE, null)
         val typedArray: TypedArray = context.obtainStyledAttributes(attrs, R.styleable.SubmitButton, defStyleAttr, 0)
         progressColor = typedArray.getColor(R.styleable.SubmitButton_progressColor, getAccentColor())
-        succeedColor = typedArray.getColor(R.styleable.SubmitButton_succeedColor, Color.parseColor("#19CC95"))
-        errorColor = typedArray.getColor(R.styleable.SubmitButton_errorColor, Color.parseColor("#FC8E34"))
+        succeedColor = typedArray.getColor(R.styleable.SubmitButton_succeedColor, "#19CC95".toColorInt())
+        errorColor = typedArray.getColor(R.styleable.SubmitButton_errorColor, "#FC8E34".toColorInt())
         progressStyle = typedArray.getInt(R.styleable.SubmitButton_progressStyle, STYLE_LOADING)
         typedArray.recycle()
 
@@ -254,7 +255,7 @@ class SubmitButton @JvmOverloads constructor(
             addUpdateListener { animation: ValueAnimator ->
                 viewWidth = animation.animatedValue as Int
                 if (viewWidth == viewHeight) {
-                    backgroundPaint.color = Color.parseColor("#DDDDDD")
+                    backgroundPaint.color = "#DDDDDD".toColorInt()
                     backgroundPaint.style = Paint.Style.STROKE
                 }
                 invalidate()

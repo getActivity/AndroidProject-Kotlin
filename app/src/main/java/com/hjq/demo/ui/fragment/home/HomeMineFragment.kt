@@ -3,8 +3,8 @@ package com.hjq.demo.ui.fragment.home
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.content.pm.ActivityInfo
-import android.net.Uri
 import android.view.View
+import androidx.core.net.toUri
 import com.hjq.base.BaseDialog
 import com.hjq.base.ktx.startActivity
 import com.hjq.demo.R
@@ -193,7 +193,7 @@ class HomeMineFragment : TitleBarFragment<HomeActivity>() {
                                 postDelayed({
                                     try {
                                         startActivity(Intent.ACTION_VIEW) {
-                                            data = Uri.parse("alipays://platformapi/startapp?saId=10000007&clientVersion=3.7.0.0718&qrcode=https%3A%2F%2Fqr.alipay.com%2FFKX04202G4K6AVCF5GIY66%3F_s%3Dweb-other")
+                                            data = "alipays://platformapi/startapp?saId=10000007&clientVersion=3.7.0.0718&qrcode=https%3A%2F%2Fqr.alipay.com%2FFKX04202G4K6AVCF5GIY66%3F_s%3Dweb-other".toUri()
                                             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                                         }
                                     } catch (e: ActivityNotFoundException) {

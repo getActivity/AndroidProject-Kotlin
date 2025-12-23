@@ -4,6 +4,7 @@ import android.content.Context
 import android.os.Environment
 import java.io.File
 import java.math.BigDecimal
+import java.math.RoundingMode
 
 /**
  *    author : Android 轮子哥
@@ -87,16 +88,16 @@ object CacheDataManager {
         }
         val megaByte: Double = kiloByte / 1024
         if (megaByte < 1) {
-            return BigDecimal(kiloByte).setScale(2, BigDecimal.ROUND_HALF_UP).toPlainString() + "K"
+            return BigDecimal(kiloByte).setScale(2, RoundingMode.HALF_UP).toPlainString() + "K"
         }
         val gigaByte: Double = megaByte / 1024
         if (gigaByte < 1) {
-            return BigDecimal(megaByte).setScale(2, BigDecimal.ROUND_HALF_UP).toPlainString() + "M"
+            return BigDecimal(megaByte).setScale(2, RoundingMode.HALF_UP).toPlainString() + "M"
         }
         val teraBytes: Double = gigaByte / 1024
         if (teraBytes < 1) {
-            return BigDecimal(gigaByte).setScale(2, BigDecimal.ROUND_HALF_UP).toPlainString() + "GB"
+            return BigDecimal(gigaByte).setScale(2, RoundingMode.HALF_UP).toPlainString() + "GB"
         }
-        return BigDecimal(teraBytes).setScale(2, BigDecimal.ROUND_HALF_UP).toPlainString() + "TB"
+        return BigDecimal(teraBytes).setScale(2, RoundingMode.HALF_UP).toPlainString() + "TB"
     }
 }

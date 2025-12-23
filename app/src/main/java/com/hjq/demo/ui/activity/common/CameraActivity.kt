@@ -162,7 +162,7 @@ class CameraActivity : AppActivity() {
             intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
             // 将拍取的照片保存到指定 Uri
             intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri)
-        }, { resultCode, data ->
+        }, { resultCode, _ ->
             if (resultCode == RESULT_OK) {
                 // 通知系统多媒体扫描该文件，否则会导致拍摄出来的图片或者视频没有及时显示到相册中，而需要通过重启手机才能看到
                 MediaScannerConnection.scanFile(applicationContext, arrayOf(file.path), null, null)

@@ -39,7 +39,7 @@ abstract class BaseActivity : AppCompatActivity(), ContextAction,
 
     override fun onCreate(savedInstanceState: Bundle?) {
         if (!isAllowOrientation(this)) {
-            fixScreenOrientation(this);
+            fixScreenOrientation(this)
         }
         super.onCreate(savedInstanceState)
         initActivity()

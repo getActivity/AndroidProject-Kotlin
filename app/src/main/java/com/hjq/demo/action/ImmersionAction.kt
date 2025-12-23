@@ -15,13 +15,13 @@ interface ImmersionAction : OnTitleBarListener {
      * 获取需要沉浸的顶部 View 对象
      */
     fun getImmersionTopView(): View? {
-        return null;
+        return null
     }
 
     /**
      * 获取需要沉浸的底部 View 对象
      */
     fun getImmersionBottomView(): View? {
-        return null;
+        return null
     }
 }

@@ -3,7 +3,8 @@ package com.hjq.core.action
 import android.app.Activity
 import android.content.pm.ActivityInfo
 import android.content.res.TypedArray
-import com.hjq.core.ktx.isAndroid8
+import com.hjq.core.ktx.ANDROID_8
+import com.hjq.core.ktx.getSdkVersion
 
 /**
  *    author : Android 轮子哥
@@ -17,7 +18,7 @@ interface FixOrientationAction {
      * 是否允许 Activity 设置显示方向
      */
     fun isAllowOrientation(activity: Activity): Boolean {
-        if (isAndroid8()) {
+        if (getSdkVersion() != ANDROID_8) {
             return true
         }
         return !isTranslucentOrFloating(activity)
@@ -30,13 +31,9 @@ interface FixOrientationAction {
     fun isTranslucentOrFloating(activity: Activity): Boolean {
         var typedArray: TypedArray? = null
         try {
-            val styleableRes = Class.forName("com.android.internal.R\$styleable")
-                .getField("Window")[null] as IntArray
+            val styleableRes = Class.forName($$"com.android.internal.R$styleable").getField("Window")[null] as IntArray
             typedArray = activity.obtainStyledAttributes(styleableRes)
-            val method = ActivityInfo::class.java.getMethod(
-                "isTranslucentOrFloating",
-                TypedArray::class.java
-            )
+            val method = ActivityInfo::class.java.getMethod("isTranslucentOrFloating", TypedArray::class.java)
             method.isAccessible = true
             return method.invoke(null, typedArray) as Boolean
         } catch (e: Exception) {

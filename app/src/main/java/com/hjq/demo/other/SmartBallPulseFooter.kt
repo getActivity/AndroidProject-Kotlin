@@ -9,6 +9,7 @@ import android.util.AttributeSet
 import android.view.animation.AccelerateDecelerateInterpolator
 import androidx.annotation.ColorInt
 import androidx.core.graphics.ColorUtils
+import androidx.core.graphics.toColorInt
 import com.hjq.demo.R
 import com.hjq.smallest.width.dp2px
 import com.hjq.smallest.width.sp2px
@@ -33,12 +34,12 @@ class SmartBallPulseFooter @JvmOverloads constructor(context: Context, attrs: At
     private var manualNormalColor: Boolean = false
     private var manualAnimationColor: Boolean = false
     private val paint: Paint = Paint()
-    private var normalColor: Int = Color.parseColor("#EEEEEE")
+    private var normalColor: Int = "#EEEEEE".toColorInt()
 
     private var animatingColor: IntArray = intArrayOf(
-        Color.parseColor("#30B399"),
-        Color.parseColor("#FF4600"),
-        Color.parseColor("#142DCC"))
+        "#30B399".toColorInt(),
+        "#FF4600".toColorInt(),
+        "#142DCC".toColorInt())
 
     private val circleSpacing: Float
     private var startTime: Long = 0
@@ -60,7 +61,7 @@ class SmartBallPulseFooter @JvmOverloads constructor(context: Context, attrs: At
         val width: Int = width
         val height: Int = height
         if (noMoreData) {
-            paint.color = Color.parseColor("#898989")
+            paint.color = "#898989".toColorInt()
             canvas.drawText(context.getString(R.string.common_no_more_data),
                 (width - textWidth) / 2, (height - paint.textSize) / 2, paint)
         } else {
@@ -118,7 +119,7 @@ class SmartBallPulseFooter @JvmOverloads constructor(context: Context, attrs: At
             if (colors.size > 1) {
                 setNormalColor(colors[1])
             } else if (colors.isNotEmpty()) {
-                setNormalColor(ColorUtils.compositeColors(Color.parseColor("#99FFFFFF"), colors[0]))
+                setNormalColor(ColorUtils.compositeColors("#99FFFFFF".toColorInt(), colors[0]))
             }
             manualNormalColor = false
         }

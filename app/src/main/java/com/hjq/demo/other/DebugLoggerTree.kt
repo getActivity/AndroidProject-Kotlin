@@ -21,9 +21,6 @@ class DebugLoggerTree : DebugTree() {
     override fun createStackElementTag(element: StackTraceElement): String {
         val tag = "(" + element.fileName + ":" + element.lineNumber + ")"
         // 日志 TAG 长度限制已经在 Android 8.0 被移除
-        return if (tag.length <= MAX_TAG_LENGTH || isAndroid8()) {
-            tag
-        } else
-            tag.take(MAX_TAG_LENGTH)
+        return if (tag.length <= MAX_TAG_LENGTH || isAndroid8()) { tag } else tag.take(MAX_TAG_LENGTH)
     }
 }

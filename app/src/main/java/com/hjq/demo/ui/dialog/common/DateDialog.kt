@@ -111,12 +111,12 @@ class DateDialog {
         fun setDate(date: String): Builder = apply {
             if (date.matches(Regex("\\d{8}"))) {
                 // 20190519
-                setYear(date.substring(0, 4))
+                setYear(date.take(4))
                 setMonth(date.substring(4, 6))
                 setDay(date.substring(6, 8))
             } else if (date.matches(Regex("\\d{4}-\\d{2}-\\d{2}"))) {
                 // 2019-05-19
-                setYear(date.substring(0, 4))
+                setYear(date.take(4))
                 setMonth(date.substring(5, 7))
                 setDay(date.substring(8, 10))
             }

@@ -2,11 +2,11 @@ plugins {
     alias(libs.plugins.library)
 }
 
-val UMENG_APP_KEY = rootProject.extra["UMENG_APP_KEY"].toString()
-val QQ_APP_ID = rootProject.extra["QQ_APP_ID"].toString()
-val QQ_APP_SECRET = rootProject.extra["QQ_APP_SECRET"].toString()
-val WX_APP_ID = rootProject.extra["WX_APP_ID"].toString()
-val WX_APP_SECRET = rootProject.extra["WX_APP_SECRET"].toString()
+val umengAppKey = rootProject.extra["UMENG_APP_KEY"].toString()
+var qqAppId = rootProject.extra["QQ_APP_ID"].toString()
+val qqAppSecret = rootProject.extra["QQ_APP_SECRET"].toString()
+val wxAppId = rootProject.extra["WX_APP_ID"].toString()
+val wxAppSecret = rootProject.extra["WX_APP_SECRET"].toString()
 
 android {
     namespace = "com.hjq.umeng.sdk"
@@ -21,19 +21,19 @@ android {
         consumerProguardFiles("proguard-umeng.pro")
 
         // 构建配置字段
-        buildConfigField("String", "UM_KEY", "\"$UMENG_APP_KEY\"")
-        buildConfigField("String", "QQ_ID", "\"$QQ_APP_ID\"")
-        buildConfigField("String", "QQ_SECRET", "\"$QQ_APP_SECRET\"")
-        buildConfigField("String", "WX_ID", "\"$WX_APP_ID\"")
-        buildConfigField("String", "WX_SECRET", "\"$WX_APP_SECRET\"")
+        buildConfigField("String", "UM_KEY", "\"$umengAppKey\"")
+        buildConfigField("String", "QQ_ID", "\"$qqAppId\"")
+        buildConfigField("String", "QQ_SECRET", "\"$qqAppSecret\"")
+        buildConfigField("String", "WX_ID", "\"$wxAppId\"")
+        buildConfigField("String", "WX_SECRET", "\"$wxAppSecret\"")
 
         // 清单占位符
         manifestPlaceholders += mapOf(
-                "UM_KEY" to UMENG_APP_KEY,
-                "QQ_ID" to QQ_APP_ID,
-                "QQ_SECRET" to QQ_APP_SECRET,
-                "WX_ID" to WX_APP_ID,
-                "WX_SECRET" to WX_APP_SECRET
+                "UM_KEY" to umengAppKey,
+                "QQ_ID" to qqAppId,
+                "QQ_SECRET" to qqAppSecret,
+                "WX_ID" to wxAppId,
+                "WX_SECRET" to wxAppSecret
         )
     }
 }

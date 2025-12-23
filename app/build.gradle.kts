@@ -13,10 +13,10 @@ plugins {
 
 apply(plugin = "org.jetbrains.kotlin.kapt")
 
-val LOG_ENABLE = rootProject.extra["LOG_ENABLE"].toString().toBoolean()
-val HOST_URL = rootProject.extra["HOST_URL"].toString()
-val BUGLY_ID = rootProject.extra["BUGLY_ID"].toString()
-val BUGLY_KEY = rootProject.extra["BUGLY_KEY"].toString()
+val logEnable = rootProject.extra["LOG_ENABLE"].toString().toBoolean()
+val hostUrl = rootProject.extra["HOST_URL"].toString()
+val buglyId = rootProject.extra["BUGLY_ID"].toString()
+val buglyKey = rootProject.extra["BUGLY_KEY"].toString()
 
 // Android 代码规范文档：https://github.com/getActivity/AndroidCodeStandard
 android {
@@ -43,13 +43,13 @@ android {
         proguardFiles("proguard-sdk.pro", "proguard-app.pro")
 
         // 日志开关
-        buildConfigField("boolean", "LOG_ENABLE", LOG_ENABLE.toString())
+        buildConfigField("boolean", "LOG_ENABLE", logEnable.toString())
         // 主机地址
-        buildConfigField("String", "HOST_URL", "\"$HOST_URL\"")
+        buildConfigField("String", "HOST_URL", "\"$hostUrl\"")
         // BuglyId
-        buildConfigField("String", "BUGLY_ID", "\"$BUGLY_ID\"")
+        buildConfigField("String", "BUGLY_ID", "\"$buglyId\"")
         // BuglyKey
-        buildConfigField("String", "BUGLY_KEY", "\"$BUGLY_KEY\"")
+        buildConfigField("String", "BUGLY_KEY", "\"$buglyKey\"")
 
         // 仅保留 arm64-v8a 架构（需要注意的是 mmkv 库在 2.0 及之后的版本已经不支持在 32 位的机器上面运行）
         ndk {

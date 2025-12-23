@@ -11,7 +11,6 @@ import android.media.AudioManager
 import android.media.MediaPlayer
 import android.media.MediaPlayer.OnCompletionListener
 import android.media.MediaPlayer.OnPreparedListener
-import android.net.Uri
 import android.provider.Settings
 import android.provider.Settings.SettingNotFoundException
 import android.text.TextUtils
@@ -31,6 +30,10 @@ import android.widget.TextView
 import android.widget.VideoView
 import androidx.annotation.DrawableRes
 import androidx.core.content.ContextCompat
+import androidx.core.net.toUri
+import androidx.core.view.isGone
+import androidx.core.view.isInvisible
+import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
@@ -176,18 +179,18 @@ class PlayerView @JvmOverloads constructor(
             progressView.progress = progress
             progressView.secondaryProgress = (videoView.bufferPercentage / 100f * videoView.duration).toInt()
             if (videoView.isPlaying) {
-                if (!lockMode && bottomLayout.visibility == GONE) {
+                if (!lockMode && bottomLayout.isGone) {
                     bottomLayout.visibility = VISIBLE
                 }
-                if (!videoView.getKeepScreenOn()) {
-                    videoView.setKeepScreenOn(true)
+                if (!videoView.keepScreenOn) {
+                    videoView.keepScreenOn = true
                 }
             } else {
-                if (bottomLayout.visibility == VISIBLE) {
+                if (bottomLayout.isVisible) {
                     bottomLayout.visibility = GONE
                 }
-                if (videoView.getKeepScreenOn()) {
-                    videoView.setKeepScreenOn(false)
+                if (videoView.keepScreenOn) {
+                    videoView.keepScreenOn = false
                 }
             }
             postDelayed(this, REFRESH_TIME.toLong())
@@ -298,7 +301,7 @@ class PlayerView @JvmOverloads constructor(
         if (TextUtils.isEmpty(url)) {
             return
         }
-        videoView.setVideoURI(Uri.parse(url))
+        videoView.setVideoURI(url?.toUri())
     }
 
     /**
@@ -420,7 +423,7 @@ class PlayerView @JvmOverloads constructor(
             if (translationY != -topLayout.height) {
                 return@AnimatorUpdateListener
             }
-            if (topLayout.visibility == INVISIBLE) {
+            if (topLayout.isInvisible) {
                 topLayout.visibility = VISIBLE
             }
         })
@@ -433,7 +436,7 @@ class PlayerView @JvmOverloads constructor(
             if (translationY != bottomLayout.height) {
                 return@AnimatorUpdateListener
             }
-            if (bottomLayout.visibility == INVISIBLE) {
+            if (bottomLayout.isInvisible) {
                 bottomLayout.visibility = VISIBLE
             }
         })
@@ -447,10 +450,10 @@ class PlayerView @JvmOverloads constructor(
             if (alpha != 0f) {
                 return@AnimatorUpdateListener
             }
-            if (lockView.visibility == INVISIBLE) {
+            if (lockView.isInvisible) {
                 lockView.visibility = VISIBLE
             }
-            if (controlView.visibility == INVISIBLE) {
+            if (controlView.isInvisible) {
                 controlView.visibility = VISIBLE
             }
         })
@@ -473,7 +476,7 @@ class PlayerView @JvmOverloads constructor(
             if (translationY != -topLayout.height) {
                 return@AnimatorUpdateListener
             }
-            if (topLayout.visibility == VISIBLE) {
+            if (topLayout.isVisible) {
                 topLayout.visibility = INVISIBLE
             }
         })
@@ -486,7 +489,7 @@ class PlayerView @JvmOverloads constructor(
             if (translationY != bottomLayout.height) {
                 return@AnimatorUpdateListener
             }
-            if (bottomLayout.visibility == VISIBLE) {
+            if (bottomLayout.isVisible) {
                 bottomLayout.visibility = INVISIBLE
             }
         })
@@ -500,10 +503,10 @@ class PlayerView @JvmOverloads constructor(
             if (alpha != 0f) {
                 return@AnimatorUpdateListener
             }
-            if (lockView.visibility == VISIBLE) {
+            if (lockView.isVisible) {
                 lockView.visibility = INVISIBLE
             }
-            if (controlView.visibility == VISIBLE) {
+            if (controlView.isVisible) {
                 controlView.visibility = INVISIBLE
             }
         })
@@ -553,12 +556,13 @@ class PlayerView @JvmOverloads constructor(
         if (progress != 0) {
             // 记录当前播放进度
             currentProgress = progress
-        } else {
-            // 如果 Activity 返回到后台，progress 会等于 0，而 mVideoView.getDuration 会等于 -1
-            // 所以要避免在这种情况下记录当前的播放进度，以便用户从后台返回到前台的时候恢复正确的播放进度
-            if (videoView.duration > 0) {
-                currentProgress = progress
-            }
+            return
+        }
+
+        // 如果 Activity 返回到后台，progress 会等于 0，而 mVideoView.getDuration 会等于 -1
+        // 所以要避免在这种情况下记录当前的播放进度，以便用户从后台返回到前台的时候恢复正确的播放进度
+        if (videoView.duration > 0) {
+            currentProgress = 0
         }
     }
 
@@ -741,7 +745,7 @@ class PlayerView @JvmOverloads constructor(
             return super.onTouchEvent(event)
         }
 
-        val layoutDirection = getResources().getConfiguration().getLayoutDirection()
+        val layoutDirection = resources.configuration.layoutDirection
 
         when (event.action) {
             MotionEvent.ACTION_DOWN -> {
@@ -850,8 +854,7 @@ class PlayerView @JvmOverloads constructor(
                         val voice: Int = min(max(currentVolume + delta, 0f), maxVoice.toFloat()).toInt()
                         it.setStreamVolume(AudioManager.STREAM_MUSIC, voice, 0)
                         val percent: Int = voice * 100 / maxVoice
-                        @DrawableRes val iconId: Int
-                        iconId = when {
+                        @DrawableRes val iconId: Int = when {
                             percent > 100 / 3 * 2 -> {
                                 R.drawable.video_volume_high_ic
                             }

@@ -336,7 +336,7 @@ class ImageSelectActivity : AppActivity(), StatusAction, Runnable,
     override fun onItemLongClick(recyclerView: RecyclerView, itemView: View, position: Int): Boolean {
         if (selectImage.size < maxSelect) {
             // 长按的时候模拟选中
-            itemView?.findViewById<View?>(R.id.fl_image_select_check)?.let {
+            itemView.findViewById<View?>(R.id.fl_image_select_check)?.let {
                 return it.performClick()
             }
         }

@@ -1,5 +1,6 @@
 package com.hjq.demo.ui.adapter.common
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.drawable.Drawable
 import android.view.View
@@ -44,6 +45,7 @@ class NavigationAdapter(context: Context) :
         return selectedPosition
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     fun setSelectedPosition(position: Int) {
         selectedPosition = position
         notifyDataSetChanged()
@@ -59,6 +61,7 @@ class NavigationAdapter(context: Context) :
     /**
      * [BaseAdapter.OnItemClickListener]
      */
+    @SuppressLint("NotifyDataSetChanged")
     override fun onItemClick(recyclerView: RecyclerView, itemView: View, position: Int) {
         if (selectedPosition == position) {
             return

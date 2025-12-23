@@ -52,6 +52,7 @@ open class BrowserViewClient : WebViewClient() {
     /**
      * 网页加载错误时回调，需要注意的是：这个方法会在 onPageFinished 之前调用
      */
+    @Suppress("DEPRECATION")
     override fun onReceivedError(view: WebView, errorCode: Int, description: String, failingUrl: String) {
         super.onReceivedError(view, errorCode, description, failingUrl)
         log(String.format("onReceivedError: errorCode = %s, description = %s, failingUrl = %s",

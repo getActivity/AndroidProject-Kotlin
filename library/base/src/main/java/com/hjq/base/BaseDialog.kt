@@ -26,6 +26,7 @@ import androidx.annotation.LayoutRes
 import androidx.annotation.StringRes
 import androidx.annotation.StyleRes
 import androidx.appcompat.app.AppCompatDialog
+import androidx.core.util.size
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LifecycleRegistry
@@ -903,7 +904,7 @@ open class BaseDialog(context: Context, @StyleRes themeResId: Int = R.style.Base
 
                 clickArray?.let { array ->
                     var i = 0
-                    while (i < array.size()) {
+                    while (i < array.size) {
                         val view = contentView?.findViewById<View?>(array.keyAt(i))
                         view?.setOnClickListener(ViewClickWrapper(it, array.valueAt(i)))
                         i++

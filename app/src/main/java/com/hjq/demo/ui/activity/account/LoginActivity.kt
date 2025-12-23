@@ -260,10 +260,8 @@ class LoginActivity : AppActivity(), UmengLogin.OnLoginListener,
                 .into(it)
         }
 
-        toast(("昵称：" + data?.getName() + "\n" +
-                    "性别：" + data?.getSex() + "\n" +
-                    "id：" + data?.getId() + "\n" +
-                    "token：" + data?.getToken()))
+        toast("昵称：" + data.getName() + "\n" + "性别：" + data.getSex() + "\n" +
+                    "id：" + data.getId() + "\n" + "token：" + data.getToken())
     }
 
     /**

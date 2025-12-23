@@ -54,18 +54,23 @@ class AlbumDialog {
 
         override fun onItemClick(recyclerView: RecyclerView, itemView: View, position: Int) {
             val data = adapter.getData()
-            for (info in data) {
-                if (info.isSelect()) {
-                    info.setSelect(false)
-                    break
+            for (i in 0 until data.size) {
+                val albumInfo = data[i]
+                if (!albumInfo.isSelect()) {
+                    continue
                 }
+                albumInfo.setSelect(false)
+                adapter.notifyItemChanged(i)
+                break
             }
-            adapter.getItem(position).setSelect(true)
-            adapter.notifyDataSetChanged()
+
+            val albumInfo = adapter.getItem(position)
+            albumInfo.setSelect(true)
+            adapter.notifyItemChanged(position)
 
             // 延迟消失
             postDelayed({
-                listener?.onSelected(requireNotNull(getDialog()), position, adapter.getItem(position))
+                listener?.onSelected(requireNotNull(getDialog()), position, albumInfo)
                 dismiss()
             }, 300)
         }

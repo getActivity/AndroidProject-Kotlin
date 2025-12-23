@@ -101,10 +101,10 @@ open class VideoPlayActivity : AppActivity(), OnPlayListener {
     }
 
     /** 竖屏播放 */
-    public class Portrait : VideoPlayActivity()
+    class Portrait : VideoPlayActivity()
 
     /** 横屏播放 */
-    public class Landscape : VideoPlayActivity()
+    class Landscape : VideoPlayActivity()
 
     /**
      * 播放参数构建

@@ -82,10 +82,10 @@ subprojects {
             val buildDirPath = properties.getProperty("build.dir")
             if (!buildDirPath.isNullOrEmpty()) {
                 // 将构建文件统一输出到指定的目录下
-                setBuildDir(File(buildDirPath, rootProject.name + "/build/${project.path.replace(':', '/')}"))
+                buildDir = File(buildDirPath, rootProject.name + "/build/${project.path.replace(':', '/')}")
             } else {
                 // 将构建文件统一输出到项目根目录下的 build 文件夹
-                setBuildDir(File(rootDir, "build/${project.path.replace(':', '/')}"))
+                buildDir = File(rootDir, "build/${project.path.replace(':', '/')}")
             }
         }
 

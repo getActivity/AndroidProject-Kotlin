@@ -12,7 +12,7 @@ import com.tencent.mmkv.MMKV
  */
 object HttpCacheManager {
 
-    private val HTTP_CACHE_CONTENT: MMKV = MMKV.mmkvWithID("http_cache_content");
+    private val HTTP_CACHE_CONTENT: MMKV = MMKV.mmkvWithID("http_cache_content")
 
     private val HTTP_CACHE_TIME: MMKV = MMKV.mmkvWithID("http_cache_time")
 

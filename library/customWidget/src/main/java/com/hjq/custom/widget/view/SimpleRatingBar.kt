@@ -10,6 +10,8 @@ import android.view.MotionEvent
 import android.view.View
 import androidx.core.content.ContextCompat
 import com.hjq.custom.widget.R
+import kotlin.math.max
+import kotlin.math.min
 import kotlin.math.roundToInt
 
 /**
@@ -62,8 +64,8 @@ class SimpleRatingBar @JvmOverloads constructor(
                              requireNotNull(ContextCompat.getDrawable(getContext(), array.getResourceId(R.styleable.SimpleRatingBar_fillDrawable, R.drawable.rating_star_fill_ic))))
         setGradeCount(array.getInt(R.styleable.SimpleRatingBar_gradeCount, 5))
         setGradeSpace(array.getDimension(R.styleable.SimpleRatingBar_gradeSpace, gradeWidth / 4f).toInt())
-        setGradeWidth(array.getDimensionPixelSize(R.styleable.SimpleRatingBar_gradeWidth, requireNotNull(normalDrawable).intrinsicWidth))
-        setGradeHeight(array.getDimensionPixelSize(R.styleable.SimpleRatingBar_gradeHeight, requireNotNull(normalDrawable).intrinsicHeight))
+        setGradeWidth(array.getDimensionPixelSize(R.styleable.SimpleRatingBar_gradeWidth, normalDrawable.intrinsicWidth))
+        setGradeHeight(array.getDimensionPixelSize(R.styleable.SimpleRatingBar_gradeHeight, normalDrawable.intrinsicHeight))
         when (array.getInt(R.styleable.SimpleRatingBar_gradeStep, 0)) {
             0x01 -> setGradeStep(GradleStep.ONE)
             0x00 -> setGradeStep(GradleStep.HALF)
@@ -90,16 +92,15 @@ class SimpleRatingBar @JvmOverloads constructor(
         when (event.action) {
             MotionEvent.ACTION_DOWN, MotionEvent.ACTION_MOVE -> {
                 var grade = 0f
-                val distance: Float
-                if (layoutDirection == LAYOUT_DIRECTION_RTL) {
-                    distance = (width - event.x) - getPaddingRight() - gradeSpace
+                val distance: Float = if (layoutDirection == LAYOUT_DIRECTION_RTL) {
+                    (width - event.x) - getPaddingRight() - gradeSpace
                 } else {
-                    distance = event.x - getPaddingLeft() - gradeSpace
+                    event.x - getPaddingLeft() - gradeSpace
                 }
                 if (distance > 0) {
                     grade = distance / (gradeWidth + gradeSpace)
                 }
-                grade = Math.min(Math.max(grade, 0f), gradeCount.toFloat())
+                grade = min(max(grade, 0f), gradeCount.toFloat())
                 if (grade - grade.toInt() > 0) {
                     grade = if (grade - grade.toInt() > 0.5f) {
                         // 0.5 - 1 算一颗星

@@ -6,6 +6,7 @@ import android.content.Context
 import android.net.ConnectivityManager
 import android.net.Network
 import androidx.core.content.ContextCompat
+import androidx.core.content.edit
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import com.chuckerteam.chucker.api.ChuckerInterceptor
@@ -72,7 +73,7 @@ object InitManager {
      */
     fun setAgreePrivacy(context: Context, result: Boolean) {
         val sharedPreferences = context.getSharedPreferences(AGREE_PRIVACY_NAME, Context.MODE_PRIVATE)
-        sharedPreferences.edit().putBoolean(KEY_AGREE_PRIVACY_RESULT, result).apply()
+        sharedPreferences.edit { putBoolean(KEY_AGREE_PRIVACY_RESULT, result) }
     }
 
     /**
@@ -126,7 +127,6 @@ object InitManager {
         // 友盟统计、登录、分享 SDK
         UmengClient.init(application, AppConfig.isLogEnable())
 
-        // Bugly 异常捕捉
         // Bugly 异常捕捉
         val builder = BuglyBuilder(AppConfig.getBuglyId(), AppConfig.getBuglyKey())
         builder.debugMode = AppConfig.isDebug()

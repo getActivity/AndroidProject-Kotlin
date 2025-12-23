@@ -44,7 +44,7 @@ class DialogActivity : AppActivity() {
     private var waitDialog: BaseDialog? = null
 
     /** 菜单弹窗 */
-    private var listPopup: BasePopupWindow? = null;
+    private var listPopup: BasePopupWindow? = null
 
     override fun getLayoutId(): Int {
         return R.layout.dialog_activity
@@ -473,7 +473,7 @@ class DialogActivity : AppActivity() {
                     .addOnCancelListener { toast("Dialog 取消了") }
                     .addOnDismissListener { toast("Dialog 销毁了") }
                     .setOnKeyListener { dialog, event ->
-                        toast("按键代码：" + event?.keyCode)
+                        toast("按键代码：" + event.keyCode)
                         return@setOnKeyListener false
                     }
                     .setOnClickListenerByView(R.id.btn_dialog_custom_ok) { dialog, _ ->

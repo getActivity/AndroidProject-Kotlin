@@ -15,6 +15,7 @@ import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
 import android.view.animation.AccelerateInterpolator
+import androidx.core.graphics.toColorInt
 import com.hjq.custom.widget.R
 import com.hjq.smallest.width.dp2px
 
@@ -65,19 +66,19 @@ class SwitchButton @JvmOverloads constructor(
     private var checked: Boolean = false
 
     /** 开启状态背景色 */
-    private var accentColor: Int = Color.parseColor("#4BD763")
+    private var accentColor: Int = "#4BD763".toColorInt()
 
     /** 开启状态按钮描边色 */
-    private var primaryDarkColor: Int = Color.parseColor("#3AC652")
+    private var primaryDarkColor: Int = "#3AC652".toColorInt()
 
     /** 关闭状态描边色 */
-    private var offColor: Int = Color.parseColor("#E3E3E3")
+    private var offColor: Int = "#E3E3E3".toColorInt()
 
     /** 关闭状态按钮描边色 */
-    private var offDarkColor: Int = Color.parseColor("#BFBFBF")
+    private var offDarkColor: Int = "#BFBFBF".toColorInt()
 
     /** 按钮阴影色 */
-    private var shadowColor: Int = Color.parseColor("#333333")
+    private var shadowColor: Int = "#333333".toColorInt()
 
     /** 监听器 */
     private var listener: OnCheckedChangeListener? = null
@@ -303,9 +304,9 @@ class SwitchButton @JvmOverloads constructor(
         canvas.save()
         canvas.scale(scale, scale, centerX + scaleOffset, centerY)
         if (isEnabled) {
-            paint.color = Color.parseColor("#FFFFFF")
+            paint.color = "#FFFFFF".toColorInt()
         } else {
-            paint.color = Color.parseColor("#BBBBBB")
+            paint.color = "#BBBBBB".toColorInt()
         }
         canvas.drawPath(backgroundPath, paint)
         canvas.restore()
@@ -326,7 +327,7 @@ class SwitchButton @JvmOverloads constructor(
         // draw bar
         canvas.scale(0.98f, 0.98f, viewWidth / 2, viewWidth / 2)
         paint.style = Paint.Style.FILL
-        paint.color = Color.parseColor("#FFFFFF")
+        paint.color = "#FFFFFF".toColorInt()
         canvas.drawPath(barPath, paint)
         paint.style = Paint.Style.STROKE
         paint.strokeWidth = strokeWidth * 0.5f

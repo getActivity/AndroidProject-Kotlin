@@ -133,7 +133,7 @@ class ArrowDrawable private constructor(private val builder: Builder) : Drawable
         invalidateSelf()
     }
 
-    class Builder constructor(private val context: Context) {
+    class Builder(private val context: Context) {
 
         /** 箭头高度 */
         var arrowHeight: Int

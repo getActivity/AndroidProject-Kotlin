@@ -21,6 +21,7 @@ import androidx.annotation.ColorInt
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.core.content.ContextCompat
+import androidx.core.graphics.toColorInt
 import com.hjq.core.ktx.isAndroid10
 import com.hjq.custom.widget.R
 import com.hjq.smallest.width.dp2px
@@ -158,7 +159,7 @@ class SettingBar @JvmOverloads constructor(
         if (array.hasValue(R.styleable.SettingBar_bar_lineDrawable)) {
             setLineDrawable(array.getDrawable(R.styleable.SettingBar_bar_lineDrawable))
         } else {
-            setLineDrawable(ColorDrawable(Color.parseColor("#ECECEC")))
+            setLineDrawable(ColorDrawable("#ECECEC".toColorInt()))
         }
         if (array.hasValue(R.styleable.SettingBar_bar_lineVisible)) {
             setLineVisible(array.getBoolean(R.styleable.SettingBar_bar_lineVisible, true))
@@ -346,6 +347,7 @@ class SettingBar @JvmOverloads constructor(
     /**
      * 设置左边的图标着色器
      */
+    @Suppress("DEPRECATION")
     fun setStartDrawableTint(color: Int): SettingBar = apply {
         startDrawableTint = color
         val drawable: Drawable? = getStartDrawable()
@@ -362,6 +364,7 @@ class SettingBar @JvmOverloads constructor(
     /**
      * 设置右边的图标着色器
      */
+    @Suppress("DEPRECATION")
     fun setEndDrawableTint(color: Int): SettingBar = apply {
         endDrawableTint = color
         val drawable: Drawable? = getEndDrawable()
