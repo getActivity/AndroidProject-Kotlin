@@ -45,10 +45,14 @@ subprojects {
                 versionCode(10)
             }
 
-            // 支持 Java JDK 21
             compileOptions {
-                targetCompatibility = JavaVersion.VERSION_21
+                // 允许项目代码使用 Java 21 的新语法
                 sourceCompatibility = JavaVersion.VERSION_21
+                // 编译后的字节码适配 Java 21 虚拟机，为了兼容安卓低版本系统 ART
+                targetCompatibility = JavaVersion.VERSION_21
+                // 开启 JDK 核心库脱糖：把高版本 JDK 新增的类 (如 java.time) 打包进 apk，让安卓低版本手机也能正常运行不闪退
+                // https://developer.android.google.cn/studio/write/java8-support-table?hl=zh-cn
+                isCoreLibraryDesugaringEnabled = true
             }
 
             // 设置存放 so 文件的目录
@@ -100,7 +104,6 @@ subprojects {
         // 通用依赖配置（排除 library:base，因为它使用 api 依赖）
         dependencies {
             // 依赖 libs 目录下所有的 jar 和 aar 包
-            // implementation(fileTree(mapOf("include" to listOf("*.jar", "*.aar"), "dir" to "libs")))
             add("implementation", fileTree(mapOf("include" to listOf("*.jar", "*.aar"), "dir" to "libs")))
 
             add("implementation", libs.appCompat)
@@ -112,6 +115,8 @@ subprojects {
             add("implementation", libs.lifecycleRuntimeKTX)
             add("implementation", libs.lifecycleViewModelKTX)
             add("implementation", libs.lifecycleLiveDatalKTX)
+
+            add("coreLibraryDesugaring", libs.desugarJdkLibs)
         }
     }
 }

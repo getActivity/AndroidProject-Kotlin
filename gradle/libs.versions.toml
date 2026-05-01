@@ -6,6 +6,7 @@ easyLauncher = "6.4.1"
 
 appCompat = "1.7.1"
 material = "1.13.0"
+desugarJdkLibs = "2.0.4"
 lifecycleKTX = "2.10.0"
 kotlinxCoroutines = "1.10.2"
 deviceCompat = "2.6"
@@ -69,6 +70,9 @@ lifecycleLiveDatalKTX = { module = "androidx.lifecycle:lifecycle-livedata-ktx", 
 # Kotlin 协程：https://github.com/Kotlin/kotlinx.coroutines
 kotlinxCoroutinesCore = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinxCoroutines" }
 kotlinxCoroutinesAndroid = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "kotlinxCoroutines" }
+
+# JDK 8+ API 反向兼容库：https://developer.android.com/studio/write/java8-support
+desugarJdkLibs = { module = "com.android.tools:desugar_jdk_libs", version.ref = "desugarJdkLibs" }
 
 # 设备兼容框架：统一设备品牌、系统等差异 https://github.com/getActivity/DeviceCompat
 deviceCompat = { module = "com.github.getActivity:DeviceCompat", version.ref = "deviceCompat" }
