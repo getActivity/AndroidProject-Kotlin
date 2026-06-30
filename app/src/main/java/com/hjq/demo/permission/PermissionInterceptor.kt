@@ -34,7 +34,7 @@ class PermissionInterceptor : OnPermissionInterceptor {
                                         deniedList: MutableList<IPermission>,
                                         callback: OnPermissionCallback?) {
 
-        callback?.onResult(grantedList, deniedList)
+        callback?.onPermissionResult(grantedList, deniedList)
 
         if (deniedList.isEmpty()) {
             return
@@ -84,7 +84,7 @@ class PermissionInterceptor : OnPermissionInterceptor {
                             return@startPermissionActivity
                         }
                         // 用户全部授权了，回调成功给外层监听器，免得用户还要再发起权限申请
-                        callback.onResult(requestList, latestDeniedList)
+                        callback.onPermissionResult(requestList, latestDeniedList)
                     }
                 }
             })
