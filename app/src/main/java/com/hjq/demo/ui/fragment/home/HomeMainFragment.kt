@@ -63,7 +63,9 @@ class HomeMainFragment : TitleBarFragment<HomeActivity>(), OnTabListener,
             it.adapter = tabAdapter
         }
 
-        ImmersionBar.setTitleBarMarginTop(getAttachActivity(), findViewById(R.id.tb_home_main_title))
+        getAttachActivity()?.let {
+            ImmersionBar.setTitleBarMarginTop(it, findViewById(R.id.tb_home_main_title))
+        }
 
         // 设置渐变监听
         collapsingToolbarLayout?.setOnScrimsListener(this)
