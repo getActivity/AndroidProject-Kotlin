@@ -29,7 +29,7 @@ import com.hjq.demo.other.TitleBarStyle
 import com.hjq.demo.other.ToastInterceptor
 import com.hjq.demo.other.ToastStyle
 import com.hjq.gson.factory.GsonFactory
-import com.hjq.gson.factory.ParseExceptionCallback
+import com.hjq.gson.factory.OnParseExceptionCallback
 import com.hjq.http.EasyConfig
 import com.hjq.http.config.IRequestInterceptor
 import com.hjq.http.model.HttpHeaders
@@ -171,17 +171,17 @@ object InitManager {
             .into()
 
         // 设置 Json 解析容错监听
-        GsonFactory.setParseExceptionCallback(object : ParseExceptionCallback {
+        GsonFactory.setOnParseExceptionCallback(object : OnParseExceptionCallback {
 
-            override fun onParseObjectException(typeToken: TypeToken<*>, fieldName: String, jsonToken: JsonToken) {
+            override fun onParseObjectException(typeToken: TypeToken<*>, fieldName: String?, jsonToken: JsonToken?) {
                 handlerGsonParseException("解析对象析异常：$typeToken#$fieldName，后台返回的类型为：$jsonToken")
             }
 
-            override fun onParseListItemException(typeToken: TypeToken<*>, fieldName: String, listItemJsonToken: JsonToken) {
+            override fun onParseListItemException(typeToken: TypeToken<*>, fieldName: String?, listItemJsonToken: JsonToken?) {
                 handlerGsonParseException("解析 List 异常：$typeToken#$fieldName，后台返回的条目类型为：$listItemJsonToken")
             }
 
-            override fun onParseMapItemException(typeToken: TypeToken<*>, fieldName: String, mapItemKey: String, mapItemJsonToken: JsonToken) {
+            override fun onParseMapItemException(typeToken: TypeToken<*>, fieldName: String?, mapItemKey: String?, mapItemJsonToken: JsonToken?) {
                 handlerGsonParseException("解析 Map 异常：$typeToken#$fieldName，mapItemKey = $mapItemKey，后台返回的条目类型为：$mapItemJsonToken")
             }
 
