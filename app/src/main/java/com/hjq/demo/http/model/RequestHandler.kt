@@ -150,7 +150,7 @@ class RequestHandler(private val application: Application) : IRequestHandler {
             // 2. 网络请求被中断
             return CancelException(application.getString(R.string.http_request_cancel), throwable)
         }
-        return HttpException(throwable.message, throwable)
+        return HttpException(throwable.message ?: "", throwable)
     }
 
     override fun downloadFail(httpRequest: HttpRequest<*>, throwable: Throwable): Throwable {
