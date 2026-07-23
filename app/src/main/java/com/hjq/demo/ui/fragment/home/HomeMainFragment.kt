@@ -1,13 +1,16 @@
 package com.hjq.demo.ui.fragment.home
 
 import android.content.res.ColorStateList
+import android.view.ViewGroup
+import android.view.ViewGroup.MarginLayoutParams
 import android.widget.TextView
 import androidx.appcompat.widget.AppCompatImageView
+import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager.widget.ViewPager
 import androidx.viewpager.widget.ViewPager.OnPageChangeListener
-import com.gyf.immersionbar.ImmersionBar
 import com.hjq.base.BasePagerAdapter
 import com.hjq.base.ktx.lazyFindViewById
 import com.hjq.demo.R
@@ -38,6 +41,7 @@ class HomeMainFragment : TitleBarFragment<HomeActivity>(), OnTabListener,
     }
 
     private val collapsingToolbarLayout: XCollapsingToolbarLayout? by lazyFindViewById(R.id.ctl_home_main_bar)
+    private val toolbar: Toolbar? by lazyFindViewById(R.id.tb_home_main_title)
     private val addressView: TextView? by lazyFindViewById(R.id.tv_home_main_address)
     private val hintView: TextView? by lazyFindViewById(R.id.tv_home_main_hint)
     private val searchView: AppCompatImageView? by lazyFindViewById(R.id.iv_home_main_search)
@@ -63,12 +67,24 @@ class HomeMainFragment : TitleBarFragment<HomeActivity>(), OnTabListener,
             it.adapter = tabAdapter
         }
 
-        getAttachActivity()?.let {
-            ImmersionBar.setTitleBarMarginTop(it, findViewById(R.id.tb_home_main_title))
-        }
-
         // 设置渐变监听
         collapsingToolbarLayout?.setOnScrimsListener(this)
+
+
+        // 监听状态栏高度
+        observeStatusBarHeight(Observer { statusBarHeight: Int? ->
+            if (statusBarHeight == null) {
+                return@Observer
+            }
+            toolbar?.let {
+                val layoutParams: ViewGroup.LayoutParams? = it.layoutParams
+                if (layoutParams !is MarginLayoutParams) {
+                    return@let
+                }
+                layoutParams.topMargin = statusBarHeight
+                it.setLayoutParams(layoutParams)
+            }
+        })
     }
 
     override fun initData() {

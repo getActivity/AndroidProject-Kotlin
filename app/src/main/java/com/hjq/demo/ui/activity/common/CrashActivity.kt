@@ -1,7 +1,6 @@
 package com.hjq.demo.ui.activity.common
 
 import android.Manifest
-import android.annotation.SuppressLint
 import android.app.Application
 import android.content.Intent
 import android.content.pm.PackageInfo
@@ -15,12 +14,12 @@ import android.text.style.ForegroundColorSpan
 import android.text.style.UnderlineSpan
 import android.util.DisplayMetrics
 import android.view.View
+import android.view.ViewGroup
 import android.widget.TextView
 import androidx.core.graphics.toColorInt
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.lifecycleScope
-import com.gyf.immersionbar.ImmersionBar
 import com.hjq.base.ktx.lazyFindViewById
 import com.hjq.base.ktx.startActivity
 import com.hjq.core.ktx.createChooserIntent
@@ -75,6 +74,7 @@ class CrashActivity : AppActivity() {
 
     private val titleView: TextView? by lazyFindViewById(R.id.tv_crash_title)
     private val drawerLayout: DrawerLayout? by lazyFindViewById(R.id.dl_crash_drawer)
+    private val infoLayout: ViewGroup? by lazyFindViewById(R.id.ll_crash_info)
     private val infoView: TextView? by lazyFindViewById(R.id.tv_crash_info)
     private val messageView: TextView? by lazyFindViewById(R.id.tv_crash_message)
     private var stackTrace: String? = null
@@ -86,8 +86,15 @@ class CrashActivity : AppActivity() {
     override fun initView() {
         setOnClickListener(R.id.iv_crash_info, R.id.iv_crash_share, R.id.iv_crash_restart)
 
-        // 设置状态栏沉浸
-        ImmersionBar.setTitleBar(this, findViewById(R.id.ll_crash_info))
+        // 监听状态栏高度
+        observeStatusBarHeight { statusBarHeight: Int? ->
+            if (statusBarHeight == null) {
+                return@observeStatusBarHeight
+            }
+            infoLayout?.let {
+                it.setPadding(it.paddingLeft, statusBarHeight, it.paddingRight, it.paddingBottom)
+            }
+        }
     }
 
     override fun initData() {
@@ -231,6 +238,14 @@ class CrashActivity : AppActivity() {
         }
     }
 
+    override fun getImmersionTopView(): View? {
+        return findViewById(R.id.ll_crash_bar)
+    }
+
+    override fun getImmersionBottomView(): View? {
+        return findViewById(R.id.ll_crash_bar)
+    }
+
     @SingleClick
     override fun onClick(view: View) {
         when (view.id) {
@@ -254,16 +269,6 @@ class CrashActivity : AppActivity() {
         // 重启应用
         RestartActivity.restart(this)
         finish()
-    }
-
-    override fun createStatusBarConfig(): ImmersionBar {
-        return super.createStatusBarConfig() // 指定导航栏背景颜色
-            .navigationBarColor(R.color.white)
-    }
-
-    @SuppressLint("WrongViewCast")
-    override fun getImmersionTopView(): View? {
-        return findViewById(R.id.ll_crash_bar)
     }
 
     /**

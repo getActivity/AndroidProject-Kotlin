@@ -2,12 +2,16 @@ package com.hjq.demo.app
 
 import android.content.Intent
 import android.view.View
-import android.view.WindowInsets
 import androidx.annotation.StringRes
+import androidx.core.graphics.Insets
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
 import com.gyf.immersionbar.ImmersionBar
 import com.hjq.bar.TitleBar
 import com.hjq.base.BaseActivity
-import com.hjq.core.ktx.isAndroid15
 import com.hjq.demo.R
 import com.hjq.demo.action.ImmersionAction
 import com.hjq.demo.action.TitleBarAction
@@ -26,10 +30,14 @@ import com.hjq.umeng.sdk.UmengClient.onActivityResult
  */
 abstract class AppActivity : BaseActivity(), TitleBarAction, ImmersionAction, OnHttpListener<Any> {
 
+    /** 标题栏对象 */
     private var titleBar: TitleBar? = null
-
     /** 状态栏沉浸 */
     private var immersionBar: ImmersionBar? = null
+    /** 状态栏高度 LiveData  */
+    private val statusBarHeightLiveData = MutableLiveData<Int?>()
+    /** 导航栏高度 LiveData  */
+    private val navigationBarHeightLiveData = MutableLiveData<Int?>()
 
     /** 加载对话框 */
     private var dialog: WaitDialog.Builder? = null
@@ -105,28 +113,64 @@ abstract class AppActivity : BaseActivity(), TitleBarAction, ImmersionAction, On
             getStatusBarConfig().init()
         }
 
-        // 适配 Android 15 EdgeToEdge 特性
-        if (isAndroid15()) {
-            window.decorView.setOnApplyWindowInsetsListener { _, insets ->
-                val systemBars = insets.getInsets(WindowInsets.Type.systemBars())
-                val immersionTopView = getImmersionTopView()
-                val immersionBottomView = getImmersionBottomView()
-                if (immersionTopView != null && immersionTopView === immersionBottomView) {
-                    immersionTopView.setPadding(immersionTopView.getPaddingLeft(), systemBars.top,
-                                               immersionTopView.getPaddingRight(), systemBars.bottom)
-                    return@setOnApplyWindowInsetsListener insets
-                }
-                immersionTopView?.setPadding(immersionTopView.getPaddingLeft(), systemBars.top,
-                                            immersionTopView.getPaddingRight(), immersionTopView.paddingBottom)
-                immersionBottomView?.setPadding(immersionBottomView.getPaddingLeft(), immersionBottomView.paddingTop,
-                                               immersionBottomView.getPaddingRight(), systemBars.bottom)
-                return@setOnApplyWindowInsetsListener insets
+        // 监听状态栏和导航栏高度变化
+        statusBarHeightLiveData.observe(this, Observer { statusBarHeight: Int? ->
+            if (statusBarHeight == null) {
+                return@Observer
             }
-        } else {
             getImmersionTopView()?.let {
-                ImmersionBar.setTitleBar(this, it)
+                it.setPadding(it.paddingLeft, statusBarHeight, it.paddingRight, it.paddingBottom)
             }
+        })
+        navigationBarHeightLiveData.observe(this, Observer { navigationBarHeight: Int? ->
+            if (navigationBarHeight == null) {
+                return@Observer
+            }
+            getImmersionBottomView()?.let {
+                it.setPadding(it.paddingLeft, it.paddingTop, it.paddingRight, navigationBarHeight)
+            }
+        })
+        ViewCompat.setOnApplyWindowInsetsListener(window.decorView) { _, insets ->
+            val windowInsets: Insets = getWindowInsets(insets)
+            val statusBarHeight = statusBarHeightLiveData.getValue()
+            if (statusBarHeight == null || statusBarHeight != windowInsets.top) {
+                statusBarHeightLiveData.postValue(windowInsets.top)
+            }
+            val navigationBarHeight = navigationBarHeightLiveData.getValue()
+            if (navigationBarHeight == null || navigationBarHeight != windowInsets.bottom) {
+                navigationBarHeightLiveData.postValue(windowInsets.bottom)
+            }
+            insets
         }
+    }
+
+    /**
+     * 获取系统栏的高度
+     */
+    fun getWindowInsets(insets: WindowInsetsCompat): Insets {
+        return insets.getInsets(WindowInsetsCompat.Type.systemBars())
+    }
+
+    /**
+     * 监听状态栏高度变化
+     */
+    fun observeStatusBarHeight(observer: Observer<Int?>) {
+        observeStatusBarHeight(this, observer)
+    }
+
+    fun observeStatusBarHeight(lifecycleOwner: LifecycleOwner, observer: Observer<Int?>) {
+        statusBarHeightLiveData.observe(lifecycleOwner, observer)
+    }
+
+    /**
+     * 监听导航栏高度变化
+     */
+    fun observeNavigationBarHeight(observer: Observer<Int?>) {
+        observeNavigationBarHeight(this, observer)
+    }
+
+    fun observeNavigationBarHeight(lifecycleOwner: LifecycleOwner, observer: Observer<Int?>) {
+        navigationBarHeightLiveData.observe(lifecycleOwner, observer)
     }
 
     /**
@@ -140,6 +184,15 @@ abstract class AppActivity : BaseActivity(), TitleBarAction, ImmersionAction, On
      * 状态栏字体深色模式
      */
     open fun isStatusBarDarkFont(): Boolean {
+        // 返回 true 表示黑色字体
+        return true
+    }
+
+    /**
+     * 获取导航栏图标颜色
+     */
+    open fun isNavigationBarDarkIcon(): Boolean {
+        // 返回 true 表示黑色图标
         return true
     }
 
@@ -158,19 +211,12 @@ abstract class AppActivity : BaseActivity(), TitleBarAction, ImmersionAction, On
      */
     protected open fun createStatusBarConfig(): ImmersionBar {
         return ImmersionBar.with(this)
-            // 默认状态栏字体颜色为黑色
+            // 设置状态栏字体的颜色
             .statusBarDarkFont(isStatusBarDarkFont())
-            // 状态栏字体和导航栏内容自动变色，必须指定状态栏颜色和导航栏颜色才可以自动变色
-            .autoDarkModeEnable(true, 0.2f).apply {
-                // 适配 Android 15 EdgeToEdge 特性
-                if (isAndroid15()) {
-                    // 设置透明的导航栏
-                    transparentNavigationBar();
-                } else {
-                    // 指定导航栏背景颜色
-                    navigationBarColor(R.color.white)
-                }
-            }
+            // 设置透明的导航栏
+            .transparentNavigationBar()
+            // 设置导航栏图标的颜色
+            .navigationBarDarkIcon(isNavigationBarDarkIcon())
     }
 
     /**

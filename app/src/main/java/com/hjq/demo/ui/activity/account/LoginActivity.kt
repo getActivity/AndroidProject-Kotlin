@@ -12,7 +12,6 @@ import android.view.inputmethod.EditorInfo
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
-import com.gyf.immersionbar.ImmersionBar
 import com.hjq.base.ktx.lazyFindViewById
 import com.hjq.base.ktx.startActivity
 import com.hjq.core.ktx.createIntent
@@ -347,11 +346,5 @@ class LoginActivity : AppActivity(), UmengLogin.OnLoginListener,
             }
         }
         return false
-    }
-
-    override fun createStatusBarConfig(): ImmersionBar {
-        return super.createStatusBarConfig()
-            // 指定导航栏背景颜色
-            .navigationBarColor(R.color.white)
     }
 }

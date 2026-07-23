@@ -2,11 +2,11 @@ package com.hjq.demo.app
 
 import android.os.Bundle
 import android.view.View
-import android.view.WindowInsets
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
 import com.gyf.immersionbar.ImmersionBar
 import com.hjq.bar.TitleBar
-import com.hjq.core.ktx.isAndroid15
-import com.hjq.demo.R
 import com.hjq.demo.action.ImmersionAction
 import com.hjq.demo.action.TitleBarAction
 
@@ -20,9 +20,12 @@ abstract class TitleBarFragment<A : AppActivity> : AppFragment<A>(), TitleBarAct
 
     /** 标题栏对象 */
     private var titleBar: TitleBar? = null
-
     /** 状态栏沉浸 */
     private var immersionBar: ImmersionBar? = null
+    /** 状态栏高度 LiveData  */
+    private val statusBarHeightLiveData = MutableLiveData<Int?>()
+    /** 导航栏高度 LiveData  */
+    private val navigationBarHeightLiveData = MutableLiveData<Int?>()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -35,28 +38,50 @@ abstract class TitleBarFragment<A : AppActivity> : AppFragment<A>(), TitleBarAct
             getStatusBarConfig().init()
         }
 
-        // 适配 Android 15 EdgeToEdge 特性
-        if (isAndroid15()) {
-            view.setOnApplyWindowInsetsListener { _, insets ->
-                val systemBars = insets.getInsets(WindowInsets.Type.systemBars())
-                val immersionTopView = getImmersionTopView()
-                val immersionBottomView = getImmersionBottomView()
-                if (immersionTopView != null && immersionTopView === immersionBottomView) {
-                    immersionTopView.setPadding(immersionTopView.getPaddingLeft(), systemBars.top,
-                                               immersionTopView.getPaddingRight(), systemBars.bottom)
-                    return@setOnApplyWindowInsetsListener insets
+        val attachActivity = getAttachActivity()
+        if (attachActivity != null) {
+            // 监听状态栏和导航栏高度变化
+            statusBarHeightLiveData.observe(this, Observer { statusBarHeight: Int? ->
+                if (statusBarHeight == null) {
+                    return@Observer
                 }
-                immersionTopView?.setPadding(immersionTopView.getPaddingLeft(), systemBars.top,
-                                            immersionTopView.getPaddingRight(), immersionTopView.paddingBottom)
-                immersionBottomView?.setPadding(immersionBottomView.getPaddingLeft(), immersionBottomView.paddingTop,
-                                               immersionBottomView.getPaddingRight(), systemBars.bottom)
-                return@setOnApplyWindowInsetsListener insets
-            }
-        } else {
-            getImmersionTopView()?.let {
-                ImmersionBar.setTitleBar(this, it)
-            }
+                getImmersionTopView()?.let {
+                    it.setPadding(it.paddingLeft, statusBarHeight, it.paddingRight, it.paddingBottom)
+                }
+            })
+            navigationBarHeightLiveData.observe(this, Observer { navigationBarHeight: Int? ->
+                if (navigationBarHeight == null) {
+                    return@Observer
+                }
+                getImmersionBottomView()?.let {
+                    it.setPadding(it.paddingLeft, it.paddingTop, it.paddingRight, navigationBarHeight)
+                }
+            })
+            attachActivity.observeStatusBarHeight { statusBarHeight: Int? -> statusBarHeightLiveData.postValue(statusBarHeight) }
+            attachActivity.observeNavigationBarHeight { navigationBarHeight: Int? -> navigationBarHeightLiveData.postValue(navigationBarHeight) }
         }
+    }
+
+    /**
+     * 监听状态栏高度变化
+     */
+    fun observeStatusBarHeight(observer: Observer<Int?>) {
+        observeStatusBarHeight(this, observer)
+    }
+
+    fun observeStatusBarHeight(lifecycleOwner: LifecycleOwner, observer: Observer<Int?>) {
+        statusBarHeightLiveData.observe(lifecycleOwner, observer)
+    }
+
+    /**
+     * 监听导航栏高度变化
+     */
+    fun observeNavigationBarHeight(observer: Observer<Int?>) {
+        observeNavigationBarHeight(this, observer)
+    }
+
+    fun observeNavigationBarHeight(lifecycleOwner: LifecycleOwner, observer: Observer<Int?>) {
+        navigationBarHeightLiveData.observe(lifecycleOwner, observer)
     }
 
     override fun onResume() {
@@ -89,27 +114,26 @@ abstract class TitleBarFragment<A : AppActivity> : AppFragment<A>(), TitleBarAct
      */
     protected fun createStatusBarConfig(): ImmersionBar {
         return ImmersionBar.with(this)
-            // 默认状态栏字体颜色为黑色
+            // 设置状态栏字体的颜色
             .statusBarDarkFont(isStatusBarDarkFont())
-            // 状态栏字体和导航栏内容自动变色，必须指定状态栏颜色和导航栏颜色才可以自动变色
-            .autoDarkModeEnable(true, 0.2f).apply {
-                // 适配 Android 15 EdgeToEdge 特性
-                if (isAndroid15()) {
-                    // 设置透明的导航栏
-                    transparentNavigationBar();
-                } else {
-                    // 指定导航栏背景颜色
-                    navigationBarColor(R.color.white)
-                }
-            }
+            // 设置透明的导航栏
+            .transparentNavigationBar()
+            // 设置导航栏图标的颜色
+            .navigationBarDarkIcon(isNavigationBarDarkIcon())
     }
 
     /**
      * 获取状态栏字体颜色
      */
     protected open fun isStatusBarDarkFont(): Boolean {
-        // 返回真表示黑色字体
         return getAttachActivity()?.isStatusBarDarkFont() == true
+    }
+
+    /**
+     * 获取导航栏图标颜色
+     */
+    protected fun isNavigationBarDarkIcon(): Boolean {
+        return getAttachActivity()?.isNavigationBarDarkIcon() == true
     }
 
     override fun acquireTitleBar(): TitleBar? {

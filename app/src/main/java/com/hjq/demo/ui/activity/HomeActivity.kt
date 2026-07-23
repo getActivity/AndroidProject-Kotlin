@@ -7,7 +7,6 @@ import android.view.View
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager.widget.ViewPager
-import com.gyf.immersionbar.ImmersionBar
 import com.hjq.base.BasePagerAdapter
 import com.hjq.base.ktx.lazyFindViewById
 import com.hjq.core.ktx.createIntent
@@ -127,11 +126,6 @@ class HomeActivity : AppActivity(), NavigationAdapter.OnNavigationListener {
             }
             else -> false
         }
-    }
-
-    override fun createStatusBarConfig(): ImmersionBar {
-        return super.createStatusBarConfig() // 指定导航栏背景颜色
-            .navigationBarColor(R.color.white)
     }
 
     override fun onBackPressed() {

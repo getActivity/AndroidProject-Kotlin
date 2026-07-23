@@ -217,8 +217,8 @@ class RegisterActivity : AppActivity(), OnEditorActionListener {
     }
 
     override fun createStatusBarConfig(): ImmersionBar {
-        return super.createStatusBarConfig() // 指定导航栏背景颜色
-            .navigationBarColor(R.color.white) // 不要把整个布局顶上去
+        return super.createStatusBarConfig()
+            // 不要把整个布局顶上去
             .keyboardEnable(true)
     }
 
