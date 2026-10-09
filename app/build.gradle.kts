@@ -34,10 +34,8 @@ android {
         applicationId = "com.hjq.demo"
 
         // 仅保留中文语种的资源
-        resConfigs("zh")
-
         // 仅保留 xxhdpi 图片资源（目前主流分辨率 1920 * 1080）
-        resConfigs("xxhdpi")
+        resourceConfigurations += setOf("zh", "xxhdpi")
 
         // 混淆配置
         proguardFiles("proguard-sdk.pro", "proguard-app.pro")
@@ -100,18 +98,14 @@ android {
             // 签名信息配置
             signingConfig = signingConfigs.getByName("config")
             // 添加清单占位符
-            manifestPlaceholders += mapOf(
-                    "app_name" to "@string/app_name_debug"
-            )
+            manifestPlaceholders += mapOf("app_name" to "@string/app_name_debug")
         }
 
         getByName("preview") {
             initWith(getByName("debug"))
             applicationIdSuffix = ""
             // 添加清单占位符
-            manifestPlaceholders += mapOf(
-                    "app_name" to "@string/app_name_preview"
-            )
+            manifestPlaceholders += mapOf("app_name" to "@string/app_name_preview")
         }
 
         getByName("release") {
@@ -124,9 +118,6 @@ android {
             isMinifyEnabled = true
             signingConfig = signingConfigs.getByName("config")
             // 添加清单占位符
-            manifestPlaceholders += mapOf(
-                    "app_name" to "@string/app_name"
-            )
         }
     }
 

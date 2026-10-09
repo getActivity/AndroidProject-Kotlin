@@ -29,11 +29,11 @@ android {
 
         // 清单占位符
         manifestPlaceholders += mapOf(
-                "UM_KEY" to umengAppKey,
-                "QQ_ID" to qqAppId,
-                "QQ_SECRET" to qqAppSecret,
-                "WX_ID" to wxAppId,
-                "WX_SECRET" to wxAppSecret
+            "UM_KEY" to umengAppKey,
+            "QQ_ID" to qqAppId,
+            "QQ_SECRET" to qqAppSecret,
+            "WX_ID" to wxAppId,
+            "WX_SECRET" to wxAppSecret
         )
     }
 }
