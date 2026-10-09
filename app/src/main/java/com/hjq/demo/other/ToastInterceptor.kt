@@ -15,7 +15,7 @@ class ToastInterceptor : ToastLogInterceptor() {
         return AppConfig.isLogEnable()
     }
 
-    override fun printLog(msg: String?) {
+    override fun printLog(msg: String) {
         Timber.tag("Toaster")
         Timber.i(msg)
     }
