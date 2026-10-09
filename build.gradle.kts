@@ -35,12 +35,12 @@ subprojects {
         extensions.configure<BaseExtension> {
 
             // 编译源码版本
-            compileSdkVersion(36)
+            compileSdkVersion(37)
             defaultConfig {
                 // 最低安装版本
                 minSdkVersion(23)
                 // Android 版本适配指南：https://github.com/getActivity/AndroidVersionAdapter
-                targetSdkVersion(36)
+                targetSdkVersion(37)
                 versionName("1.0")
                 versionCode(10)
             }
