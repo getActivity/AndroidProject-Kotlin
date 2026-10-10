@@ -1,4 +1,5 @@
-import com.android.build.gradle.BaseExtension
+import com.android.build.api.dsl.ApplicationExtension
+import com.android.build.api.dsl.CommonExtension
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
@@ -23,20 +24,24 @@ subprojects {
         plugins.apply("org.jetbrains.kotlin.kapt")
 
         // 配置 Android 扩展
-        extensions.configure<BaseExtension> {
+        extensions.configure<CommonExtension> {
 
             // 编译源码版本
-            compileSdkVersion(37)
-            defaultConfig {
-                // 最低安装版本
-                minSdkVersion(23)
-                // Android 版本适配指南：https://github.com/getActivity/AndroidVersionAdapter
-                targetSdkVersion(37)
-                versionName("1.0")
-                versionCode(10)
+            compileSdk = 37
+            defaultConfig.apply {
+                minSdk = 23
+            }
+            // 只有应用模块才执行下面这段
+            if (this is ApplicationExtension) {
+                defaultConfig.apply {
+                    // Android 版本适配指南：https://github.com/getActivity/AndroidVersionAdapter
+                    targetSdk = 37
+                    versionName = "1.0"
+                    versionCode = 10
+                }
             }
 
-            compileOptions {
+            compileOptions.apply {
                 // 允许项目代码使用 Java 21 的新语法
                 sourceCompatibility = JavaVersion.VERSION_21
                 // 编译后的字节码适配 Java 21 虚拟机，为了兼容安卓低版本系统 ART
@@ -48,7 +53,7 @@ subprojects {
 
             // 设置存放 so 文件的目录
             sourceSets.getByName("main") {
-                jniLibs.srcDirs("libs")
+                jniLibs.directories += "libs"
             }
 
             // 可在 Studio 最左侧中的 Build Variants 选项中切换默认的构建类型
@@ -61,10 +66,10 @@ subprojects {
             }
 
             // 代码警告配置
-            lintOptions {
+            lint.apply {
                 // HardcodedText：禁用文本硬编码警告
                 // ContentDescription：禁用图片描述警告
-                disable("HardcodedText", "ContentDescription")
+                disable += listOf("HardcodedText", "ContentDescription")
             }
 
             // 读取 local.properties 文件配置
