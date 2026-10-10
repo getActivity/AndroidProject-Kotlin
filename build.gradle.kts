@@ -15,10 +15,6 @@ fun main() {
     loadAppConfig()
 }
 
-tasks.register("clean", Delete::class) {
-    delete(rootProject.buildDir)
-}
-
 subprojects {
     // 通用配置
     pluginManager.withPlugin("com.android.base") {
@@ -81,10 +77,7 @@ subprojects {
             val buildDirPath = properties.getProperty("build.dir")
             if (!buildDirPath.isNullOrEmpty()) {
                 // 将构建文件统一输出到指定的目录下
-                buildDir = File(buildDirPath, rootProject.name + "/build/${project.path.replace(':', '/')}")
-            } else {
-                // 将构建文件统一输出到项目根目录下的 build 文件夹
-                buildDir = File(rootDir, "build/${project.path.replace(':', '/')}")
+                layout.buildDirectory = File(buildDirPath, rootProject.name + "/${project.path.replace(':', '/')}")
             }
         }
 
