@@ -120,6 +120,7 @@ android {
             isMinifyEnabled = true
             signingConfig = signingConfigs.getByName("config")
             // 添加清单占位符
+            manifestPlaceholders += mapOf("app_name" to "@string/app_name")
         }
     }
 
