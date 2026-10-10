@@ -11,8 +11,6 @@ plugins {
     alias(libs.plugins.easyLauncher)
 }
 
-apply(plugin = "org.jetbrains.kotlin.kapt")
-
 val logEnable = rootProject.extra["LOG_ENABLE"].toString().toBoolean()
 val hostUrl = rootProject.extra["HOST_URL"].toString()
 val buglyId = rootProject.extra["BUGLY_ID"].toString()

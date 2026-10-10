@@ -23,7 +23,8 @@ subprojects {
     // 通用配置
     pluginManager.withPlugin("com.android.base") {
         // 为所有模块应用 Kotlin 插件
-        apply(plugin = "org.jetbrains.kotlin.android")
+        plugins.apply("org.jetbrains.kotlin.android")
+        plugins.apply("org.jetbrains.kotlin.kapt")
 
         // 配置 Android 扩展
         extensions.configure<BaseExtension> {
