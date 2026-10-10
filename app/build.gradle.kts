@@ -91,6 +91,7 @@ android {
             isDebuggable = true
             isJniDebuggable = true
             // 移除无用的资源
+            // noinspection NotShrinkingResources
             isShrinkResources = false
             // 代码混淆开关
             isMinifyEnabled = false
