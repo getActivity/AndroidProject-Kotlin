@@ -1,4 +1,4 @@
-@file:Suppress("DEPRECATION")
+@file:Suppress("DEPRECATION", "AvoidDuplicateDependencies")
 
 import com.android.build.gradle.internal.api.BaseVariantOutputImpl
 import java.text.SimpleDateFormat
