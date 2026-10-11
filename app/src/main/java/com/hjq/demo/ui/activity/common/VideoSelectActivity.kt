@@ -10,6 +10,7 @@ import android.os.Parcel
 import android.os.Parcelable
 import android.provider.MediaStore
 import android.view.View
+import android.view.ViewGroup
 import android.view.animation.AnimationUtils
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts.PickMultipleVisualMedia
@@ -197,6 +198,22 @@ class VideoSelectActivity : AppActivity(), StatusAction, Runnable, BaseAdapter.O
                     }
                 }
             })
+        }
+
+        // 监听底部导航栏高度
+        observeNavigationBarHeight { navigationBarHeight ->
+            if (navigationBarHeight == null) {
+                return@observeNavigationBarHeight
+            }
+            val layoutParams = floatingView?.layoutParams
+            if (layoutParams !is ViewGroup.MarginLayoutParams) {
+                return@observeNavigationBarHeight
+            }
+            if (layoutParams.bottomMargin >= navigationBarHeight) {
+                return@observeNavigationBarHeight
+            }
+            layoutParams.bottomMargin = navigationBarHeight
+            floatingView?.layoutParams = layoutParams
         }
     }
 

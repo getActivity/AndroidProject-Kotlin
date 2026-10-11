@@ -7,6 +7,7 @@ import android.net.Uri
 import android.provider.MediaStore
 import android.text.TextUtils
 import android.view.View
+import android.view.ViewGroup
 import android.view.animation.AnimationUtils
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts.PickMultipleVisualMedia
@@ -191,6 +192,22 @@ class ImageSelectActivity : AppActivity(), StatusAction, Runnable,
                     }
                 }
             })
+        }
+
+        // 监听底部导航栏高度
+        observeNavigationBarHeight { navigationBarHeight ->
+            if (navigationBarHeight == null) {
+                return@observeNavigationBarHeight
+            }
+            val layoutParams = floatingView?.layoutParams
+            if (layoutParams !is ViewGroup.MarginLayoutParams) {
+                return@observeNavigationBarHeight
+            }
+            if (layoutParams.bottomMargin >= navigationBarHeight) {
+                return@observeNavigationBarHeight
+            }
+            layoutParams.bottomMargin = navigationBarHeight
+            floatingView?.layoutParams = layoutParams
         }
     }
 
