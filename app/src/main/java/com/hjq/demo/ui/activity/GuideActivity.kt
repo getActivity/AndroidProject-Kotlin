@@ -5,6 +5,8 @@ import android.view.animation.Animation
 import android.view.animation.ScaleAnimation
 import androidx.viewpager2.widget.ViewPager2
 import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
+import com.gyf.immersionbar.BarHide
+import com.gyf.immersionbar.ImmersionBar
 import com.hjq.base.ktx.lazyFindViewById
 import com.hjq.demo.R
 import com.hjq.demo.aop.SingleClick
@@ -75,10 +77,6 @@ class GuideActivity : AppActivity() {
         indicatorView?.setViewPager(viewPager)
     }
 
-    override fun getImmersionBottomView(): View? {
-        return findViewById(R.id.fl_guide_control)
-    }
-
     @SingleClick
     override fun onClick(view: View) {
         if (view === completeView) {
@@ -90,5 +88,11 @@ class GuideActivity : AppActivity() {
     override fun onDestroy() {
         super.onDestroy()
         viewPager?.unregisterOnPageChangeCallback(callback)
+    }
+
+    override fun createStatusBarConfig(): ImmersionBar {
+        return super.createStatusBarConfig()
+            // 隐藏状态栏和导航栏
+            .hideBar(BarHide.FLAG_HIDE_BAR)
     }
 }
