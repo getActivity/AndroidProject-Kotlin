@@ -122,7 +122,8 @@ class ImagePreviewActivity : AppActivity(), BaseAdapter.OnItemClickListener {
     }
 
     override fun createStatusBarConfig(): ImmersionBar {
-        return super.createStatusBarConfig() // 隐藏状态栏和导航栏
+        return super.createStatusBarConfig()
+            // 隐藏状态栏和导航栏
             .hideBar(BarHide.FLAG_HIDE_BAR)
     }
 
