@@ -1,40 +1,39 @@
+@file:Suppress("UnstableApiUsage")
+
+rootProject.name = "AndroidProject-Kotlin"
+
 pluginManagement {
     repositories {
         // 本地 Maven 仓库
         maven(url = uri("$rootDir/localMaven"))
-        gradlePluginPortal()
-        // 阿里云云效仓库（Gradle 插件）：https://maven.aliyun.com/mvn/guide
-        maven(url = uri("https://maven.aliyun.com/repository/gradle-plugin"))
         // 阿里云云效仓库：https://maven.aliyun.com/mvn/guide
+        maven(url = uri("https://maven.aliyun.com/repository/gradle-plugin"))
         maven(url = uri("https://maven.aliyun.com/repository/public"))
         maven(url = uri("https://maven.aliyun.com/repository/google"))
-        // 华为开源镜像：https://mirrors.huaweicloud.com
-        maven(url = uri("https://repo.huaweicloud.com/repository/maven"))
-        // JitPack 远程仓库：https://jitpack.io
-        maven(url = uri("https://jitpack.io"))
-        // MavenCentral 远程仓库：https://mvnrepository.com
-        mavenCentral()
+        // Gradle 插件门户仓库：https://plugins.gradle.org/
+        gradlePluginPortal()
         // Google 仓库：https://maven.google.com/web/index.html
         google()
+        // MavenCentral 仓库：https://mvnrepository.com
+        mavenCentral()
+        // JitPack 仓库：https://jitpack.io
+        maven(url = uri("https://jitpack.io"))
     }
 }
 
 dependencyResolutionManagement {
-    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
         // 本地 Maven 仓库
         maven(url = uri("$rootDir/localMaven"))
         // 阿里云云效仓库：https://maven.aliyun.com/mvn/guide
         maven(url = uri("https://maven.aliyun.com/repository/public"))
         maven(url = uri("https://maven.aliyun.com/repository/google"))
-        // 华为开源镜像：https://mirrors.huaweicloud.com
-        maven(url = uri("https://repo.huaweicloud.com/repository/maven"))
-        // JitPack 远程仓库：https://jitpack.io
-        maven(url = uri("https://jitpack.io"))
-        // MavenCentral 远程仓库：https://mvnrepository.com
-        mavenCentral()
         // Google 仓库：https://maven.google.com/web/index.html
         google()
+        // JitPack 仓库：https://jitpack.io
+        maven(url = uri("https://jitpack.io"))
+        // MavenCentral 仓库：https://mvnrepository.com
+        mavenCentral()
     }
 }
 
