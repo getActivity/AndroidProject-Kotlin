@@ -127,7 +127,7 @@ class PasswordForgetActivity : AppActivity(), OnEditorActionListener {
     /**
      * [TextView.OnEditorActionListener]
      */
-    override fun onEditorAction(v: TextView, actionId: Int, event: KeyEvent): Boolean {
+    override fun onEditorAction(v: TextView, actionId: Int, event: KeyEvent?): Boolean {
         if (actionId == EditorInfo.IME_ACTION_DONE) {
             // 模拟点击下一步按钮
             commitView?.let {

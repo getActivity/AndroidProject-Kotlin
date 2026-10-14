@@ -123,7 +123,7 @@ class PasswordResetActivity : AppActivity(), OnEditorActionListener {
     /**
      * [TextView.OnEditorActionListener]
      */
-    override fun onEditorAction(v: TextView, actionId: Int, event: KeyEvent): Boolean {
+    override fun onEditorAction(v: TextView, actionId: Int, event: KeyEvent?): Boolean {
         if (actionId == EditorInfo.IME_ACTION_DONE) {
             // 模拟点击提交按钮
             commitView?.let {

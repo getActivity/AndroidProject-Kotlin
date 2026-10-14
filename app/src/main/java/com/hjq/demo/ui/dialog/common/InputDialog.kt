@@ -90,7 +90,7 @@ class InputDialog {
         /**
          * [TextView.OnEditorActionListener]
          */
-        override fun onEditorAction(v: TextView, actionId: Int, event: KeyEvent): Boolean {
+        override fun onEditorAction(v: TextView, actionId: Int, event: KeyEvent?): Boolean {
             if (actionId == EditorInfo.IME_ACTION_DONE) {
                 findViewById<View>(R.id.tv_ui_confirm)?.let {
                     // 模拟点击确认按钮
